@@ -16,48 +16,48 @@ export default function Home() {
         <p className="text-[9px] tracking-[0.4em] uppercase opacity-50 mt-2">Defining the art of modern sophistication</p>
       </section>
 
-      {/* 3. المربعات - نفس ترتيب الصورة مع مسافة بسيطة وخط تقيل */}
-      <section className="flex flex-col items-center w-full py-12 px-4 space-y-4"> 
-        {/* space-y-4 بتعمل المسافة الصغيرة اللي أنت عايزها بين كل مربع والتاني */}
-          
-          {/* مربع أطفالي */}
-          <div className="w-[300px] h-[450px] relative group overflow-hidden bg-white">
-            <img 
-              src="/child.jpg" 
-              className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
-              alt="Kids" 
-            />
-            <div className="absolute top-4 right-4 flex flex-col items-end z-10 text-right">
-              <span className="font-black text-xl tracking-tighter text-[#3d2b1f] drop-shadow-sm">أطفالي</span>
-              <span className="text-[10px] font-black tracking-widest text-[#3d2b1f] opacity-80">KIDS</span>
-            </div>
+      {/* 3. المربعات - مع إجبار المسافة والخط */}
+      <section className="flex flex-col items-center w-full py-12 px-4">
+        {/* الحاوية دي فيها margin-bottom عشان نضمن الفراغ بين كل صورة والتانية */}
+        
+        {/* مربع أطفالي */}
+        <div className="w-[300px] h-[450px] relative overflow-hidden bg-white mb-[20px]"> 
+          <img 
+            src="/child.jpg" 
+            className="absolute inset-0 w-full h-full object-cover" 
+            alt="Kids" 
+          />
+          <div className="absolute top-4 right-4 flex flex-col items-end z-10 text-right">
+            <span className="text-xl text-[#3d2b1f]" style={{ fontWeight: '900' }}>أطفالي</span>
+            <span className="text-[10px] text-[#3d2b1f]" style={{ fontWeight: '900', letterSpacing: '0.2em' }}>KIDS</span>
           </div>
+        </div>
 
-          {/* مربع حريمي */}
-          <div className="w-[300px] h-[450px] relative group overflow-hidden bg-white">
-            <img 
-              src="/coat.jpg" 
-              className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
-              alt="Women" 
-            />
-            <div className="absolute top-4 right-4 flex flex-col items-end z-10 text-right">
-              <span className="font-black text-xl tracking-tighter text-[#3d2b1f] drop-shadow-sm">حريمي</span>
-              <span className="text-[10px] font-black tracking-widest text-[#3d2b1f] opacity-80">WOMEN</span>
-            </div>
+        {/* مربع حريمي */}
+        <div className="w-[300px] h-[450px] relative overflow-hidden bg-white mb-[20px]">
+          <img 
+            src="/coat.jpg" 
+            className="absolute inset-0 w-full h-full object-cover" 
+            alt="Women" 
+          />
+          <div className="absolute top-4 right-4 flex flex-col items-end z-10 text-right">
+            <span className="text-xl text-[#3d2b1f]" style={{ fontWeight: '900' }}>حريمي</span>
+            <span className="text-[10px] text-[#3d2b1f]" style={{ fontWeight: '900', letterSpacing: '0.2em' }}>WOMEN</span>
           </div>
+        </div>
 
-          {/* مربع رجالي */}
-          <div className="w-[300px] h-[450px] relative group overflow-hidden bg-white">
-            <img 
-              src="/pants.jpg" 
-              className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
-              alt="Men" 
-            />
-            <div className="absolute top-4 right-4 flex flex-col items-end z-10 text-right">
-              <span className="font-black text-xl tracking-tighter text-[#3d2b1f] drop-shadow-sm">رجالي</span>
-              <span className="text-[10px] font-black tracking-widest text-[#3d2b1f] opacity-80">MEN</span>
-            </div>
+        {/* مربع رجالي */}
+        <div className="w-[300px] h-[450px] relative overflow-hidden bg-white mb-[20px]">
+          <img 
+            src="/pants.jpg" 
+            className="absolute inset-0 w-full h-full object-cover" 
+            alt="Men" 
+          />
+          <div className="absolute top-4 right-4 flex flex-col items-end z-10 text-right">
+            <span className="text-xl text-[#3d2b1f]" style={{ fontWeight: '900' }}>رجالي</span>
+            <span className="text-[10px] text-[#3d2b1f]" style={{ fontWeight: '900', letterSpacing: '0.2em' }}>MEN</span>
           </div>
+        </div>
 
       </section>
 
