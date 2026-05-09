@@ -1,23 +1,27 @@
+import Link from 'next/link';
+
 export default function Home() {
   return (
-   import Link from 'next/link';
+    <main className="min-h-screen bg-[#f4ece1] font-sans text-[#3d2b1f] flex flex-col">
+      
+      {/* 1. الهيدر وزرار الداشبورد - مربوطين بصفحة اللوجن */}
+      <header className="p-6 flex justify-between items-center">
+        <h1 className="text-xl font-bold tracking-widest">WEARIVO</h1>
+        <Link href="/login">
+          <button className="border border-[#3d2b1f]/20 px-2 py-0.5 text-[10px] opacity-60 hover:opacity-100 transition-all uppercase tracking-widest">
+            DASHBOARD
+          </button>
+        </Link>
+      </header>
 
-// ... وسط الكود عند الهيدر
-<Link href="/login">
-  <button className="border border-[#3d2b1f]/20 px-2 py-0.5 text-[10px] opacity-60 hover:opacity-100 transition-all">
-    DASHBOARD
-  </button>
-</Link>
-
-      {/* 2. العنوان الرئيسي */}
+      {/* 2. العنوان الرئيسي - زي ما هو بالظبط */}
       <section className="text-center mt-10">
         <h2 className="text-2xl font-light tracking-[0.4em] uppercase">Elegance & Luxury</h2>
         <p className="text-[9px] tracking-[0.4em] uppercase opacity-50 mt-2">Defining the art of modern sophistication</p>
       </section>
 
-      {/* 3. المربعات - مع إجبار المسافة والخط */}
+      {/* 3. المربعات - نفس مقاساتك وتنسيقك بالملي */}
       <section className="flex flex-col items-center w-full py-12 px-4">
-        {/* الحاوية دي فيها margin-bottom عشان نضمن الفراغ بين كل صورة والتانية */}
         
         {/* مربع أطفالي */}
         <div className="w-[300px] h-[450px] relative overflow-hidden bg-white mb-[20px]"> 
@@ -60,7 +64,7 @@ export default function Home() {
 
       </section>
 
-      {/* 4. الفوتر */}
+      {/* 4. الفوتر - لمسة عيسى وحيد */}
       <footer className="mt-auto pb-10 text-center">
         <p className="font-bold tracking-[0.2em] text-sm opacity-80">WEARIVO</p>
         <p className="text-[8px] opacity-40 uppercase mt-1">Developed By ESSA WAHID</p>
