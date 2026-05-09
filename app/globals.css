@@ -2,54 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background-rgb: 250, 250, 250; /* خلفية فاتحة قريبة من الصورة */
-  --text-rgb: 20, 20, 20;
-}
-
 body {
-  color: rgb(var(--text-rgb));
-  background: rgb(var(--background-rgb));
-  margin: 0;
-  padding: 0;
-  position: relative;
+  background-color: #f2f2f2;
+  color: #000000;
   overflow-x: hidden;
 }
 
-/* طبقة الملابس الطائرة (رجالي، حريمي، أطفال) */
-body::before {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  
-  /* مزيج من ملابس مختلفة: تيشيرت (رجالي)، فستان (حريمي)، شورت/بيبي (أطفال) */
-  background-image: 
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150' viewBox='0 0 100 100'%3E%3Cg fill='none' stroke='%23888' stroke-width='0.5' stroke-opacity='0.3'%3E%3Cpath d='M30 20 L40 20 L45 25 L55 25 L60 20 L70 20 L75 35 L65 35 L65 70 L35 70 L35 35 L25 35 Z'/%3E%3Ccircle cx='80' cy='80' r='5'/%3E%3Cpath d='M10 80 L20 70 L30 80 L20 90 Z'/%3E%3Cpath d='M50 80 L60 75 L70 80 L60 85 Z'/%3E%3C/g%3E%3C/svg%3E");
-
-  background-repeat: repeat;
-  background-size: 300px 300px;
-  opacity: 0.4;
-  z-index: -1;
-  animation: floatBackground 100s linear infinite;
+/* حركة بسيطة عشان الزرار يلمع */
+button {
+  box-shadow: 5px 5px 0px 0px rgba(0,0,0,1);
 }
-
-/* حركة طيران ناعمة جداً */
-@keyframes floatBackground {
-  from { background-position: 0 0; }
-  to { background-position: 1000px 1000px; }
-}
-
-/* إضافة لمسة "الكومة" في الأسفل بشكل جمالي */
-main::after {
-  content: "";
-  position: fixed;
-  bottom: -50px;
-  left: 0;
-  width: 100%;
-  height: 200px;
-  background: radial-gradient(ellipse at center, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0) 70%);
-  z-index: -1;
+button:hover {
+  box-shadow: 0px 0px 0px 0px rgba(0,0,0,1);
+  transform: translate(2px, 2px);
 }
