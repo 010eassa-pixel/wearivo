@@ -1,68 +1,56 @@
 export default function Home() {
   return (
-    <main className="min-h-screen bg-[#f2f2f2] flex flex-col font-sans overflow-x-hidden">
+    <main className="h-screen w-full bg-[#f9f9f9] flex flex-col overflow-hidden font-sans">
       
-      {/* 1. الهيدر: اسم البراند وتفاصيلك */}
-      <header className="p-6 flex justify-between items-center border-b-2 border-black bg-white sticky top-0 z-50">
-        <div>
-          <h1 className="text-4xl font-black italic tracking-tighter uppercase">Wearivo</h1>
-          <p className="text-[9px] font-bold tracking-[0.2em] uppercase opacity-60">Developed by 010EASSA-PIXEL</p>
-        </div>
-        
-        {/* زرار الداشبورد: كبير، واضح، واحترافي */}
-        <button className="bg-[#d4ff00] text-black font-black py-3 px-8 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all">
+      {/* الهيدر: الداشبورد واسم البراند */}
+      <header className="p-4 flex justify-between items-center bg-white border-b border-gray-200">
+        <button className="bg-white text-black border-2 border-black px-6 py-2 font-bold text-xs tracking-widest shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
           DASHBOARD
         </button>
+        <h1 className="text-3xl font-black tracking-tighter uppercase">WEARIVO</h1>
       </header>
 
-      {/* 2. المربعات: صور حقيقية ومقاسات مضبوطة */}
-      <div className="grid grid-cols-1 md:grid-cols-3 w-full bg-white border-b-2 border-black">
-        {/* مربع رجالي */}
-        <div className="aspect-square border-r-2 border-black relative group overflow-hidden">
-          <img src="https://images.unsplash.com/photo-1516257984877-a03a80476661?q=80&w=500" className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500" />
-          <div className="absolute top-4 left-4 bg-black text-[#d4ff00] px-3 py-1 font-bold italic">MEN</div>
-        </div>
+      {/* المحتوى الرئيسي: المربعات والشماعة */}
+      <div className="flex-1 flex flex-col items-center justify-center space-y-6 p-4">
         
-        {/* مربع حريمي */}
-        <div className="aspect-square border-r-2 border-black relative group overflow-hidden">
-          <img src="https://images.unsplash.com/photo-1554412933-514a83d2f3c8?q=80&w=500" className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500" />
-          <div className="absolute top-4 left-4 bg-black text-[#d4ff00] px-3 py-1 font-bold italic">WOMEN</div>
+        <div className="text-center">
+          <h2 className="text-2xl font-light tracking-[0.4em] uppercase">Elegance & Luxury</h2>
+          <p className="text-[8px] tracking-[0.3em] uppercase opacity-50 mt-1">Defining the art of modern sophistication</p>
         </div>
 
-        {/* مربع أطفالي */}
-        <div className="aspect-square relative group overflow-hidden">
-          <img src="https://images.unsplash.com/photo-1514090458221-65bb69af63e6?q=80&w=500" className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500" />
-          <div className="absolute top-4 left-4 bg-black text-[#d4ff00] px-3 py-1 font-bold italic">KIDS</div>
+        {/* المربعات الثلاثة بنفس ستايل الصورة */}
+        <div className="flex gap-4 w-full max-w-4xl justify-center">
+          {['أطفالي', 'حريمي', 'رجالي'].map((cat, i) => (
+            <div key={i} className="w-48 h-64 border-2 border-[#4b2c71] bg-white flex flex-col items-center justify-center group cursor-pointer hover:bg-[#4b2c71] transition-colors">
+              <span className="text-[#4b2c71] font-bold text-lg group-hover:text-white">{cat}</span>
+              <span className="text-[8px] tracking-widest uppercase opacity-40 group-hover:text-white">
+                {i === 0 ? 'KIDS' : i === 1 ? 'WOMEN' : 'MEN'}
+              </span>
+            </div>
+          ))}
         </div>
-      </div>
 
-      {/* 3. الصورة اللي عجبتك: متصغرة ومظبوطة في النص */}
-      <div className="py-16 px-4 flex flex-col items-center justify-center bg-[#f2f2f2]">
-        <div className="max-w-4xl w-full border-2 border-black p-2 bg-white shadow-xl">
-           <img 
-            src="https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?q=80&w=1000" 
-            className="w-full h-[400px] object-cover" 
-            alt="Wearivo Collection"
+        {/* صورة الشماعة الاحترافية - متناسقة مع الخلفية */}
+        <div className="w-full max-w-md h-40 relative">
+          <img 
+            src="https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?auto=format&fit=crop&q=80&w=800" 
+            alt="Hanger" 
+            className="w-full h-full object-contain mix-blend-multiply opacity-80"
           />
         </div>
-        
-        <div className="mt-10 text-center">
-          <h3 className="text-5xl font-black tracking-tighter italic uppercase mb-4">Elegance & Luxury</h3>
-          <button className="bg-black text-[#d4ff00] font-black py-4 px-12 text-lg border-2 border-black hover:bg-[#d4ff00] hover:text-black transition-all">
-            SHOP THE COLLECTION
-          </button>
-        </div>
       </div>
 
-      {/* 4. الفوتر القديم الشيك */}
-      <footer className="p-8 bg-black text-white flex justify-between items-end border-t-4 border-[#d4ff00]">
-        <div>
-          <p className="text-2xl font-black italic">WEARIVO</p>
-          <p className="text-[10px] opacity-40 uppercase tracking-[0.3em]">Premium Fashion Brand 2026</p>
-        </div>
-        <div className="text-right">
-          <p className="text-[10px] uppercase opacity-40">Maintained by</p>
-          <p className="text-[#d4ff00] font-bold text-lg">010EASSA-PIXEL</p>
+      {/* الفوتر: تفاصيل المطور اللي طلبتها */}
+      <footer className="p-6 text-center border-t border-gray-200 bg-white">
+        <div className="space-y-1">
+          <p className="text-[10px] font-black uppercase tracking-widest">WEARIVO</p>
+          <p className="text-[8px] tracking-widest opacity-60">PURE LUXURY • PURE MINIMALIST</p>
+          <div className="py-2">
+            <p className="text-[8px] uppercase opacity-40">Developed By</p>
+            <p className="text-xs font-bold text-black">عيسى وحيد | ESSA WAHID</p>
+            <a href="tel:01061445195" className="text-blue-600 text-[10px] font-mono">01061445195</a>
+          </div>
+          <p className="text-[8px] opacity-40 tracking-tighter">.WEARIVO. ALL RIGHTS RESERVED 2026 ©</p>
         </div>
       </footer>
 
