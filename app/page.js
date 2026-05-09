@@ -16,7 +16,7 @@ export default function Home() {
         <p className="text-[9px] tracking-[0.4em] uppercase opacity-50 mt-2">Defining the art of modern sophistication</p>
       </section>
 
-      {/* 3. قسم المربعات (الصور الفعلية وبنفس الحجم الطولي) */}
+      {/* 3. قسم المربعات (نفس الحجم الطولي بدون حواف) */}
       <section className="flex justify-center w-full py-12 px-4">
         <div className="flex flex-col md:flex-row gap-0 shadow-lg">
           
@@ -24,12 +24,12 @@ export default function Home() {
           <div className="w-[300px] h-[450px] relative group overflow-hidden bg-white">
             <img 
               src="https://i.ibb.co/VYvYvYr/child.jpg" 
-              className="absolute inset-0 w-full h-full object-cover transition-all duration-500 group-hover:scale-105" 
+              className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
               alt="Kids" 
             />
             <div className="absolute inset-0 flex flex-col items-center justify-center z-10 bg-black/5 group-hover:bg-transparent transition-all">
-              <span className="font-bold text-2xl tracking-widest text-[#3d2b1f] drop-shadow-md">أطفالي</span>
-              <span className="text-[10px] tracking-widest mt-1 opacity-70 font-medium">KIDS</span>
+              <span className="font-bold text-2xl tracking-widest text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)]">أطفالي</span>
+              <span className="text-[10px] tracking-widest mt-1 text-white opacity-90 drop-shadow-sm">KIDS</span>
             </div>
           </div>
 
@@ -37,12 +37,12 @@ export default function Home() {
           <div className="w-[300px] h-[450px] relative group overflow-hidden bg-white border-x border-[#f4ece1]">
             <img 
               src="https://i.ibb.co/vYm6F6m/coat.jpg" 
-              className="absolute inset-0 w-full h-full object-cover transition-all duration-500 group-hover:scale-105" 
+              className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
               alt="Women" 
             />
             <div className="absolute inset-0 flex flex-col items-center justify-center z-10 bg-black/5 group-hover:bg-transparent transition-all">
-              <span className="font-bold text-2xl tracking-widest text-[#3d2b1f] drop-shadow-md">حريمي</span>
-              <span className="text-[10px] tracking-widest mt-1 opacity-70 font-medium">WOMEN</span>
+              <span className="font-bold text-2xl tracking-widest text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)]">حريمي</span>
+              <span className="text-[10px] tracking-widest mt-1 text-white opacity-90 drop-shadow-sm">WOMEN</span>
             </div>
           </div>
 
@@ -50,12 +50,12 @@ export default function Home() {
           <div className="w-[300px] h-[450px] relative group overflow-hidden bg-white">
             <img 
               src="https://i.ibb.co/C0L0K0x/pants.jpg" 
-              className="absolute inset-0 w-full h-full object-cover transition-all duration-500 group-hover:scale-105" 
+              className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
               alt="Men" 
             />
             <div className="absolute inset-0 flex flex-col items-center justify-center z-10 bg-black/5 group-hover:bg-transparent transition-all">
-              <span className="font-bold text-2xl tracking-widest text-[#3d2b1f] drop-shadow-md">رجالي</span>
-              <span className="text-[10px] tracking-widest mt-1 opacity-70 font-medium">MEN</span>
+              <span className="font-bold text-2xl tracking-widest text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)]">رجالي</span>
+              <span className="text-[10px] tracking-widest mt-1 text-white opacity-90 drop-shadow-sm">MEN</span>
             </div>
           </div>
 
