@@ -1,14 +1,13 @@
 export default function Home() {
   return (
-    <main className="min-h-screen w-full bg-[#f4ece1] flex flex-col font-sans text-[#3d2b1f]">
-      
-      {/* 1. الهيدر */}
-      <header className="p-6 flex justify-between items-center w-full">
-        <h1 className="text-3xl font-black tracking-tighter">WEARIVO</h1>
-        <button className="border border-[#3d2b1f]/20 px-2 py-0.5 text-[10px] opacity-60">
-          DASHBOARD
-        </button>
-      </header>
+   import Link from 'next/link';
+
+// ... وسط الكود عند الهيدر
+<Link href="/login">
+  <button className="border border-[#3d2b1f]/20 px-2 py-0.5 text-[10px] opacity-60 hover:opacity-100 transition-all">
+    DASHBOARD
+  </button>
+</Link>
 
       {/* 2. العنوان الرئيسي */}
       <section className="text-center mt-10">
