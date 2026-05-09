@@ -3,24 +3,20 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 255, 255, 255;
-  --background-start-rgb: 10, 10, 10; /* أسود شيك */
-  --background-end-rgb: 0, 0, 0;
+  --background-rgb: 250, 250, 250; /* خلفية فاتحة قريبة من الصورة */
+  --text-rgb: 20, 20, 20;
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  color: rgb(var(--text-rgb));
+  background: rgb(var(--background-rgb));
+  margin: 0;
+  padding: 0;
   position: relative;
-  overflow-x: hidden; /* عشان الصور متعملش سكرول بالعرض */
+  overflow-x: hidden;
 }
 
-/* طبقة الخلفية "الطائرة" */
+/* طبقة الملابس الطائرة (رجالي، حريمي، أطفال) */
 body::before {
   content: "";
   position: fixed;
@@ -29,26 +25,31 @@ body::before {
   width: 100%;
   height: 100%;
   
-  /* هنا بنحط صور الملابس المكررة */
-  /* مؤقتاً هنستخدم رموز تعبيرية (Emojis) للملابس كخلفية */
+  /* مزيج من ملابس مختلفة: تيشيرت (رجالي)، فستان (حريمي)، شورت/بيبي (أطفال) */
   background-image: 
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Ctext y='50' x='0' font-size='30'%3E👕%3C/text%3E%3Ctext y='90' x='50' font-size='30'%3E👗%3C/text%3E%3Ctext y='40' x='70' font-size='25'%3E👟%3C/text%3E%3Ctext y='10' x='20' font-size='25'%3E🧢%3C/text%3E%3C/svg%3E");
-  
-  background-repeat: repeat; /* تكرار الصور في كل مكان */
-  background-size: 200px 200px; /* حجم مساحة التكرار */
-  opacity: 0.08; /* خليها شفافة جداً عشان متبقاش مزعجة (8% بس) */
-  z-index: -1; /* خليها ورا الكلام */
-  
-  /* تأثير الحركة (الطيران ببطء) */
-  animation: flyingClothes 60s linear infinite;
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150' viewBox='0 0 100 100'%3E%3Cg fill='none' stroke='%23888' stroke-width='0.5' stroke-opacity='0.3'%3E%3Cpath d='M30 20 L40 20 L45 25 L55 25 L60 20 L70 20 L75 35 L65 35 L65 70 L35 70 L35 35 L25 35 Z'/%3E%3Ccircle cx='80' cy='80' r='5'/%3E%3Cpath d='M10 80 L20 70 L30 80 L20 90 Z'/%3E%3Cpath d='M50 80 L60 75 L70 80 L60 85 Z'/%3E%3C/g%3E%3C/svg%3E");
+
+  background-repeat: repeat;
+  background-size: 300px 300px;
+  opacity: 0.4;
+  z-index: -1;
+  animation: floatBackground 100s linear infinite;
 }
 
-/* تعريف الحركة */
-@keyframes flyingClothes {
-  from {
-    background-position: 0 0;
-  }
-  to {
-    background-position: 1000px 1000px; /* بتتحرك بالورب */
-  }
+/* حركة طيران ناعمة جداً */
+@keyframes floatBackground {
+  from { background-position: 0 0; }
+  to { background-position: 1000px 1000px; }
+}
+
+/* إضافة لمسة "الكومة" في الأسفل بشكل جمالي */
+main::after {
+  content: "";
+  position: fixed;
+  bottom: -50px;
+  left: 0;
+  width: 100%;
+  height: 200px;
+  background: radial-gradient(ellipse at center, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0) 70%);
+  z-index: -1;
 }
