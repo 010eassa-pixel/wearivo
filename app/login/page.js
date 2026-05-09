@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { auth } from '../../firebase'; 
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
@@ -8,12 +8,6 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
-
-  // الكود ده بيضمن إن الصفحة تبدأ من فوق خالص وتلغي أي تأثيرات خارجية
-  useEffect(() => {
-    document.body.style.backgroundColor = "white";
-    return () => { document.body.style.backgroundColor = ""; };
-  }, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -26,65 +20,74 @@ export default function LoginPage() {
   };
 
   return (
-    /* fixed و inset-0 عشان الصفحة تفرش على الشاشة كلها وتلغي الهيدر والفوتر بتوع الموقع */
-    <div className="fixed inset-0 z-[9999] bg-white flex items-center justify-center font-sans p-4 overflow-y-auto">
-      <div className="flex flex-col md:flex-row items-center justify-between max-w-5xl w-full gap-12 bg-white">
+    <div style={{
+      position: 'fixed', inset: 0, zIndex: 9999, backgroundColor: 'white',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      fontFamily: 'sans-serif', padding: '20px', overflowY: 'auto'
+    }}>
+      <div style={{
+        display: 'flex', flexDirection: 'row', alignItems: 'center',
+        justifyContent: 'space-between', maxWidth: '1000px', width: '100%', gap: '50px'
+      }}>
         
         {/* الجزء الأيسر: الرسوم التوضيحية (الأشخاص) */}
-        <div className="hidden md:flex flex-1 justify-center items-end gap-4 border-b border-dashed border-gray-200 pb-10">
-          <div className="flex flex-col items-center">
-            <div className="w-4 h-4 bg-gray-500 rounded-full mb-1"></div>
-            <div className="w-10 h-16 bg-blue-400 rounded-t-full"></div>
-            <div className="flex gap-1 mt-1">
-               <div className="w-2 h-8 bg-gray-700"></div>
-               <div className="w-2 h-8 bg-gray-700"></div>
+        <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'flex-end', gap: '15px', borderBottom: '1px dashed #eee', paddingBottom: '40px' }}>
+          {/* شخص أزرق */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <div style={{ width: '16px', height: '16px', backgroundColor: '#6b7280', borderRadius: '50%', marginBottom: '4px' }}></div>
+            <div style={{ width: '40px', height: '64px', backgroundColor: '#60a5fa', borderRadius: '40px 40px 0 0' }}></div>
+            <div style={{ display: 'flex', gap: '4px', marginTop: '4px' }}>
+               <div style={{ width: '8px', height: '32px', backgroundColor: '#374151' }}></div>
+               <div style={{ width: '8px', height: '32px', backgroundColor: '#374151' }}></div>
             </div>
           </div>
-          <div className="flex flex-col items-center">
-            <div className="w-5 h-5 bg-red-400 rounded-full mb-1"></div>
-            <div className="w-14 h-20 bg-purple-500" style={{ clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)' }}></div>
+          {/* شخص بنفسجي */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <div style={{ width: '20px', height: '20px', backgroundColor: '#f87171', borderRadius: '50%', marginBottom: '4px' }}></div>
+            <div style={{ width: '56px', height: '80px', backgroundColor: '#a855f7', clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)' }}></div>
           </div>
-          <div className="flex flex-col items-center">
-            <div className="w-3 h-3 bg-yellow-400 rounded-full mb-1"></div>
-            <div className="w-8 h-12 bg-green-500 rounded-t-md"></div>
-            <div className="flex gap-1 mt-1">
-               <div className="w-1.5 h-4 bg-gray-700"></div>
-               <div className="w-1.5 h-4 bg-gray-700"></div>
+          {/* شخص أخضر */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <div style={{ width: '12px', height: '12px', backgroundColor: '#facc15', borderRadius: '50%', marginBottom: '4px' }}></div>
+            <div style={{ width: '32px', height: '48px', backgroundColor: '#4ade80', borderRadius: '8px 8px 0 0' }}></div>
+            <div style={{ display: 'flex', gap: '4px', marginTop: '4px' }}>
+               <div style={{ width: '6px', height: '16px', backgroundColor: '#374151' }}></div>
+               <div style={{ width: '6px', height: '16px', backgroundColor: '#374151' }}></div>
             </div>
           </div>
         </div>
 
         {/* الجزء الأيمن: فورم الدخول */}
-        <div className="flex-1 max-w-md w-full text-right" dir="rtl">
-          <div className="mb-8">
-            <h1 className="text-5xl font-black text-slate-800 mb-2 tracking-tighter">Wearivo</h1>
-            <p className="text-gray-400 text-sm tracking-widest">أناقتك تبدأ من هنا</p>
+        <div style={{ flex: 1, maxWidth: '400px', width: '100%', textAlign: 'right' }} dir="rtl">
+          <div style={{ marginBottom: '30px' }}>
+            <h1 style={{ fontSize: '48px', fontWeight: '900', color: '#1e293b', margin: '0 0 8px 0' }}>Wearivo</h1>
+            <p style={{ color: '#94a3b8', fontSize: '14px', margin: 0 }}>أناقتك تبدأ من هنا</p>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <input 
               type="email" 
               placeholder="البريد الإلكتروني" 
-              className="w-full bg-gray-50 p-5 rounded-lg border border-gray-100 focus:ring-2 focus:ring-slate-400 text-right outline-none text-black"
+              style={{ width: '100%', backgroundColor: '#f8fafc', padding: '18px', borderRadius: '8px', border: '1px solid #f1f5f9', textAlign: 'right', outline: 'none' }}
               onChange={(e) => setEmail(e.target.value)}
             />
             <input 
               type="password" 
               placeholder="كلمة المرور" 
-              className="w-full bg-gray-50 p-5 rounded-lg border border-gray-100 focus:ring-2 focus:ring-slate-400 text-right outline-none text-black"
+              style={{ width: '100%', backgroundColor: '#f8fafc', padding: '18px', borderRadius: '8px', border: '1px solid #f1f5f9', textAlign: 'right', outline: 'none' }}
               onChange={(e) => setPassword(e.target.value)}
             />
             
             <button 
               type="submit"
-              className="w-full bg-[#2d3e50] text-white py-5 rounded-lg font-bold text-lg hover:bg-[#1a2531] transition-all shadow-lg shadow-blue-900/10"
+              style={{ width: '100%', backgroundColor: '#2d3e50', color: 'white', padding: '18px', borderRadius: '8px', fontWeight: 'bold', fontSize: '18px', border: 'none', cursor: 'pointer' }}
             >
               تسجيل الدخول
             </button>
 
             <button 
               type="button"
-              className="w-full bg-gray-100 text-slate-600 py-5 rounded-lg font-bold text-lg hover:bg-gray-200 transition-all"
+              style={{ width: '100%', backgroundColor: '#f1f5f9', color: '#475569', padding: '18px', borderRadius: '8px', fontWeight: 'bold', fontSize: '18px', border: 'none', cursor: 'pointer' }}
             >
               إنشاء حساب جديد
             </button>
