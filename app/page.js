@@ -16,46 +16,46 @@ export default function Home() {
         <p className="text-[9px] tracking-[0.4em] uppercase opacity-50 mt-2">Defining the art of modern sophistication</p>
       </section>
 
-      {/* 3. قسم المربعات (نفس الحجم الطولي بدون حواف) */}
+      {/* 3. المربعات (بتنادي الصور من فولدر public) */}
       <section className="flex justify-center w-full py-12 px-4">
         <div className="flex flex-col md:flex-row gap-0 shadow-lg">
           
-          {/* مربع أطفالي - صورة الطفل */}
+          {/* مربع أطفالي */}
           <div className="w-[300px] h-[450px] relative group overflow-hidden bg-white">
             <img 
-              src="https://i.ibb.co/VYvYvYr/child.jpg" 
+              src="/child.jpg" 
               className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
               alt="Kids" 
             />
-            <div className="absolute inset-0 flex flex-col items-center justify-center z-10 bg-black/5 group-hover:bg-transparent transition-all">
-              <span className="font-bold text-2xl tracking-widest text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)]">أطفالي</span>
-              <span className="text-[10px] tracking-widest mt-1 text-white opacity-90 drop-shadow-sm">KIDS</span>
+            <div className="absolute inset-0 flex flex-col items-center justify-center z-10 bg-black/10 group-hover:bg-transparent transition-all">
+              <span className="font-bold text-2xl tracking-widest text-white drop-shadow-lg">أطفالي</span>
+              <span className="text-[10px] tracking-widest mt-1 text-white opacity-90">KIDS</span>
             </div>
           </div>
 
-          {/* مربع حريمي - صورة البالطو */}
+          {/* مربع حريمي */}
           <div className="w-[300px] h-[450px] relative group overflow-hidden bg-white border-x border-[#f4ece1]">
             <img 
-              src="https://i.ibb.co/vYm6F6m/coat.jpg" 
+              src="/coat.jpg" 
               className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
               alt="Women" 
             />
-            <div className="absolute inset-0 flex flex-col items-center justify-center z-10 bg-black/5 group-hover:bg-transparent transition-all">
-              <span className="font-bold text-2xl tracking-widest text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)]">حريمي</span>
-              <span className="text-[10px] tracking-widest mt-1 text-white opacity-90 drop-shadow-sm">WOMEN</span>
+            <div className="absolute inset-0 flex flex-col items-center justify-center z-10 bg-black/10 group-hover:bg-transparent transition-all">
+              <span className="font-bold text-2xl tracking-widest text-white drop-shadow-lg">حريمي</span>
+              <span className="text-[10px] tracking-widest mt-1 text-white opacity-90">WOMEN</span>
             </div>
           </div>
 
-          {/* مربع رجالي - صورة البنطلون */}
+          {/* مربع رجالي */}
           <div className="w-[300px] h-[450px] relative group overflow-hidden bg-white">
             <img 
-              src="https://i.ibb.co/C0L0K0x/pants.jpg" 
+              src="/pants.jpg" 
               className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
               alt="Men" 
             />
-            <div className="absolute inset-0 flex flex-col items-center justify-center z-10 bg-black/5 group-hover:bg-transparent transition-all">
-              <span className="font-bold text-2xl tracking-widest text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)]">رجالي</span>
-              <span className="text-[10px] tracking-widest mt-1 text-white opacity-90 drop-shadow-sm">MEN</span>
+            <div className="absolute inset-0 flex flex-col items-center justify-center z-10 bg-black/10 group-hover:bg-transparent transition-all">
+              <span className="font-bold text-2xl tracking-widest text-white drop-shadow-lg">رجالي</span>
+              <span className="text-[10px] tracking-widest mt-1 text-white opacity-90">MEN</span>
             </div>
           </div>
 
