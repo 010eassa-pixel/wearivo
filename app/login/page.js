@@ -1,67 +1,91 @@
-import Link from 'next/link'; // السطر ده مكانه الصح هنا فوق خالص
+"use client";
+import { useState } from 'react';
+import { auth } from '../../firebase'; 
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { useRouter } from 'next/navigation';
 
-export default function Home() {
+export default function LoginPage() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const router = useRouter();
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      router.push('/admin'); 
+    } catch (error) {
+      alert("بيانات الدخول غير صحيحة");
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-[#f4ece1] font-sans text-[#3d2b1f] selection:bg-[#3d2b1f] selection:text-[#f4ece1]">
-      {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-[#f4ece1]/80 backdrop-blur-md border-b border-[#3d2b1f]/5">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-8">
-            <h1 className="text-2xl font-black tracking-tighter cursor-pointer">WEARIVO</h1>
-            <nav className="hidden md:flex items-center gap-6">
-              {['COLLECTIONS', 'NEW ARRIVALS', 'ABOUT'].map((item) => (
-                <a key={item} href="#" className="text-[10px] tracking-[0.2em] font-bold opacity-40 hover:opacity-100 transition-all uppercase">
-                  {item}
-                </a>
-              ))}
-            </nav>
+    // الخلفية بيضاء تماماً عشان نفصل عن تصميم الموقع الأساسي
+    <div className="min-h-screen bg-white flex items-center justify-center font-sans p-4 z-[9999] relative">
+      <div className="flex flex-col md:flex-row items-center justify-between max-w-5xl w-full gap-12">
+        
+        {/* الجزء الأيسر: الرسوم التوضيحية للأشخاص */}
+        <div className="hidden md:flex flex-1 justify-center items-end gap-4 border-b border-dashed border-gray-200 pb-10">
+          <div className="flex flex-col items-center">
+            <div className="w-4 h-4 bg-gray-400 rounded-full mb-1"></div>
+            <div className="w-10 h-16 bg-blue-300 rounded-t-full"></div>
+            <div className="flex gap-1 mt-1">
+               <div className="w-2 h-8 bg-gray-600"></div>
+               <div className="w-2 h-8 bg-gray-600"></div>
+            </div>
           </div>
-          
-          <div className="flex items-center gap-4">
-            {/* زرار الداشبورد المتعدل */}
-            <Link href="/login">
-              <button className="border border-[#3d2b1f]/20 px-3 py-1 text-[10px] font-bold opacity-60 hover:opacity-100 transition-all uppercase tracking-widest">
-                DASHBOARD
-              </button>
-            </Link>
-            <div className="w-8 h-8 rounded-full bg-[#3d2b1f] flex items-center justify-center text-[#f4ece1] cursor-pointer">
-              <span className="text-[10px] font-bold">0</span>
+          <div className="flex flex-col items-center">
+            <div className="w-5 h-5 bg-red-300 rounded-full mb-1"></div>
+            <div className="w-14 h-20 bg-purple-400" style={{ clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)' }}></div>
+          </div>
+          <div className="flex flex-col items-center">
+            <div className="w-3 h-3 bg-yellow-300 rounded-full mb-1"></div>
+            <div className="w-8 h-12 bg-green-400 rounded-t-md"></div>
+            <div className="flex gap-1 mt-1">
+               <div className="w-1.5 h-4 bg-gray-600"></div>
+               <div className="w-1.5 h-4 bg-gray-600"></div>
             </div>
           </div>
         </div>
-      </header>
 
-      {/* Main Content */}
-      <main className="pt-20">
-        <section className="px-6 py-20 max-w-7xl mx-auto text-center">
-          <h2 className="text-6xl md:text-8xl font-black tracking-tighter mb-8 leading-[0.9]">
-            ELEVATE YOUR<br />STREET STYLE.
-          </h2>
-          <p className="max-w-md mx-auto text-sm opacity-60 leading-relaxed mb-10">
-            Discover a curated collection of premium essentials designed for the modern individual. Quality, comfort, and timeless design in every stitch.
-          </p>
-          <button className="bg-[#3d2b1f] text-[#f4ece1] px-12 py-5 rounded-full text-xs font-bold uppercase tracking-[0.2em] hover:scale-105 transition-transform">
-            Shop Collection
-          </button>
-        </section>
+        {/* الجزء الأيمن: فورم الدخول */}
+        <div className="flex-1 max-w-md w-full text-right" dir="rtl">
+          <div className="mb-8">
+            <h1 className="text-4xl font-bold text-slate-800 mb-2">Wearivo</h1>
+            <p className="text-gray-400 text-sm">أناقتك تبدأ من هنا</p>
+          </div>
 
-        {/* Categories Section */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-1 px-1">
-          {['MEN', 'WOMEN', 'KIDS'].map((cat) => (
-            <div key={cat} className="relative aspect-[4/5] bg-[#3d2b1f]/5 overflow-hidden group cursor-pointer">
-              <div className="absolute inset-0 flex items-center justify-center z-10">
-                <h3 className="text-white text-2xl font-black tracking-widest group-hover:scale-110 transition-transform">{cat}</h3>
-              </div>
-              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-all" />
-            </div>
-          ))}
+          <form onSubmit={handleLogin} className="space-y-4">
+            <input 
+              type="email" 
+              placeholder="البريد الإلكتروني" 
+              className="w-full bg-gray-50 p-4 rounded-md border border-gray-200 focus:ring-2 focus:ring-slate-400 text-right outline-none text-black"
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <input 
+              type="password" 
+              placeholder="كلمة المرور" 
+              className="w-full bg-gray-50 p-4 rounded-md border border-gray-200 focus:ring-2 focus:ring-slate-400 text-right outline-none text-black"
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            
+            <button 
+              type="submit"
+              className="w-full bg-[#2d3e50] text-white py-4 rounded-md font-bold text-lg hover:bg-[#1a2531] transition-all"
+            >
+              تسجيل الدخول
+            </button>
+
+            <button 
+              type="button"
+              className="w-full bg-gray-100 text-slate-600 py-4 rounded-md font-bold text-lg hover:bg-gray-200 transition-all"
+            >
+              إنشاء حساب جديد
+            </button>
+          </form>
         </div>
-      </main>
 
-      {/* Footer */}
-      <footer className="py-20 px-6 border-t border-[#3d2b1f]/5 text-center">
-        <p className="text-[10px] tracking-widest opacity-40 uppercase">© 2026 WEARIVO. All rights reserved.</p>
-      </footer>
+      </div>
     </div>
   );
 }
