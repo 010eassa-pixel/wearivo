@@ -11,56 +11,54 @@ export default function Home() {
       </header>
 
       {/* 2. العنوان الرئيسي */}
-      <section className="text-center mt-10 px-4">
+      <section className="text-center mt-10">
         <h2 className="text-2xl font-light tracking-[0.4em] uppercase">Elegance & Luxury</h2>
         <p className="text-[9px] tracking-[0.4em] uppercase opacity-50 mt-2">Defining the art of modern sophistication</p>
       </section>
 
-      {/* 3. قسم المربعات - مع إجبار المسافة وتقل الخط */}
-      <section className="flex justify-center w-full py-16 px-4">
-        {/* space-y للموبايل و md:space-x للشاشة الكبيرة بتضمن المسافة اللي طلبتها */}
-        <div className="flex flex-col md:flex-row space-y-10 md:space-y-0 md:space-x-12 items-center justify-center">
+      {/* 3. المربعات - نفس ترتيب الصورة مع مسافة بسيطة وخط تقيل */}
+      <section className="flex flex-col items-center w-full py-12 px-4 space-y-4"> 
+        {/* space-y-4 بتعمل المسافة الصغيرة اللي أنت عايزها بين كل مربع والتاني */}
           
           {/* مربع أطفالي */}
-          <div className="w-[300px] h-[450px] relative group overflow-hidden bg-white shadow-2xl">
+          <div className="w-[300px] h-[450px] relative group overflow-hidden bg-white">
             <img 
               src="/child.jpg" 
               className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
               alt="Kids" 
             />
-            <div className="absolute inset-0 flex flex-col items-center justify-center z-10 bg-black/20">
-              <span className="font-black text-3xl tracking-widest text-white drop-shadow-2xl">أطفالي</span>
-              <span className="text-sm font-bold tracking-[0.3em] mt-2 text-white uppercase">KIDS</span>
+            <div className="absolute top-4 right-4 flex flex-col items-end z-10 text-right">
+              <span className="font-black text-xl tracking-tighter text-[#3d2b1f] drop-shadow-sm">أطفالي</span>
+              <span className="text-[10px] font-black tracking-widest text-[#3d2b1f] opacity-80">KIDS</span>
             </div>
           </div>
 
           {/* مربع حريمي */}
-          <div className="w-[300px] h-[450px] relative group overflow-hidden bg-white shadow-2xl">
+          <div className="w-[300px] h-[450px] relative group overflow-hidden bg-white">
             <img 
               src="/coat.jpg" 
               className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
               alt="Women" 
             />
-            <div className="absolute inset-0 flex flex-col items-center justify-center z-10 bg-black/20">
-              <span className="font-black text-3xl tracking-widest text-white drop-shadow-2xl">حريمي</span>
-              <span className="text-sm font-bold tracking-[0.3em] mt-2 text-white uppercase">WOMEN</span>
+            <div className="absolute top-4 right-4 flex flex-col items-end z-10 text-right">
+              <span className="font-black text-xl tracking-tighter text-[#3d2b1f] drop-shadow-sm">حريمي</span>
+              <span className="text-[10px] font-black tracking-widest text-[#3d2b1f] opacity-80">WOMEN</span>
             </div>
           </div>
 
           {/* مربع رجالي */}
-          <div className="w-[300px] h-[450px] relative group overflow-hidden bg-white shadow-2xl">
+          <div className="w-[300px] h-[450px] relative group overflow-hidden bg-white">
             <img 
               src="/pants.jpg" 
               className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
               alt="Men" 
             />
-            <div className="absolute inset-0 flex flex-col items-center justify-center z-10 bg-black/20">
-              <span className="font-black text-3xl tracking-widest text-white drop-shadow-2xl">رجالي</span>
-              <span className="text-sm font-bold tracking-[0.3em] mt-2 text-white uppercase">MEN</span>
+            <div className="absolute top-4 right-4 flex flex-col items-end z-10 text-right">
+              <span className="font-black text-xl tracking-tighter text-[#3d2b1f] drop-shadow-sm">رجالي</span>
+              <span className="text-[10px] font-black tracking-widest text-[#3d2b1f] opacity-80">MEN</span>
             </div>
           </div>
 
-        </div>
       </section>
 
       {/* 4. الفوتر */}
