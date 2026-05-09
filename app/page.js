@@ -16,12 +16,13 @@ export default function Home() {
         <p className="text-[9px] tracking-[0.4em] uppercase opacity-50 mt-2">Defining the art of modern sophistication</p>
       </section>
 
-      {/* 3. المربعات (بتنادي الصور من فولدر public) */}
+      {/* 3. المربعات مع إضافة مسافات */}
       <section className="flex justify-center w-full py-12 px-4">
-        <div className="flex flex-col md:flex-row gap-0 shadow-lg">
+        {/* غيرنا gap-0 إلى gap-8 لإضافة مسافة 2 سم تقريباً */}
+        <div className="flex flex-col md:flex-row gap-8">
           
           {/* مربع أطفالي */}
-          <div className="w-[300px] h-[450px] relative group overflow-hidden bg-white">
+          <div className="w-[300px] h-[450px] relative group overflow-hidden bg-white shadow-lg">
             <img 
               src="/child.jpg" 
               className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
@@ -34,7 +35,7 @@ export default function Home() {
           </div>
 
           {/* مربع حريمي */}
-          <div className="w-[300px] h-[450px] relative group overflow-hidden bg-white border-x border-[#f4ece1]">
+          <div className="w-[300px] h-[450px] relative group overflow-hidden bg-white shadow-lg">
             <img 
               src="/coat.jpg" 
               className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
@@ -47,7 +48,7 @@ export default function Home() {
           </div>
 
           {/* مربع رجالي */}
-          <div className="w-[300px] h-[450px] relative group overflow-hidden bg-white">
+          <div className="w-[300px] h-[450px] relative group overflow-hidden bg-white shadow-lg">
             <img 
               src="/pants.jpg" 
               className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
