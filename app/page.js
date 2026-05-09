@@ -16,45 +16,45 @@ export default function Home() {
         <p className="text-[9px] tracking-[0.4em] uppercase opacity-50 mt-2">Defining the art of modern sophistication</p>
       </section>
 
-      {/* 3. قسم المربعات (الصور الجديدة وبنفس الحجم الطولي بدون حواف) */}
-      <section className="flex justify-center w-full py-12">
-        <div className="flex flex-col md:flex-row gap-0 shadow-2xl">
+      {/* 3. قسم المربعات (الصور الفعلية وبنفس الحجم الطولي) */}
+      <section className="flex justify-center w-full py-12 px-4">
+        <div className="flex flex-col md:flex-row gap-0 shadow-lg">
           
           {/* مربع أطفالي - صورة الطفل */}
-          <div className="w-[300px] h-[450px] relative group overflow-hidden bg-[#e8dfd3]">
+          <div className="w-[300px] h-[450px] relative group overflow-hidden bg-white">
             <img 
               src="https://i.ibb.co/VYvYvYr/child.jpg" 
-              className="absolute inset-0 w-full h-full object-cover mix-blend-multiply opacity-90 group-hover:opacity-100 transition-all duration-500" 
+              className="absolute inset-0 w-full h-full object-cover transition-all duration-500 group-hover:scale-105" 
               alt="Kids" 
             />
-            <div className="absolute inset-0 flex flex-col items-center justify-center z-10 pointer-events-none bg-[#3d2b1f]/5 group-hover:bg-transparent transition-all">
-              <span className="font-bold text-2xl tracking-widest text-[#3d2b1f] drop-shadow-sm">أطفالي</span>
+            <div className="absolute inset-0 flex flex-col items-center justify-center z-10 bg-black/5 group-hover:bg-transparent transition-all">
+              <span className="font-bold text-2xl tracking-widest text-[#3d2b1f] drop-shadow-md">أطفالي</span>
               <span className="text-[10px] tracking-widest mt-1 opacity-70 font-medium">KIDS</span>
             </div>
           </div>
 
           {/* مربع حريمي - صورة البالطو */}
-          <div className="w-[300px] h-[450px] relative group overflow-hidden bg-[#e8dfd3]">
+          <div className="w-[300px] h-[450px] relative group overflow-hidden bg-white border-x border-[#f4ece1]">
             <img 
               src="https://i.ibb.co/vYm6F6m/coat.jpg" 
-              className="absolute inset-0 w-full h-full object-cover mix-blend-multiply opacity-90 group-hover:opacity-100 transition-all duration-500" 
+              className="absolute inset-0 w-full h-full object-cover transition-all duration-500 group-hover:scale-105" 
               alt="Women" 
             />
-            <div className="absolute inset-0 flex flex-col items-center justify-center z-10 pointer-events-none bg-[#3d2b1f]/5 group-hover:bg-transparent transition-all">
-              <span className="font-bold text-2xl tracking-widest text-[#3d2b1f] drop-shadow-sm">حريمي</span>
+            <div className="absolute inset-0 flex flex-col items-center justify-center z-10 bg-black/5 group-hover:bg-transparent transition-all">
+              <span className="font-bold text-2xl tracking-widest text-[#3d2b1f] drop-shadow-md">حريمي</span>
               <span className="text-[10px] tracking-widest mt-1 opacity-70 font-medium">WOMEN</span>
             </div>
           </div>
 
           {/* مربع رجالي - صورة البنطلون */}
-          <div className="w-[300px] h-[450px] relative group overflow-hidden bg-[#e8dfd3]">
+          <div className="w-[300px] h-[450px] relative group overflow-hidden bg-white">
             <img 
               src="https://i.ibb.co/C0L0K0x/pants.jpg" 
-              className="absolute inset-0 w-full h-full object-cover mix-blend-multiply opacity-90 group-hover:opacity-100 transition-all duration-500" 
+              className="absolute inset-0 w-full h-full object-cover transition-all duration-500 group-hover:scale-105" 
               alt="Men" 
             />
-            <div className="absolute inset-0 flex flex-col items-center justify-center z-10 pointer-events-none bg-[#3d2b1f]/5 group-hover:bg-transparent transition-all">
-              <span className="font-bold text-2xl tracking-widest text-[#3d2b1f] drop-shadow-sm">رجالي</span>
+            <div className="absolute inset-0 flex flex-col items-center justify-center z-10 bg-black/5 group-hover:bg-transparent transition-all">
+              <span className="font-bold text-2xl tracking-widest text-[#3d2b1f] drop-shadow-md">رجالي</span>
               <span className="text-[10px] tracking-widest mt-1 opacity-70 font-medium">MEN</span>
             </div>
           </div>
