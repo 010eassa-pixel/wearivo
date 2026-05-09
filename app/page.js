@@ -1,77 +1,70 @@
-import Link from 'next/link';
-
 export default function Home() {
-  const mainCategories = [
-    { id: 1, ar: 'رجالي', en: 'MEN', slug: 'men' },
-    { id: 2, ar: 'حريمي', en: 'WOMEN', slug: 'women' },
-    { id: 3, ar: 'أطفالي', en: 'KIDS', slug: 'kids' },
-  ];
-
   return (
-    <main className="bg-white min-h-screen text-right font-sans selection:bg-black selection:text-white" dir="rtl">
+    <main className="min-h-screen bg-[#f2f2f2] flex flex-col font-sans">
       
-      {/* Navbar - شريط التنقل */}
-      <nav className="flex justify-between items-center py-6 px-10 border-b border-gray-100 sticky top-0 bg-white/90 backdrop-blur-md z-50">
-        <h1 className="text-2xl font-black tracking-[0.2em] text-black uppercase">WEARIVO</h1>
-        
-        <div className="flex items-center gap-8">
-          {/* زر DASHBOARD المستطيل الصغير */}
-          <Link href="/dashboard" className="border-2 border-black bg-black text-white px-5 py-2 text-[9px] font-bold tracking-[0.2em] hover:bg-white hover:text-black transition-all duration-300">
+      {/* الهيدر واسم البراند */}
+      <header className="p-8 flex justify-between items-center border-b border-black">
+        <h1 className="text-5xl font-black italic tracking-tighter uppercase">Wearivo</h1>
+        <div className="text-right">
+          <p className="text-[10px] font-bold tracking-[0.3em] uppercase opacity-60">Elegance & Luxury</p>
+          {/* كلمة داشبورد مكبرة وشكلها احترافي */}
+          <h2 className="text-2xl font-black text-[#d4ff00] bg-black px-4 py-1 mt-2 inline-block skew-x-[-10deg]">
             DASHBOARD
-          </Link>
+          </h2>
         </div>
-      </nav>
-
-      {/* Hero Section - جملة الأناقة والفخامة */}
-      <header className="text-center py-20 px-4">
-        <h2 className="text-4xl md:text-6xl font-black text-black mb-4 tracking-tighter uppercase leading-none">
-          Elegance & Luxury
-        </h2>
-        <p className="text-gray-500 text-[10px] md:text-xs tracking-[0.4em] uppercase font-light">
-          Defining the Art of Modern Sophistication
-        </p>
       </header>
 
-    {/* container المربعات - مضبوط عشان يلمهم في النص */}
-<section className="flex justify-center items-center pb-32 px-6">
-  <div className="flex flex-wrap md:flex-nowrap justify-center gap-4 max-w-4xl w-full">
-    {mainCategories.map((item) => (
-      <Link href={`/category/${item.slug}`} key={item.id} className="w-full md:w-1/3 max-w-[250px] group">
-        {/* المربع الصغير بحافة تقيلة */}
-        <div className="aspect-square bg-white border-[3px] border-black flex flex-col items-center justify-center transition-all duration-500 group-hover:bg-black relative overflow-hidden shadow-sm">
-          
-          <span className="text-black text-5xl font-black opacity-5 group-hover:text-white group-hover:opacity-10 transition-all duration-700">W</span>
-          
-          {/* نصوص القسم */}
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-2">
-             <h3 className="text-lg font-black text-black group-hover:text-white transition-colors duration-500 uppercase tracking-tighter leading-none">{item.ar}</h3>
-             <p className="text-[7px] font-bold text-gray-400 group-hover:text-gray-300 tracking-[0.2em] mt-1 uppercase">{item.en}</p>
-          </div>
-          
+      {/* شبكة المربعات الاحترافية - الملابس الحقيقية */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-0 border-b border-black bg-white">
+        <div className="aspect-[3/4] border-r border-black relative group overflow-hidden">
+          <img src="https://images.unsplash.com/photo-1516257984877-a03a80476661?q=80&w=600" className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700" />
+          <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-all"></div>
+          <span className="absolute bottom-6 left-6 text-white font-bold text-xl tracking-widest bg-black px-3">MEN</span>
         </div>
-      </Link>
-    ))}
-  </div>
-</section>
+        
+        <div className="aspect-[3/4] border-r border-black relative group overflow-hidden">
+          <img src="https://images.unsplash.com/photo-1554412933-514a83d2f3c8?q=80&w=600" className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700" />
+          <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-all"></div>
+          <span className="absolute bottom-6 left-6 text-white font-bold text-xl tracking-widest bg-black px-3">WOMEN</span>
+        </div>
 
-      {/* Footer - الفوتر الاحترافي باسمك */}
-      <footer className="bg-black text-white py-16 px-10 border-t border-gray-900">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-10">
-          <div className="text-center md:text-right">
-            <h4 className="text-2xl font-black tracking-widest mb-2">WEARIVO</h4>
-            <p className="text-gray-500 text-[10px] tracking-widest uppercase">Pure Luxury • Pure Minimalist</p>
-          </div>
-          
-          <div className="text-center md:text-left">
-            <p className="text-[10px] text-gray-500 tracking-widest mb-2 uppercase">Developed By</p>
-            <h5 className="text-lg font-bold text-white mb-1">عيسى وحيد | ESSA WAHID</h5>
-            <a href="tel:01061445195" className="text-xl font-black tracking-[0.1em] hover:text-gray-300 transition block">01061445195</a>
-          </div>
+        <div className="aspect-[3/4] relative group overflow-hidden">
+          <img src="https://images.unsplash.com/photo-1514090458221-65bb69af63e6?q=80&w=600" className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700" />
+          <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-all"></div>
+          <span className="absolute bottom-6 left-6 text-white font-bold text-xl tracking-widest bg-black px-3">KIDS</span>
         </div>
-        <div className="mt-16 text-center text-[9px] text-gray-700 tracking-[0.4em] uppercase">
-          © 2026 WEARIVO. All Rights Reserved.
+      </div>
+
+      {/* خلفية كومة الملابس (نفس روح الصورة اللي بعتها) */}
+      <div className="relative py-24 flex flex-col items-center justify-center overflow-hidden bg-[#e8e8e8]">
+        {/* صورة الكومة كخلفية مندمجة */}
+        <img 
+          src="https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?q=80&w=1000" 
+          className="absolute inset-0 w-full h-full object-cover opacity-20 mix-blend-multiply" 
+          alt="Pile of clothes"
+        />
+        
+        <div className="relative z-10 text-center">
+          <p className="text-[#d4ff00] font-black text-xs tracking-[0.5em] mb-4 bg-black px-2 py-1 inline-block">THE NEW COLLECTION</p>
+          <h3 className="text-7xl font-black tracking-tighter mb-8 italic uppercase">This is Wearivo.</h3>
+          <button className="bg-[#d4ff00] text-black font-black py-5 px-16 text-lg hover:bg-black hover:text-[#d4ff00] transition-all border-2 border-black">
+            SHOP THE PILE
+          </button>
+        </div>
+      </div>
+
+      {/* تفاصيل المطور والبراند (القديمة) */}
+      <footer className="p-10 bg-black text-white flex flex-col md:flex-row justify-between items-center border-t-4 border-[#d4ff00]">
+        <div>
+          <p className="text-xl font-bold">WEARIVO © 2026</p>
+          <p className="text-[10px] opacity-50 uppercase tracking-widest">Premium Quality Clothing</p>
+        </div>
+        <div className="mt-6 md:mt-0 text-center md:text-right">
+          <p className="text-xs font-mono">Developed by:</p>
+          <p className="text-[#d4ff00] font-bold tracking-widest">010EASSA-PIXEL</p>
         </div>
       </footer>
+
     </main>
   );
 }
