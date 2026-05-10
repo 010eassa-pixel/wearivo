@@ -20,7 +20,6 @@ export default function AdminDashboard() {
   const router = useRouter();
 
   useEffect(() => {
-    // استدعاء خط Inter من Google Fonts لضمان النظافة
     const link = document.createElement('link');
     link.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800;900&display=swap';
     link.rel = 'stylesheet';
@@ -43,7 +42,6 @@ export default function AdminDashboard() {
   return (
     <div style={{ ...style.font, display: 'flex', flexDirection: isMobile ? 'column' : 'row', minHeight: '100vh', backgroundColor: '#fcfdfe' }}>
       
-      {/* Logout Modal */}
       {showLogoutConfirm && (
         <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
           <div style={{ backgroundColor: '#fff', padding: '40px', borderRadius: '32px', textAlign: 'center', width: '320px' }}>
@@ -57,7 +55,6 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {/* Sidebar */}
       <aside style={{ width: isMobile ? '100%' : '100px', height: isMobile ? 'auto' : '100vh', backgroundColor: '#fff', borderRight: '1px solid #f2f4f7', position: isMobile ? 'relative' : 'fixed', display: 'flex', flexDirection: isMobile ? 'row' : 'column', alignItems: 'center', justifyContent: 'space-between', padding: '30px 20px', zIndex: 1000, boxSizing: 'border-box' }}>
         <div style={{ width: '42px', height: '42px', background: '#000', borderRadius: '12px', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '900', fontSize: '18px' }}>W</div>
         <nav style={{ display: 'flex', flexDirection: isMobile ? 'row' : 'column', gap: '30px' }}>
@@ -68,9 +65,7 @@ export default function AdminDashboard() {
         <button onClick={() => setShowLogoutConfirm(true)} style={{ background: '#f9fafb', border: '1px solid #f2f4f7', width: '42px', height: '42px', borderRadius: '12px', color: '#98a2b3', cursor: 'pointer' }}><Icons.Logout /></button>
       </aside>
 
-      {/* Main Content */}
       <main style={{ flex: 1, marginLeft: isMobile ? '0' : '100px', padding: isMobile ? '40px 20px' : '80px 100px' }}>
-        
         <div style={{ textAlign: 'center', marginBottom: '80px' }}>
           <h2 style={{ fontSize: isMobile ? '36px' : '56px', fontWeight: '900', letterSpacing: '-4px', margin: 0, color: '#101828' }}>WEARIVO ADMIN</h2>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', marginTop: '12px' }}>
@@ -83,31 +78,14 @@ export default function AdminDashboard() {
         {activeTab === 'home' && (
           <div style={{ animation: 'fadeIn 0.4s ease' }}>
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: '24px', marginBottom: '40px' }}>
-              {[
-                { label: 'TOTAL ITEMS', val: '3' },
-                { label: 'PENDING ORDERS', val: '0', color: '#f04438' },
-                { label: 'GROSS SALES', val: '0 EGP' }
-              ].map((s, i) => (
+              {[{ l: 'TOTAL ITEMS', v: '3' }, { l: 'PENDING ORDERS', v: '0', c: '#f04438' }, { l: 'GROSS SALES', v: '0 EGP' }].map((s, i) => (
                 <div key={i} style={style.card}>
-                  <p style={{ fontSize: '11px', fontWeight: '600', color: '#667085', letterSpacing: '1px', marginBottom: '12px' }}>{s.label}</p>
-                  <p style={{ fontSize: '42px', fontWeight: '900', letterSpacing: '-2px', margin: 0, color: s.color || '#101828' }}>{s.val}</p>
+                  <p style={{ fontSize: '11px', fontWeight: '600', color: '#667085', letterSpacing: '1px', marginBottom: '12px' }}>{s.l}</p>
+                  <p style={{ fontSize: '42px', fontWeight: '900', letterSpacing: '-2px', margin: 0, color: s.c || '#101828' }}>{s.v}</p>
                 </div>
               ))}
             </div>
-
             <div style={style.card}>
               <h4 style={{ fontSize: '18px', fontWeight: '800', letterSpacing: '-0.5px', marginBottom: '32px' }}>Recent Activity</h4>
               <div style={{ padding: '100px 20px', textAlign: 'center', background: '#f9fafb', borderRadius: '24px', border: '1px dashed #eaecf0' }}>
-                <p style={{ color: '#667085', fontSize: '13px', fontWeight: '500' }}>STANDBY: NO RECENT LOGS FOUND</p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'products' && (
-          <div style={{ animation: 'fadeIn 0.4s ease' }}>
-            <h3 style={{ fontSize: '22px', fontWeight: '800', letterSpacing: '-1px', marginBottom: '40px', paddingLeft: '4px' }}>Inventory Management</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: '24px' }}>
-              {['KIDS', 'WOMENS', 'MENS'].map(l => (
-                <div key={l} style={style.card}>
-                  <div style={{ width: '100%', height: '
+                <p style={{ color: '#667085', fontSize: '13px', fontWeight: '500' }}>STANDBY: NO RECENT LOGS
