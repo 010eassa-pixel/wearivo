@@ -1,19 +1,22 @@
+import { initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
 
-import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
-
-
+// إعدادات مشروعك الجديد logan-x
 const firebaseConfig = {
-  apiKey: "AIzaSyDX7Q4rH65b0fgW73cFaTlbBGweXn2pnbQا",
-  authDomain: "wearivo-84213.firebaseapp.com",
-  projectId: "wearivo-84213",
-  storageBucket: "wearivo-84213.firebasestorage.app",
-  messagingSenderId: "759094709370",
-  appId: "1:759094709370:web:776261a2f0e8b399863fc3"
+  apiKey: "AIzaSyCaoKoKiOJEOlnkPCBU1RPiSWlTZtNygPY",
+  authDomain: "logan-x.firebaseapp.com",
+  databaseURL: "https://logan-x-default-rtdb.firebaseio.com",
+  projectId: "logan-x",
+  storageBucket: "logan-x.appspot.com",
+  messagingSenderId: "752942331884",
+  appId: "1:752942331884:web:0f64f61bfc4a4209a832c9",
+  measurementId: "G-8TFT0KBG1C"
 };
 
-
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
+
+// تصدير الخدمات عشان نستخدمها في صفحة الـ Login والـ Admin
 export const auth = getAuth(app);
 export const db = getFirestore(app);
