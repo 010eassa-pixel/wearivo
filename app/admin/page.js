@@ -1,11 +1,12 @@
 "use client";
 import { useEffect, useState } from 'react';
-import { auth } from '../../firebase';
+import { auth, db } from '../../firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 
 export default function AdminDashboard() {
   const [user, setUser] = useState(null);
+  const [activeTab, setActiveTab] = useState('orders'); // 'orders' or 'products'
   const router = useRouter();
 
   useEffect(() => {
@@ -16,98 +17,89 @@ export default function AdminDashboard() {
     return () => unsubscribe();
   }, [router]);
 
-  if (!user) return <div className="h-screen flex items-center justify-center bg-white text-[10px] tracking-[0.3em] opacity-30">AUTHENTICATING...</div>;
+  if (!user) return <div className="h-screen flex items-center justify-center bg-white text-[10px] tracking-[0.3em] opacity-30">LOADING SYSTEM...</div>;
 
   return (
-    <div className="min-h-screen bg-[#fcfcfc] text-[#1a1a1a] font-sans selection:bg-[#1a1a1a] selection:text-white">
+    <div className="flex min-h-screen bg-[#fcfcfc] text-[#1a1a1a] font-sans">
       
-      {/* Sidebar / Header Combo */}
-      <nav className="bg-white border-b border-[#eeeeee] px-8 py-5 flex justify-between items-center sticky top-0 z-50">
-        <div className="flex items-center gap-4">
-          <div className="w-8 h-8 bg-[#1a1a1a] rounded-lg flex items-center justify-center">
-             <span className="text-white text-[10px] font-bold">W</span>
-          </div>
-          <h1 className="text-[13px] font-black tracking-widest uppercase">Wearivo Console</h1>
-        </div>
-        <div className="flex items-center gap-6">
-          <span className="text-[10px] font-bold opacity-30 uppercase tracking-widest hidden md:block">System Online</span>
-          <button onClick={() => signOut(auth)} className="text-[10px] font-bold hover:line-through transition-all uppercase tracking-widest">Logout</button>
-        </div>
-      </nav>
-
-      <main className="max-w-[1400px] mx-auto p-8">
-        
-        {/* Welcome Area */}
-        <header className="mb-12">
-          <p className="text-[10px] font-bold opacity-30 uppercase tracking-[0.3em] mb-2">Internal Management</p>
-          <h2 className="text-4xl font-light tracking-tight">Welcome back, <span className="font-bold">Essa</span></h2>
-        </header>
-
-        {/* Bosta Style Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-12">
-          {[
-            { label: 'Pending Orders', val: '0', color: '#1a1a1a' },
-            { label: 'Out for Delivery', val: '0', color: '#1a1a1a' },
-            { label: 'Inventory Items', val: '3', color: '#1a1a1a' },
-            { label: 'Success Rate', val: '100%', color: '#00c853' }
-          ].map((stat, i) => (
-            <div key={i} className="bg-white border border-[#eeeeee] p-6 rounded-xl hover:border-[#1a1a1a] transition-colors group">
-              <p className="text-[9px] font-bold opacity-40 uppercase tracking-widest mb-4 group-hover:opacity-100 transition-opacity">{stat.label}</p>
-              <p className="text-3xl font-bold" style={{ color: stat.color }}>{stat.val}</p>
-            </div>
-          ))}
+      {/* Sidebar - شريط الجنب الاحترافي */}
+      <aside className="w-64 bg-white border-r border-[#eeeeee] flex flex-col fixed h-full z-50">
+        <div className="p-8 border-b border-[#eeeeee] mb-4">
+          <h1 className="text-[14px] font-black tracking-widest uppercase italic">Wearivo</h1>
+          <p className="text-[8px] opacity-30 font-bold tracking-[0.2em] mt-1">CONTROL CENTER</p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <nav className="flex-1 px-4 space-y-2">
+          <button 
+            onClick={() => setActiveTab('orders')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-[11px] font-bold transition-all ${activeTab === 'orders' ? 'bg-[#1a1a1a] text-white shadow-lg shadow-black/10' : 'text-[#888] hover:bg-[#f9f9f9]'}`}
+          >
+            <span>📦</span> LIVE ORDERS
+          </button>
           
-          {/* Order Feed (Amazon Style Table) */}
-          <div className="lg:col-span-2 bg-white border border-[#eeeeee] rounded-2xl overflow-hidden shadow-sm">
-            <div className="p-6 border-b border-[#eeeeee] flex justify-between items-center">
-               <h3 className="text-[11px] font-bold uppercase tracking-widest">Incoming Requests</h3>
-               <div className="flex gap-2">
-                  <div className="w-2 h-2 bg-orange-400 rounded-full"></div>
-                  <span className="text-[9px] font-bold opacity-40 uppercase tracking-widest">Live Updates</span>
-               </div>
-            </div>
-            <div className="h-[400px] flex flex-col items-center justify-center text-center p-12">
-               <div className="w-16 h-16 bg-[#f9f9f9] rounded-full flex items-center justify-center mb-4">
-                  <svg className="w-6 h-6 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
-               </div>
-               <p className="text-[10px] font-bold opacity-20 uppercase tracking-[0.2em]">Queue is currently empty</p>
-            </div>
-          </div>
+          <button 
+            onClick={() => setActiveTab('products')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-[11px] font-bold transition-all ${activeTab === 'products' ? 'bg-[#1a1a1a] text-white shadow-lg shadow-black/10' : 'text-[#888] hover:bg-[#f9f9f9]'}`}
+          >
+            <span>✨</span> PRODUCT MANAGEMENT
+          </button>
+        </nav>
 
-          {/* Quick Actions (The Upload Center) */}
-          <div className="space-y-6">
-            <div className="bg-[#1a1a1a] text-white p-8 rounded-2xl shadow-xl shadow-black/10">
-              <h3 className="text-[11px] font-bold uppercase tracking-widest mb-6 opacity-60">Store Inventory</h3>
-              <p className="text-xl font-light mb-8 leading-relaxed">Update your <span className="font-bold italic underline">Wearivo</span> storefront with new arrivals.</p>
-              
-              <button className="w-full bg-white text-[#1a1a1a] py-4 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-[#f0f0f0] transition-colors">
-                Upload New Image
-              </button>
-              <p className="text-[8px] opacity-40 text-center mt-4 tracking-widest">ASPECT RATIO 4:5 RECOMMENDED</p>
-            </div>
-
-            <div className="bg-white border border-[#eeeeee] p-8 rounded-2xl">
-              <h3 className="text-[11px] font-bold uppercase tracking-widest mb-4">System Alerts</h3>
-              <div className="p-4 bg-blue-50 rounded-lg">
-                <p className="text-[10px] text-blue-600 font-medium leading-relaxed">
-                  Your Firebase database is connected. All orders are encrypted and secure.
-                </p>
-              </div>
-            </div>
-          </div>
-
+        <div className="p-6 border-t border-[#eeeeee]">
+          <button onClick={() => signOut(auth)} className="w-full text-[10px] font-bold opacity-40 hover:opacity-100 hover:text-red-600 transition-all uppercase tracking-widest">
+            Logout Session
+          </button>
         </div>
+      </aside>
 
+      {/* Main Content Area */}
+      <main className="flex-1 ml-64 p-12">
+        
+        {activeTab === 'orders' ? (
+          <section className="animate-in fade-in duration-500">
+            <header className="mb-10">
+              <h2 className="text-3xl font-bold tracking-tight mb-2">Live Orders</h2>
+              <p className="text-[10px] font-bold opacity-30 uppercase tracking-[0.3em]">Customer Request Stream</p>
+            </header>
+
+            <div className="bg-white border border-[#eeeeee] rounded-2xl p-20 text-center shadow-sm">
+              <div className="w-16 h-16 bg-[#f9f9f9] rounded-full flex items-center justify-center mx-auto mb-6">
+                 <span className="opacity-20 text-xl">💤</span>
+              </div>
+              <p className="text-[10px] font-bold opacity-30 uppercase tracking-[0.2em]">All orders are processed. Standing by.</p>
+            </div>
+          </section>
+        ) : (
+          <section className="animate-in fade-in duration-500">
+            <header className="mb-10">
+              <h2 className="text-3xl font-bold tracking-tight mb-2">Products</h2>
+              <p className="text-[10px] font-bold opacity-30 uppercase tracking-[0.3em]">Manage Sections & Inventory</p>
+            </header>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {['MENS SECTION', 'WOMENS SECTION', 'KIDS SECTION'].map((section) => (
+                <div key={section} className="bg-white border border-[#eeeeee] p-8 rounded-2xl hover:border-[#1a1a1a] transition-all group shadow-sm">
+                  <h3 className="text-[11px] font-black tracking-widest mb-6 opacity-40 group-hover:opacity-100">{section}</h3>
+                  <div className="aspect-[3/4] bg-[#f9f9f9] rounded-xl mb-6 flex items-center justify-center border border-dashed border-[#ddd]">
+                    <span className="text-[10px] font-bold opacity-20 uppercase">No Image Active</span>
+                  </div>
+                  <button className="w-full bg-[#f9f9f9] group-hover:bg-[#1a1a1a] group-hover:text-white py-4 rounded-xl text-[9px] font-bold uppercase tracking-widest transition-all">
+                    Update Image
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-10 p-8 bg-[#1a1a1a] text-white rounded-2xl flex justify-between items-center">
+              <div>
+                <h4 className="text-sm font-bold mb-1">Global Site Control</h4>
+                <p className="text-[10px] opacity-50">Change site-wide colors, banners, and announcements.</p>
+              </div>
+              <button className="bg-white text-black px-6 py-3 rounded-lg text-[10px] font-bold uppercase tracking-widest">Open Global Settings</button>
+            </div>
+          </section>
+        )}
       </main>
-
-      {/* Footer Branding */}
-      <footer className="p-12 text-center opacity-20">
-        <p className="text-[9px] font-bold tracking-[0.5em] uppercase">WEARIVO INTERNAL OS v1.0</p>
-      </footer>
-
     </div>
   );
 }
