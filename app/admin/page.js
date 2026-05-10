@@ -13,7 +13,7 @@ const Icons = {
   ExternalLink: () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
 };
 
-export default function WearivoResponsiveConsole() {
+export default function WearivoMasterConsole() {
   const [user, setUser] = useState(null);
   const [activeTab, setActiveTab] = useState('orders');
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
@@ -26,19 +26,17 @@ export default function WearivoResponsiveConsole() {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     handleResize();
     window.addEventListener('resize', handleResize);
-    
     const link = document.createElement('link');
     link.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap';
     link.rel = 'stylesheet';
     document.head.appendChild(link);
-    
     onAuthStateChanged(auth, (u) => u ? setUser(u) : router.push('/login'));
     return () => window.removeEventListener('resize', handleResize);
   }, [router]);
 
   if (!user) return null;
 
-  const cardStyle = { backgroundColor: '#fff', borderRadius: '12px', border: '1px solid #eef2f6', padding: '24px', display: 'flex', flexDirection: 'column' };
+  const cardStyle = { backgroundColor: '#fff', borderRadius: '16px', border: '1px solid #eef2f6', padding: '24px', display: 'flex', flexDirection: 'column' };
 
   return (
     <div style={{ fontFamily: "'Inter', sans-serif", display: 'flex', flexDirection: isMobile ? 'column' : 'row', minHeight: '100vh', backgroundColor: '#f8fafc' }}>
@@ -67,7 +65,7 @@ export default function WearivoResponsiveConsole() {
           </>
         )}
 
-        <nav style={{ flex: isMobile ? 'none' : 1, width: isMobile ? '100%' : 'auto' }}>
+        <nav style={{ flex: isMobile ? 'none' : 1, width: '100%' }}>
           <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: isMobile ? 'row' : 'column', justifyContent: 'space-around' }}>
             <li onClick={() => setActiveTab('orders')} style={{ padding: isMobile ? '10px' : '16px 20px', borderRadius: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '15px', background: activeTab === 'orders' ? '#334155' : 'transparent', color: activeTab === 'orders' ? cafeColor : '#94a3b8' }}>
               <Icons.LiveOrders /> {!isMobile && "Live Orders"}
@@ -86,14 +84,14 @@ export default function WearivoResponsiveConsole() {
         )}
       </aside>
 
-      {/* 2. Main Content */}
+      {/* 2. Main Content Area */}
       <main style={{ flex: 1, marginLeft: isMobile ? 0 : '280px', marginBottom: isMobile ? '70px' : 0, padding: isMobile ? '20px' : '40px' }}>
         
-        {/* Top Header - Search bar adjust */}
+        {/* Search Header - Adjusted width to prevent overlapping */}
         <header style={{ backgroundColor: '#fff', padding: '15px 25px', borderRadius: '12px', marginBottom: '30px', border: '1px solid #f2f4f7', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
           <div style={{ position: 'relative', width: isMobile ? '100%' : '350px' }}>
             <span style={{ position: 'absolute', left: '15px', top: '50%', transform: 'translateY(-50%)', opacity: 0.3 }}><Icons.Search /></span>
-            <input type="text" placeholder="Search Order Code..." style={{ width: '100%', padding: '10px 10px 10px 40px', borderRadius: '8px', border: '1px solid #e2e8f0', outline: 'none' }} />
+            <input type="text" placeholder={activeTab === 'orders' ? "Search Order Code (#WRV)..." : "Search Product Catalog..."} style={{ width: '100%', padding: '10px 10px 10px 40px', borderRadius: '8px', border: '1px solid #e2e8f0', outline: 'none' }} />
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <span style={{ fontSize: '10px', fontWeight: '800', color: '#10b981' }}>ONLINE</span>
@@ -102,31 +100,31 @@ export default function WearivoResponsiveConsole() {
         </header>
 
         {activeTab === 'orders' ? (
-          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: '24px' }}>
-            <div style={cardStyle}><p style={{ fontSize: '11px', fontWeight: '800', color: '#64748b', textAlign: 'right' }}>TRANSACTIONS</p><h2 style={{ fontSize: '28px', fontWeight: '800', textAlign: 'right' }}>$208,187</h2></div>
-            <div style={cardStyle}><p style={{ fontSize: '11px', fontWeight: '800', color: '#64748b', textAlign: 'right' }}>RATING</p><h2 style={{ fontSize: '28px', fontWeight: '800', textAlign: 'right' }}>4.3 ★</h2></div>
-            <div style={cardStyle}>
-              <h3 style={{ fontSize: '14px', fontWeight: '800', marginBottom: '15px' }}>Stats</h3>
-              <div style={{ height: '8px', width: '90%', background: '#10b981', borderRadius: '10px' }}></div>
-              <div style={{ height: '8px', width: '40%', background: cafeColor, borderRadius: '10px', marginTop: '8px' }}></div>
-            </div>
-            {/* Pie Chart Simulation */}
-            <div style={{ ...cardStyle, gridColumn: isMobile ? 'auto' : 'span 1', alignItems: 'center' }}>
-               <div style={{ width: '120px', height: '120px', borderRadius: '50%', border: '15px solid #1e293b', borderTopColor: cafeColor }}></div>
+          <div>
+            <h1 style={{ fontSize: '24px', fontWeight: '800', marginBottom: '20px' }}>Live Order Stream</h1>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: '24px' }}>
+              <div style={cardStyle}><p style={{ fontSize: '11px', fontWeight: '800', color: '#64748b', textAlign: 'right' }}>TRANSACTIONS</p><h2 style={{ fontSize: '28px', fontWeight: '800', textAlign: 'right' }}>$208,187</h2></div>
+              <div style={cardStyle}><p style={{ fontSize: '11px', fontWeight: '800', color: '#64748b', textAlign: 'right' }}>RATING</p><h2 style={{ fontSize: '28px', fontWeight: '800', textAlign: 'right' }}>4.3 ★</h2></div>
+              <div style={cardStyle}><h3 style={{ fontSize: '12px', fontWeight: '800' }}>Status Overview</h3><div style={{ height: '8px', width: '90%', background: '#10b981', borderRadius: '10px' }}></div></div>
             </div>
           </div>
         ) : (
-          <div style={cardStyle}>
-             <button onClick={() => setShowAddModal(true)} style={{ background: '#000', color: '#fff', border: 'none', padding: '12px', borderRadius: '8px', fontWeight: '700', cursor: 'pointer', marginBottom: '20px' }}>+ ADD PRODUCT</button>
-             <h4 style={{ fontSize: '14px', fontWeight: '800' }}>Theme</h4>
-             <input type="color" value={cafeColor} onChange={(e) => setCafeColor(e.target.value)} style={{ width: '50px', height: '50px', border: 'none', borderRadius: '8px' }} />
+          <div>
+            <header style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '30px' }}>
+              <h1 style={{ fontSize: '24px', fontWeight: '800' }}>Brand & Style</h1>
+              <button onClick={() => setShowAddModal(true)} style={{ background: '#000', color: '#fff', border: 'none', padding: '12px 20px', borderRadius: '8px', fontWeight: '700', cursor: 'pointer' }}>+ ADD PRODUCT</button>
+            </header>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '24px' }}>
+              <div style={cardStyle}><p style={{ fontWeight: '800', fontSize: '14px' }}>Primary Theme Color</p><input type="color" value={cafeColor} onChange={(e) => setCafeColor(e.target.value)} style={{ width: '60px', height: '60px', border: 'none', borderRadius: '8px' }} /></div>
+              <div style={cardStyle}><p style={{ fontWeight: '800', fontSize: '14px' }}>Store Background</p><select style={{ padding: '10px', borderRadius: '8px' }}><option>Beige Texture</option><option>White Minimal</option></select></div>
+            </div>
           </div>
         )}
       </main>
 
-      {/* Logout Confirm Modal */}
+      {/* Logout & Add Modal logic remains same for consistency */}
       {showLogoutConfirm && (
-        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(15, 23, 42, 0.8)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(15, 23, 42, 0.8)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000 }}>
           <div style={{ backgroundColor: '#fff', padding: '30px', borderRadius: '20px', textAlign: 'center', width: '300px' }}>
             <h3 style={{ fontWeight: '800' }}>Logout?</h3>
             <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
