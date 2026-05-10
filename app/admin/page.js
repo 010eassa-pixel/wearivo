@@ -17,93 +17,86 @@ export default function AdminDashboard() {
     return () => unsubscribe();
   }, [router]);
 
-  if (!user) return <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', fontSize: '12px', letterSpacing: '2px' }}>INITIALIZING WEARIVO OS...</div>;
+  if (!user) return <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', fontSize: '12px', fontWeight: 'bold', letterSpacing: '4px', opacity: 0.2 }}>WEARIVO OS</div>;
 
   const styles = {
-    aside: { width: '80px', backgroundColor: '#fff', borderRight: '1px solid #eee', position: 'fixed', height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '30px 0', zIndex: 1000 },
-    main: { marginLeft: '80px', padding: '50px', backgroundColor: '#F9FBFC', minHeight: '100vh', width: 'calc(100% - 80px)' },
-    card: { backgroundColor: '#fff', borderRadius: '20px', border: '1px solid #edf2f7', padding: '30px', marginBottom: '30px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.02)' },
-    grid: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '30px', marginBottom: '30px' },
-    statusBadge: { fontSize: '11px', fontWeight: 'bold', color: '#10b981', background: '#ecfdf5', padding: '6px 14px', borderRadius: '12px', border: '1px solid #d1fae5' }
+    aside: { width: '80px', backgroundColor: '#fff', borderRight: '1px solid #f0f0f0', position: 'fixed', height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '40px 0', zIndex: 1000 },
+    main: { marginLeft: '80px', padding: '60px', backgroundColor: '#fcfdfe', minHeight: '100vh', width: 'calc(100% - 80px)' },
+    card: { backgroundColor: '#fff', borderRadius: '24px', border: '1px solid #f0f0f0', padding: '32px', transition: 'all 0.3s ease', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' },
+    statNumber: { fontSize: '42px', fontWeight: '900', margin: '10px 0 0 0', letterSpacing: '-2px' },
+    navBtn: { fontSize: '24px', border: 'none', background: 'none', cursor: 'pointer', transition: '0.3s', padding: '12px', borderRadius: '15px' }
   };
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', fontFamily: 'system-ui, sans-serif', color: '#1a202c' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', fontFamily: '"Inter", sans-serif', color: '#000' }}>
       
-      {/* Sidebar */}
+      {/* Sidebar - احترافي وبسيط */}
       <aside style={styles.aside}>
-        <div style={{ width: '45px', height: '45px', background: '#1a1a1a', borderRadius: '12px', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '900', fontSize: '18px', marginBottom: '50px' }}>W</div>
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: '30px' }}>
-          <button onClick={() => setActiveTab('home')} title="Overview" style={{ fontSize: '22px', border: 'none', background: 'none', cursor: 'pointer', opacity: activeTab === 'home' ? 1 : 0.2 }}>🏠</button>
-          <button onClick={() => setActiveTab('products')} title="Products" style={{ fontSize: '22px', border: 'none', background: 'none', cursor: 'pointer', opacity: activeTab === 'products' ? 1 : 0.2 }}>👕</button>
-          <button onClick={() => setActiveTab('orders')} title="Orders" style={{ fontSize: '22px', border: 'none', background: 'none', cursor: 'pointer', opacity: activeTab === 'orders' ? 1 : 0.2 }}>📦</button>
-          <button onClick={() => signOut(auth)} title="Logout" style={{ fontSize: '22px', border: 'none', background: 'none', cursor: 'pointer', opacity: 0.2, marginTop: '100px' }}>🚪</button>
+        <div style={{ width: '48px', height: '48px', background: '#000', borderRadius: '16px', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '900', fontSize: '20px', marginBottom: '60px', boxShadow: '0 10px 20px rgba(0,0,0,0.1)' }}>W</div>
+        <nav style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}>
+          <button onClick={() => setActiveTab('home')} style={{ ...styles.navBtn, backgroundColor: activeTab === 'home' ? '#f5f5f5' : 'transparent', opacity: activeTab === 'home' ? 1 : 0.2 }}>🏠</button>
+          <button onClick={() => setActiveTab('products')} style={{ ...styles.navBtn, backgroundColor: activeTab === 'products' ? '#f5f5f5' : 'transparent', opacity: activeTab === 'products' ? 1 : 0.2 }}>👕</button>
+          <button onClick={() => setActiveTab('orders')} style={{ ...styles.navBtn, backgroundColor: activeTab === 'orders' ? '#f5f5f5' : 'transparent', opacity: activeTab === 'orders' ? 1 : 0.2 }}>📦</button>
+          <button onClick={() => signOut(auth)} style={{ ...styles.navBtn, opacity: 0.2, marginTop: '80px' }}>🚪</button>
         </nav>
       </aside>
 
       {/* Main Content */}
       <main style={styles.main}>
         
-        {/* Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '45px' }}>
-          <div>
-            <h2 style={{ fontSize: '32px', fontWeight: '800', letterSpacing: '-1px', margin: 0 }}>Wearivo Admin</h2>
-            <p style={{ color: '#718096', fontSize: '15px', marginTop: '8px', fontWeight: '500' }}>Welcome back, Essa Wahid</p>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-            <span style={styles.statusBadge}>● SYSTEM ONLINE</span>
-            <div style={{ width: '45px', height: '45px', borderRadius: '14px', background: '#1a1a1a', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>EW</div>
+        {/* Centralized Header - وريفو أدمن في النص */}
+        <div style={{ textAlign: 'center', marginBottom: '60px' }}>
+          <h2 style={{ fontSize: '48px', fontWeight: '900', letterSpacing: '-3px', margin: 0, textTransform: 'uppercase' }}>Wearivo Admin</h2>
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px', marginTop: '10px' }}>
+            <span style={{ fontSize: '12px', fontWeight: '800', color: '#10b981', letterSpacing: '1px' }}>● SYSTEM LIVE</span>
+            <span style={{ width: '4px', height: '4px', background: '#ddd', borderRadius: '50%' }}></span>
+            <span style={{ fontSize: '12px', fontWeight: '600', color: '#888' }}>V1.0.4</span>
           </div>
         </div>
 
         {activeTab === 'home' && (
-          <div style={{ animation: 'fadeIn 0.5s ease' }}>
-            {/* Quick Stats */}
-            <div style={styles.grid}>
-              <div style={styles.card}>
-                <p style={{ fontSize: '12px', fontWeight: '700', color: '#a0aec0', marginBottom: '15px', letterSpacing: '1px' }}>TOTAL SALES</p>
-                <p style={{ fontSize: '36px', fontWeight: '800', margin: 0 }}>0 <span style={{ fontSize: '16px', color: '#cbd5e0' }}>EGP</span></p>
+          <div style={{ animation: 'fadeIn 0.6s ease-out' }}>
+            {/* Stats Grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '30px', marginBottom: '40px' }}>
+              <div style={styles.card} onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'} onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>
+                <p style={{ fontSize: '11px', fontWeight: '900', color: '#999', letterSpacing: '2px' }}>GROSS SALES</p>
+                <p style={styles.statNumber}>0 <span style={{ fontSize: '18px', fontWeight: '600', opacity: 0.2 }}>EGP</span></p>
               </div>
-              <div style={styles.card}>
-                <p style={{ fontSize: '12px', fontWeight: '700', color: '#a0aec0', marginBottom: '15px', letterSpacing: '1px' }}>PENDING ORDERS</p>
-                <p style={{ fontSize: '36px', fontWeight: '800', margin: 0, color: '#f56565' }}>0</p>
+              <div style={styles.card} onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'} onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>
+                <p style={{ fontSize: '11px', fontWeight: '900', color: '#999', letterSpacing: '2px' }}>PENDING ORDERS</p>
+                <p style={{ ...styles.statNumber, color: '#ff4d4d' }}>0</p>
               </div>
-              <div style={styles.card}>
-                <p style={{ fontSize: '12px', fontWeight: '700', color: '#a0aec0', marginBottom: '15px', letterSpacing: '1px' }}>ACTIVE PRODUCTS</p>
-                <p style={{ fontSize: '36px', fontWeight: '800', margin: 0 }}>3</p>
+              <div style={styles.card} onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'} onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>
+                <p style={{ fontSize: '11px', fontWeight: '900', color: '#999', letterSpacing: '2px' }}>TOTAL ITEMS</p>
+                <p style={styles.statNumber}>3</p>
               </div>
             </div>
 
-            {/* Orders Tracking Box */}
-            <div style={styles.card}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
-                <h4 style={{ fontSize: '18px', fontWeight: '800' }}>Recent Orders Feed</h4>
-                <button style={{ background: 'none', border: 'none', color: '#4a5568', fontWeight: 'bold', fontSize: '12px', cursor: 'pointer' }}>VIEW ALL →</button>
+            {/* Orders Feed */}
+            <div style={{ ...styles.card, padding: '40px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px' }}>
+                <h4 style={{ fontSize: '20px', fontWeight: '900', letterSpacing: '-1px' }}>Recent Activity</h4>
+                <div style={{ width: '40px', height: '4px', background: '#eee', borderRadius: '10px' }}></div>
               </div>
-              <div style={{ padding: '60px', textAlign: 'center', background: '#f7fafc', borderRadius: '15px', border: '2px dashed #edf2f7' }}>
-                <p style={{ color: '#a0aec0', fontSize: '14px', fontWeight: '600' }}>No incoming requests from customers yet.</p>
+              <div style={{ padding: '80px 20px', textAlign: 'center', background: '#fafafa', borderRadius: '30px', border: '2px dashed #f0f0f0' }}>
+                <p style={{ color: '#bbb', fontSize: '14px', fontWeight: '600', letterSpacing: '1px' }}>NO INCOMING REQUESTS AT THE MOMENT</p>
               </div>
             </div>
           </div>
         )}
 
         {activeTab === 'products' && (
-          <div style={{ animation: 'fadeIn 0.5s ease' }}>
-            <h3 style={{ fontSize: '22px', fontWeight: '800', marginBottom: '30px' }}>Store Sections Management</h3>
-            <div style={styles.grid}>
+          <div style={{ animation: 'fadeIn 0.6s ease-out' }}>
+            <h3 style={{ fontSize: '24px', fontWeight: '900', marginBottom: '40px', letterSpacing: '-1px' }}>Inventory Management</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '40px' }}>
               {[
-                { name: 'رجالي', en: 'MENS' },
-                { name: 'حريمي', en: 'WOMENS' },
-                { name: 'أطفالي', en: 'KIDS' }
-              ].map(section => (
-                <div key={section.en} style={styles.card}>
-                  <div style={{ width: '100%', height: '220px', background: '#f1f5f9', borderRadius: '15px', marginBottom: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
-                    <span style={{ fontSize: '40px' }}>📷</span>
-                    <span style={{ fontSize: '12px', fontWeight: '700', color: '#94a3b8' }}>{section.name}</span>
-                  </div>
-                  <button style={{ width: '100%', padding: '16px', background: '#1a1a1a', color: '#fff', border: 'none', borderRadius: '12px', fontSize: '12px', fontWeight: '700', cursor: 'pointer', transition: 'transform 0.2s' }}>
-                    UPLOAD {section.en} IMAGE
-                  </button>
+                { label: 'MENS', icon: '🤵' },
+                { label: 'WOMENS', icon: '👗' },
+                { label: 'KIDS', icon: '🧸' }
+              ].map(item => (
+                <div key={item.label} style={styles.card}>
+                  <div style={{ width: '100%', height: '260px', background: '#f8f8f8', borderRadius: '25px', marginBottom: '25px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '50px' }}>{item.icon}</div>
+                  <button style={{ width: '100%', padding: '20px', background: '#000', color: '#fff', border: 'none', borderRadius: '18px', fontSize: '12px', fontWeight: '900', cursor: 'pointer', letterSpacing: '2px', boxShadow: '0 10px 20px rgba(0,0,0,0.1)' }}>UPLOAD {item.label}</button>
                 </div>
               ))}
             </div>
