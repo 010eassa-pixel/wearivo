@@ -2,9 +2,9 @@
 import { useEffect, useState } from 'react';
 import { auth, db } from '../../firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 
-// أيقونات Dashboard احترافية
 const Icons = {
   LiveOrders: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>,
   BrandManager: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 20v-6M6 20V10M18 20V4"/></svg>,
@@ -18,7 +18,7 @@ export default function WearivoUltimateConsole() {
   const [user, setUser] = useState(null);
   const [activeTab, setActiveTab] = useState('orders');
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-  const [isFormOpen, setIsFormOpen] = useState(false); // الحالة المسؤولة عن فتح فورم الإضافة
+  const [isFormOpen, setIsFormOpen] = useState(false);
   const [cafeColor, setCafeColor] = useState('#D2B48C');
   const [isMobile, setIsMobile] = useState(false);
   const router = useRouter();
@@ -42,7 +42,6 @@ export default function WearivoUltimateConsole() {
   return (
     <div style={{ fontFamily: "'Inter', sans-serif", display: 'flex', flexDirection: isMobile ? 'column' : 'row', minHeight: '100vh', backgroundColor: '#f8fafc' }}>
       
-      {/* 1. Sidebar */}
       <aside style={{ width: isMobile ? '100%' : '280px', backgroundColor: '#1e293b', padding: isMobile ? '10px' : '40px 24px', display: 'flex', flexDirection: isMobile ? 'row' : 'column', color: '#fff', position: 'fixed', height: isMobile ? '70px' : '100vh', bottom: isMobile ? 0 : 'auto', left: 0, zIndex: 1000 }}>
         {!isMobile && (
           <>
@@ -62,15 +61,29 @@ export default function WearivoUltimateConsole() {
             </li>
           </ul>
         </nav>
-        <div onClick={() => setShowLogoutConfirm(true)} style={{ padding: '20px', borderRadius: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '15px', color: '#fca5a5', fontWeight: '700', borderTop: isMobile ? 'none' : '1px solid #334155', marginTop: 'auto' }}>
+
+        {/* التعديل الوحيد: رفعنا الـ marginBottom عشان الزرار يظهر كامل فوق شريط الويندوز */}
+        <div 
+          onClick={() => setShowLogoutConfirm(true)} 
+          style={{ 
+            padding: '20px', 
+            borderRadius: '12px', 
+            cursor: 'pointer', 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '15px', 
+            color: '#fca5a5', 
+            fontWeight: '700', 
+            borderTop: isMobile ? 'none' : '1px solid #334155', 
+            marginTop: 'auto',
+            marginBottom: isMobile ? '0px' : '45px' 
+          }}
+        >
           <Icons.Logout /> {!isMobile && "Logout Session"}
         </div>
       </aside>
 
-      {/* 2. Main Content Area */}
       <main style={{ flex: 1, marginLeft: isMobile ? 0 : '280px', marginBottom: isMobile ? '70px' : 0, padding: isMobile ? '20px' : '40px', boxSizing: 'border-box' }}>
-        
-        {/* Header with Integrated Search */}
         <header style={{ backgroundColor: '#fff', padding: '15px 25px', borderRadius: '12px', marginBottom: '30px', border: '1px solid #f2f4f7', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
           <div style={{ position: 'relative', width: isMobile ? '100%' : '350px' }}>
             <span style={{ position: 'absolute', left: '15px', top: '50%', transform: 'translateY(-50%)', opacity: 0.3 }}><Icons.Search /></span>
@@ -88,9 +101,8 @@ export default function WearivoUltimateConsole() {
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: '24px', marginBottom: '24px' }}>
               <div style={cardStyle}><p style={{ fontSize: '11px', fontWeight: '800', color: '#64748b' }}>TRANSACTIONS</p><h2 style={{ fontSize: '32px', fontWeight: '800', margin: '15px 0' }}>$208,187</h2></div>
               <div style={cardStyle}><p style={{ fontSize: '11px', fontWeight: '800', color: '#64748b' }}>PROJECT RATING</p><h2 style={{ fontSize: '32px', fontWeight: '800', margin: '15px 0' }}>4.3 ★</h2></div>
-              <div style={cardStyle}><p style={{ fontSize: '11px', fontWeight: '800', color: '#64748b' }}>NEWS STATISTICS</p><div style={{ height: '8px', width: '90%', background: '#10b981', borderRadius: '10px', marginTop: '20px' }}></div></div>
+              <div style={cardStyle}><p style={{ fontSize: '11px', fontWeight: '800', color: '#64748b' }}>STATUS</p><div style={{ height: '8px', width: '90%', background: '#10b981', borderRadius: '10px', marginTop: '20px' }}></div></div>
             </div>
-            {/* Pie Chart Simulation as per Display */}
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1.2fr 2fr', gap: '24px' }}>
                 <div style={cardStyle}><h3 style={{ fontSize: '14px', fontWeight: '800', marginBottom: '20px' }}>Phone Calls</h3><div style={{ width: '160px', height: '160px', borderRadius: '50%', border: '20px solid #1e293b', borderTopColor: cafeColor, borderRightColor: '#10b981', margin: '0 auto' }}></div></div>
                 <div style={cardStyle}><h3 style={{ fontSize: '14px', fontWeight: '800', marginBottom: '20px' }}>Recent Orders History</h3><div style={{ textAlign: 'center', padding: '60px', border: '1px dashed #e2e8f0', borderRadius: '12px', color: '#94a3b8' }}>Waiting for data stream...</div></div>
@@ -111,31 +123,27 @@ export default function WearivoUltimateConsole() {
           </div>
         )}
 
-        {/* 3. Add Product Modal - الوجهة المطلوبة */}
         {isFormOpen && (
           <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(15, 23, 42, 0.8)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
-            <div style={{ backgroundColor: '#fff', padding: '40px', borderRadius: '32px', width: '480px', boxShadow: '0 25px 50px rgba(0,0,0,0.2)' }}>
+            <div style={{ backgroundColor: '#fff', padding: '40px', borderRadius: '32px', width: '480px' }}>
               <h3 style={{ fontSize: '24px', fontWeight: '800', marginBottom: '32px' }}>New Item Upload</h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
-                <input type="text" placeholder="Product Title" style={{ padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', outline: 'none' }} />
+                <input type="text" placeholder="Product Title" style={{ padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }} />
                 <div style={{ display: 'flex', gap: '15px' }}>
-                  <input type="number" placeholder="Price (EGP)" style={{ flex: 1, padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }} />
-                  <select style={{ flex: 1, padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                    <option>Mens Wear</option><option>Womens Wear</option><option>Kids Wear</option>
-                  </select>
+                  <input type="number" placeholder="Price" style={{ flex: 1, padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }} />
+                  <select style={{ flex: 1, padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}><option>Mens Wear</option><option>Womens Wear</option><option>Kids Wear</option></select>
                 </div>
-                <textarea placeholder="Product description and details..." rows="3" style={{ padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', resize: 'none' }}></textarea>
-                <div style={{ border: '2px dashed #e2e8f0', padding: '20px', borderRadius: '12px', textAlign: 'center' }}><input type="file" style={{ fontSize: '11px' }} /></div>
+                <textarea placeholder="Description..." rows="3" style={{ padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}></textarea>
+                <input type="file" style={{ fontSize: '11px' }} />
               </div>
               <div style={{ display: 'flex', gap: '12px', marginTop: '32px' }}>
-                <button onClick={() => setIsFormOpen(false)} style={{ flex: 1, padding: '16px', borderRadius: '16px', border: '1px solid #e2e8f0', background: '#fff', fontWeight: '700', cursor: 'pointer' }}>Cancel</button>
-                <button style={{ flex: 1, padding: '16px', borderRadius: '16px', border: 'none', background: '#000', color: '#fff', fontWeight: '700', cursor: 'pointer' }}>Save Product</button>
+                <button onClick={() => setIsFormOpen(false)} style={{ flex: 1, padding: '16px', borderRadius: '16px', border: '1px solid #e2e8f0', background: '#fff', fontWeight: '700' }}>Cancel</button>
+                <button style={{ flex: 1, padding: '16px', borderRadius: '16px', border: 'none', background: '#000', color: '#fff', fontWeight: '700' }}>Save Product</button>
               </div>
             </div>
           </div>
         )}
 
-        {/* 4. Logout Confirmation */}
         {showLogoutConfirm && (
           <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(15, 23, 42, 0.7)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
             <div style={{ backgroundColor: '#fff', padding: '40px', borderRadius: '24px', textAlign: 'center', width: '350px' }}>
