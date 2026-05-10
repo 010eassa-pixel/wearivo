@@ -28,8 +28,14 @@ export default function AdminDashboard() {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     handleResize();
     window.addEventListener('resize', handleResize);
-    onAuthStateChanged(auth, (u) => u ? setUser(u) : router.push('/login'));
-    return () => window.removeEventListener('resize', handleResize);
+    const unsubscribe = onAuthStateChanged(auth, (u) => {
+      if (u) setUser(u);
+      else router.push('/login');
+    });
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      unsubscribe();
+    };
   }, [router]);
 
   if (!user) return null;
@@ -49,7 +55,7 @@ export default function AdminDashboard() {
             <p style={{ fontSize: '13px', color: '#667085', marginBottom: '30px' }}>You will need to re-authenticate.</p>
             <div style={{ display: 'flex', gap: '10px' }}>
               <button onClick={() => setShowLogoutConfirm(false)} style={{ flex: 1, padding: '14px', borderRadius: '16px', border: '1px solid #eee', background: 'none', fontWeight: '600', cursor: 'pointer' }}>Cancel</button>
-              <button onClick={() => signOut(auth)} style={{ flex: 1, padding: '14px', borderRadius: '16px', border: 'none', background: '#000', color: '#fff', fontWeight: '600', cursor: 'pointer' }}>Confirm</button>
+              <button onClick={() => signOut(auth).then(() => router.push('/login'))} style={{ flex: 1, padding: '14px', borderRadius: '16px', border: 'none', background: '#000', color: '#fff', fontWeight: '600', cursor: 'pointer' }}>Confirm</button>
             </div>
           </div>
         </div>
@@ -65,7 +71,7 @@ export default function AdminDashboard() {
         <button onClick={() => setShowLogoutConfirm(true)} style={{ background: '#f9fafb', border: '1px solid #f2f4f7', width: '42px', height: '42px', borderRadius: '12px', color: '#98a2b3', cursor: 'pointer' }}><Icons.Logout /></button>
       </aside>
 
-      <main style={{ flex: 1, marginLeft: isMobile ? '0' : '100px', padding: isMobile ? '40px 20px' : '80px 100px' }}>
+      <main style={{ flex: 1, marginLeft: isMobile ? '0' : '100px', padding: isMobile ? '40px 20px' : '80px 100px', boxSizing: 'border-box' }}>
         <div style={{ textAlign: 'center', marginBottom: '80px' }}>
           <h2 style={{ fontSize: isMobile ? '36px' : '56px', fontWeight: '900', letterSpacing: '-4px', margin: 0, color: '#101828' }}>WEARIVO ADMIN</h2>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', marginTop: '12px' }}>
@@ -88,4 +94,26 @@ export default function AdminDashboard() {
             <div style={style.card}>
               <h4 style={{ fontSize: '18px', fontWeight: '800', letterSpacing: '-0.5px', marginBottom: '32px' }}>Recent Activity</h4>
               <div style={{ padding: '100px 20px', textAlign: 'center', background: '#f9fafb', borderRadius: '24px', border: '1px dashed #eaecf0' }}>
-                <p style={{ color: '#667085', fontSize: '13px', fontWeight: '500' }}>STANDBY: NO RECENT LOGS
+                <p style={{ color: '#667085', fontSize: '13px', fontWeight: '500' }}>STANDBY: NO RECENT LOGS FOUND</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'products' && (
+          <div style={{ animation: 'fadeIn 0.4s ease' }}>
+            <h3 style={{ fontSize: '22px', fontWeight: '800', letterSpacing: '-1px', marginBottom: '40px' }}>Inventory Management</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: '24px' }}>
+              {['KIDS', 'WOMENS', 'MENS'].map(l => (
+                <div key={l} style={style.card}>
+                  <div style={{ width: '100%', height: '240px', background: '#f9fafb', borderRadius: '20px', marginBottom: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Icons.Camera /></div>
+                  <button style={{ width: '100%', padding: '18px', background: '#000', color: '#fff', border: 'none', borderRadius: '16px', fontSize: '12px', fontWeight: '600', letterSpacing: '0.5px', cursor: 'pointer' }}>UPLOAD {l}</button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}
