@@ -4,23 +4,12 @@ import { auth } from '../../firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 
-// أيقونات SVG احترافية وبسيطة
 const Icons = {
-  Home: () => (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-  ),
-  Products: () => (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
-  ),
-  Orders: () => (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
-  ),
-  Logout: () => (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-  ),
-  Camera: () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ccc" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
-  )
+  Home: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>,
+  Products: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M3 9h18M9 21V9"></path></svg>,
+  Orders: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path></svg>,
+  Logout: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"></path></svg>,
+  Camera: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ddd" strokeWidth="1.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
 };
 
 export default function AdminDashboard() {
@@ -31,114 +20,94 @@ export default function AdminDashboard() {
   const router = useRouter();
 
   useEffect(() => {
+    // استدعاء خط Inter من Google Fonts لضمان النظافة
+    const link = document.createElement('link');
+    link.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800;900&display=swap';
+    link.rel = 'stylesheet';
+    document.head.appendChild(link);
+
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     handleResize();
     window.addEventListener('resize', handleResize);
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      if (!currentUser) router.push('/login');
-      else setUser(currentUser);
-    });
-    return () => { window.removeEventListener('resize', handleResize); unsubscribe(); };
+    onAuthStateChanged(auth, (u) => u ? setUser(u) : router.push('/login'));
+    return () => window.removeEventListener('resize', handleResize);
   }, [router]);
 
-  if (!user) return <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', fontSize: '12px', fontWeight: '900', letterSpacing: '5px', opacity: 0.1 }}>WEARIVO</div>;
+  if (!user) return null;
+
+  const style = {
+    font: { fontFamily: "'Inter', sans-serif" },
+    card: { backgroundColor: '#fff', borderRadius: '24px', border: '1px solid #f2f4f7', padding: '32px' }
+  };
 
   return (
-    <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', minHeight: '100vh', backgroundColor: '#fcfdfe', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
+    <div style={{ ...style.font, display: 'flex', flexDirection: isMobile ? 'column' : 'row', minHeight: '100vh', backgroundColor: '#fcfdfe' }}>
       
       {/* Logout Modal */}
       {showLogoutConfirm && (
-        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
-          <div style={{ backgroundColor: '#fff', padding: '40px', borderRadius: '35px', textAlign: 'center', width: '90%', maxWidth: '340px', boxShadow: '0 25px 50px rgba(0,0,0,0.15)' }}>
-            <h3 style={{ fontSize: '22px', fontWeight: '900', margin: '0 0 10px 0', letterSpacing: '-1px' }}>Confirm Logout</h3>
-            <p style={{ fontSize: '14px', color: '#888', fontWeight: '500', marginBottom: '35px', lineHeight: '1.5' }}>Are you sure you want to exit the admin panel?</p>
-            <div style={{ display: 'flex', gap: '12px' }}>
-              <button onClick={() => setShowLogoutConfirm(false)} style={{ flex: 1, padding: '16px', borderRadius: '18px', border: '1px solid #eee', backgroundColor: '#fff', fontWeight: '700', cursor: 'pointer' }}>Cancel</button>
-              <button onClick={() => signOut(auth)} style={{ flex: 1, padding: '16px', borderRadius: '18px', border: 'none', backgroundColor: '#000', color: '#fff', fontWeight: '700', cursor: 'pointer' }}>Logout</button>
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
+          <div style={{ backgroundColor: '#fff', padding: '40px', borderRadius: '32px', textAlign: 'center', width: '320px' }}>
+            <h3 style={{ fontSize: '20px', fontWeight: '900', letterSpacing: '-1px', marginBottom: '10px' }}>Logout?</h3>
+            <p style={{ fontSize: '13px', color: '#667085', marginBottom: '30px' }}>You will need to re-authenticate.</p>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button onClick={() => setShowLogoutConfirm(false)} style={{ flex: 1, padding: '14px', borderRadius: '16px', border: '1px solid #eee', background: 'none', fontWeight: '600', cursor: 'pointer' }}>Cancel</button>
+              <button onClick={() => signOut(auth)} style={{ flex: 1, padding: '14px', borderRadius: '16px', border: 'none', background: '#000', color: '#fff', fontWeight: '600', cursor: 'pointer' }}>Confirm</button>
             </div>
           </div>
         </div>
       )}
 
       {/* Sidebar */}
-      <aside style={{ 
-        width: isMobile ? '100%' : '100px', 
-        height: isMobile ? 'auto' : '100vh', 
-        backgroundColor: '#fff', 
-        borderRight: isMobile ? 'none' : '1px solid #f0f0f0', 
-        borderBottom: isMobile ? '1px solid #f0f0f0' : 'none',
-        position: isMobile ? 'relative' : 'fixed',
-        display: 'flex',
-        flexDirection: isMobile ? 'row' : 'column',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: isMobile ? '15px 25px' : '45px 0',
-        zIndex: 1000
-      }}>
-        <div style={{ width: '48px', height: '48px', background: '#000', borderRadius: '15px', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '900', fontSize: '20px', boxShadow: '0 8px 15px rgba(0,0,0,0.1)' }}>W</div>
-        
-        <nav style={{ display: 'flex', flexDirection: isMobile ? 'row' : 'column', gap: isMobile ? '20px' : '35px', alignItems: 'center' }}>
-          <button onClick={() => setActiveTab('home')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: activeTab === 'home' ? '#000' : '#d1d5db', transition: '0.3s' }}><Icons.Home /></button>
-          <button onClick={() => setActiveTab('products')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: activeTab === 'products' ? '#000' : '#d1d5db', transition: '0.3s' }}><Icons.Products /></button>
-          <button onClick={() => setActiveTab('orders')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: activeTab === 'orders' ? '#000' : '#d1d5db', transition: '0.3s' }}><Icons.Orders /></button>
+      <aside style={{ width: isMobile ? '100%' : '100px', height: isMobile ? 'auto' : '100vh', backgroundColor: '#fff', borderRight: '1px solid #f2f4f7', position: isMobile ? 'relative' : 'fixed', display: 'flex', flexDirection: isMobile ? 'row' : 'column', alignItems: 'center', justifyContent: 'space-between', padding: '30px 20px', zIndex: 1000, boxSizing: 'border-box' }}>
+        <div style={{ width: '42px', height: '42px', background: '#000', borderRadius: '12px', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '900', fontSize: '18px' }}>W</div>
+        <nav style={{ display: 'flex', flexDirection: isMobile ? 'row' : 'column', gap: '30px' }}>
+          <button onClick={() => setActiveTab('home')} style={{ background: 'none', border: 'none', color: activeTab === 'home' ? '#000' : '#d0d5dd', cursor: 'pointer' }}><Icons.Home /></button>
+          <button onClick={() => setActiveTab('products')} style={{ background: 'none', border: 'none', color: activeTab === 'products' ? '#000' : '#d0d5dd', cursor: 'pointer' }}><Icons.Products /></button>
+          <button onClick={() => setActiveTab('orders')} style={{ background: 'none', border: 'none', color: activeTab === 'orders' ? '#000' : '#d0d5dd', cursor: 'pointer' }}><Icons.Orders /></button>
         </nav>
-
-        <button onClick={() => setShowLogoutConfirm(true)} style={{ background: '#f9fafb', border: '1px solid #f3f4f6', width: '45px', height: '45px', borderRadius: '15px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9ca3af' }}><Icons.Logout /></button>
+        <button onClick={() => setShowLogoutConfirm(true)} style={{ background: '#f9fafb', border: '1px solid #f2f4f7', width: '42px', height: '42px', borderRadius: '12px', color: '#98a2b3', cursor: 'pointer' }}><Icons.Logout /></button>
       </aside>
 
       {/* Main Content */}
-      <main style={{ flex: 1, marginLeft: isMobile ? '0' : '100px', padding: isMobile ? '40px 20px' : '70px 90px' }}>
+      <main style={{ flex: 1, marginLeft: isMobile ? '0' : '100px', padding: isMobile ? '40px 20px' : '80px 100px' }}>
         
-        {/* Centralized Header */}
-        <div style={{ textAlign: 'center', marginBottom: isMobile ? '40px' : '70px' }}>
-          <h2 style={{ fontSize: isMobile ? '32px' : '52px', fontWeight: '900', letterSpacing: '-3px', margin: 0, textTransform: 'uppercase' }}>Wearivo Admin</h2>
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px', marginTop: '10px' }}>
-             <span style={{ fontSize: '11px', fontWeight: '800', color: '#10b981', letterSpacing: '1px' }}>● SYSTEM LIVE</span>
-             <span style={{ width: '4px', height: '4px', backgroundColor: '#e5e7eb', borderRadius: '50%' }}></span>
-             <span style={{ fontSize: '11px', fontWeight: '600', color: '#9ca3af' }}>V1.0.8</span>
+        <div style={{ textAlign: 'center', marginBottom: '80px' }}>
+          <h2 style={{ fontSize: isMobile ? '36px' : '56px', fontWeight: '900', letterSpacing: '-4px', margin: 0, color: '#101828' }}>WEARIVO ADMIN</h2>
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', marginTop: '12px' }}>
+            <span style={{ fontSize: '11px', fontWeight: '600', color: '#12b76a', letterSpacing: '1px' }}>● SYSTEM LIVE</span>
+            <span style={{ width: '3px', height: '3px', backgroundColor: '#d0d5dd', borderRadius: '50%' }}></span>
+            <span style={{ fontSize: '11px', fontWeight: '500', color: '#667085' }}>v1.1.0</span>
           </div>
         </div>
 
         {activeTab === 'home' && (
-          <div style={{ animation: 'fadeIn 0.6s ease' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: '30px', marginBottom: '50px' }}>
+          <div style={{ animation: 'fadeIn 0.4s ease' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: '24px', marginBottom: '40px' }}>
               {[
-                { label: 'TOTAL ITEMS', val: '3', color: '#000' },
-                { label: 'PENDING ORDERS', val: '0', color: '#ef4444' },
-                { label: 'GROSS SALES', val: '0 EGP', color: '#000' }
-              ].map((stat, i) => (
-                <div key={i} style={{ background: '#fff', padding: '35px', borderRadius: '28px', border: '1px solid #f0f0f0', boxShadow: '0 10px 30px rgba(0,0,0,0.02)' }}>
-                  <p style={{ fontSize: '10px', fontWeight: '800', color: '#9ca3af', letterSpacing: '1.5px', marginBottom: '10px' }}>{stat.label}</p>
-                  <p style={{ fontSize: isMobile ? '36px' : '46px', fontWeight: '900', margin: 0, color: stat.color, letterSpacing: '-2px' }}>{stat.val}</p>
+                { label: 'TOTAL ITEMS', val: '3' },
+                { label: 'PENDING ORDERS', val: '0', color: '#f04438' },
+                { label: 'GROSS SALES', val: '0 EGP' }
+              ].map((s, i) => (
+                <div key={i} style={style.card}>
+                  <p style={{ fontSize: '11px', fontWeight: '600', color: '#667085', letterSpacing: '1px', marginBottom: '12px' }}>{s.label}</p>
+                  <p style={{ fontSize: '42px', fontWeight: '900', letterSpacing: '-2px', margin: 0, color: s.color || '#101828' }}>{s.val}</p>
                 </div>
               ))}
             </div>
 
-            <div style={{ background: '#fff', padding: '45px', borderRadius: '28px', border: '1px solid #f0f0f0' }}>
-              <h4 style={{ fontSize: '20px', fontWeight: '900', marginBottom: '35px', letterSpacing: '-0.5px' }}>Recent Activity Stream</h4>
-              <div style={{ padding: '90px 20px', textAlign: 'center', background: '#fafbfc', borderRadius: '25px', border: '2px dashed #f1f5f9' }}>
-                <p style={{ color: '#9ca3af', fontSize: '13px', fontWeight: '600', letterSpacing: '0.5px' }}>STANDBY: NO INCOMING REQUESTS FOUND</p>
+            <div style={style.card}>
+              <h4 style={{ fontSize: '18px', fontWeight: '800', letterSpacing: '-0.5px', marginBottom: '32px' }}>Recent Activity</h4>
+              <div style={{ padding: '100px 20px', textAlign: 'center', background: '#f9fafb', borderRadius: '24px', border: '1px dashed #eaecf0' }}>
+                <p style={{ color: '#667085', fontSize: '13px', fontWeight: '500' }}>STANDBY: NO RECENT LOGS FOUND</p>
               </div>
             </div>
           </div>
         )}
 
         {activeTab === 'products' && (
-          <div style={{ animation: 'fadeIn 0.6s ease' }}>
-            <h3 style={{ fontSize: '24px', fontWeight: '900', marginBottom: '45px', letterSpacing: '-1px' }}>Inventory Management</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: '35px' }}>
-              {['KIDS', 'WOMENS', 'MENS'].map(label => (
-                <div key={label} style={{ background: '#fff', padding: '30px', borderRadius: '28px', border: '1px solid #f0f0f0', boxShadow: '0 10px 30px rgba(0,0,0,0.02)' }}>
-                  <div style={{ width: '100%', height: '240px', background: '#f8fafc', borderRadius: '22px', marginBottom: '25px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <Icons.Camera />
-                  </div>
-                  <button style={{ width: '100%', padding: '20px', background: '#000', color: '#fff', border: 'none', borderRadius: '18px', fontSize: '12px', fontWeight: '800', cursor: 'pointer', letterSpacing: '1px', boxShadow: '0 10px 20px rgba(0,0,0,0.1)' }}>UPLOAD {label}</button>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </main>
-    </div>
-  );
-}
+          <div style={{ animation: 'fadeIn 0.4s ease' }}>
+            <h3 style={{ fontSize: '22px', fontWeight: '800', letterSpacing: '-1px', marginBottom: '40px', paddingLeft: '4px' }}>Inventory Management</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: '24px' }}>
+              {['KIDS', 'WOMENS', 'MENS'].map(l => (
+                <div key={l} style={style.card}>
+                  <div style={{ width: '100%', height: '
