@@ -4,7 +4,6 @@ import { auth, db } from '../../firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 
-// أيقونات Dashboard احترافية مطابقة للعرض
 const Icons = {
   Dashboard: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>,
   Orders: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>,
@@ -13,7 +12,7 @@ const Icons = {
   Logout: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fca5a5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
 };
 
-export default function WearivoUltimateConsole() {
+export default function WearivoUltimateDashboard() {
   const [user, setUser] = useState(null);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
@@ -26,12 +25,7 @@ export default function WearivoUltimateConsole() {
     link.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap';
     link.rel = 'stylesheet';
     document.head.appendChild(link);
-    
-    const unsubscribe = onAuthStateChanged(auth, (u) => {
-      if (u) setUser(u);
-      else router.push('/login');
-    });
-    return () => unsubscribe();
+    onAuthStateChanged(auth, (u) => u ? setUser(u) : router.push('/login'));
   }, [router]);
 
   if (!user) return null;
@@ -41,23 +35,23 @@ export default function WearivoUltimateConsole() {
   return (
     <div style={{ fontFamily: "'Inter', sans-serif", display: 'flex', minHeight: '100vh', backgroundColor: '#f8fafc' }}>
       
-      {/* 1. Logout Alert Modal */}
+      {/* 1. Logout Confirm */}
       {showLogoutConfirm && (
         <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(15, 23, 42, 0.7)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
           <div style={{ backgroundColor: '#fff', padding: '40px', borderRadius: '24px', textAlign: 'center', width: '380px' }}>
             <div style={{ width: '60px', height: '60px', background: '#fff1f2', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}><Icons.Logout /></div>
-            <h3 style={{ fontSize: '20px', fontWeight: '800', marginBottom: '8px' }}>Confirm Logout?</h3>
-            <p style={{ fontSize: '14px', color: '#64748b', marginBottom: '32px' }}>Are you sure you want to end your session, Essa?</p>
+            <h3 style={{ fontSize: '20px', fontWeight: '800', marginBottom: '8px' }}>Sign Out?</h3>
+            <p style={{ fontSize: '14px', color: '#64748b', marginBottom: '32px' }}>Are you sure you want to exit, Essa?</p>
             <div style={{ display: 'flex', gap: '12px' }}>
-              <button onClick={() => setShowLogoutConfirm(false)} style={{ flex: 1, padding: '14px', borderRadius: '12px', border: '1px solid #e2e8f0', background: '#fff', fontWeight: '700', cursor: 'pointer' }}>Cancel</button>
-              <button onClick={() => signOut(auth)} style={{ flex: 1, padding: '14px', borderRadius: '12px', border: 'none', background: '#ef4444', color: '#fff', fontWeight: '700', cursor: 'pointer' }}>Yes, Logout</button>
+              <button onClick={() => setShowLogoutConfirm(false)} style={{ flex: 1, padding: '14px', borderRadius: '12px', border: '1px solid #e2e8f0', background: '#fff', fontWeight: '700' }}>Cancel</button>
+              <button onClick={() => signOut(auth)} style={{ flex: 1, padding: '14px', borderRadius: '12px', border: 'none', background: '#ef4444', color: '#fff', fontWeight: '700' }}>Logout</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* 2. Sidebar (Left Side as per the high-end dashboard) */}
-      <aside style={{ width: '280px', backgroundColor: '#1e293b', padding: '40px 24px', display: 'flex', flexDirection: 'column', color: '#fff', position: 'fixed', height: '100vh' }}>
+      {/* 2. Sidebar (Left Side) */}
+      <aside style={{ width: '280px', backgroundColor: '#1e293b', padding: '40px 24px', display: 'flex', flexDirection: 'column', color: '#fff', position: 'fixed', height: '100vh', left: 0 }}>
         <div style={{ fontSize: '28px', fontWeight: '900', color: cafeColor, letterSpacing: '-1.5px', marginBottom: '50px', textAlign: 'center' }}>WEARIVO</div>
         <nav style={{ flex: 1 }}>
           <ul style={{ listStyle: 'none', padding: 0 }}>
@@ -83,50 +77,48 @@ export default function WearivoUltimateConsole() {
         </div>
       </aside>
 
-      {/* 3. Main Content Area */}
+      {/* 3. Content */}
       <main style={{ flex: 1, marginLeft: '280px', padding: '50px 60px' }}>
         <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px' }}>
           <div>
-            <h1 style={{ fontSize: '32px', fontWeight: '800', color: '#0f172a', margin: 0 }}>Console Overview</h1>
-            <nav style={{ fontSize: '13px', color: '#64748b', marginTop: '4px' }}>Home / Dashboard / <span style={{ color: cafeColor }}>Wearivo</span></nav>
+            <h1 style={{ fontSize: '32px', fontWeight: '800', color: '#0f172a', margin: 0 }}>WEARIVO CONSOLE</h1>
+            <p style={{ fontSize: '13px', color: '#10b981', fontWeight: '700', marginTop: '4px' }}>● SYSTEM ONLINE</p>
           </div>
-          <button onClick={() => setShowAddProduct(true)} style={{ background: '#000', color: '#fff', border: 'none', padding: '14px 28px', borderRadius: '14px', fontWeight: '700', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', boxShadow: '0 10px 15px rgba(0,0,0,0.1)' }}>
+          <button onClick={() => setShowAddProduct(true)} style={{ background: '#000', color: '#fff', border: 'none', padding: '14px 28px', borderRadius: '14px', fontWeight: '700', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '10px', boxShadow: '0 10px 15px rgba(0,0,0,0.1)' }}>
             <Icons.Plus /> ADD PRODUCT
           </button>
         </header>
 
         {activeTab === 'dashboard' && (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
-            {/* Stats Cards like the provided image */}
             <div style={cardStyle}>
-              <p style={{ fontSize: '12px', fontWeight: '700', color: '#64748b', textTransform: 'uppercase', letterSpacing: '1px' }}>Transactions</p>
+              <p style={{ fontSize: '12px', fontWeight: '700', color: '#64748b', textTransform: 'uppercase' }}>Transactions</p>
               <h2 style={{ fontSize: '36px', fontWeight: '800', margin: '15px 0' }}>$208,187</h2>
-              <p style={{ fontSize: '12px', color: '#10b981' }}>↑ 12% this period</p>
+              <div style={{ height: '40px', background: 'linear-gradient(90deg, #d2b48c 20%, transparent 100%)', opacity: 0.2, borderRadius: '4px' }}></div>
             </div>
             <div style={cardStyle}>
-              <p style={{ fontSize: '12px', fontWeight: '700', color: '#64748b', textTransform: 'uppercase', letterSpacing: '1px' }}>Project Rating</p>
+              <p style={{ fontSize: '12px', fontWeight: '700', color: '#64748b', textTransform: 'uppercase' }}>Project Rating</p>
               <h2 style={{ fontSize: '36px', fontWeight: '800', margin: '15px 0' }}>4.3 <span style={{ fontSize: '18px', color: '#fbbf24' }}>★★★★☆</span></h2>
               <p style={{ fontSize: '12px', color: '#64748b' }}>+2.5 this month</p>
             </div>
             <div style={cardStyle}>
-              <p style={{ fontSize: '12px', fontWeight: '700', color: '#64748b', textTransform: 'uppercase', letterSpacing: '1px' }}>Live Inventory</p>
-              <h2 style={{ fontSize: '36px', fontWeight: '800', margin: '15px 0' }}>3 <span style={{ fontSize: '16px', color: '#94a3b8', fontWeight: '400' }}>Active Items</span></h2>
-              <p style={{ fontSize: '12px', color: '#12b76a' }}>● System Operational</p>
+              <p style={{ fontSize: '12px', fontWeight: '700', color: '#64748b', textTransform: 'uppercase' }}>Total Products</p>
+              <h2 style={{ fontSize: '36px', fontWeight: '800', margin: '15px 0' }}>3</h2>
+              <p style={{ fontSize: '12px', color: '#12b76a' }}>Inventory Sync Active</p>
             </div>
 
-            {/* Simulation of the Chart/Table area from the reference image */}
             <div style={{ ...cardStyle, gridColumn: 'span 2' }}>
-              <h3 style={{ fontSize: '18px', fontWeight: '800', marginBottom: '20px' }}>Recent Users / Orders</h3>
+              <h3 style={{ fontSize: '18px', fontWeight: '800', marginBottom: '20px' }}>Recent Activity</h3>
               <div style={{ textAlign: 'center', padding: '60px 0', border: '1px dashed #e2e8f0', borderRadius: '12px', color: '#94a3b8' }}>
                 Waiting for incoming data stream...
               </div>
             </div>
             <div style={cardStyle}>
               <h3 style={{ fontSize: '18px', fontWeight: '800', marginBottom: '20px' }}>Sales Analytics</h3>
-              <div style={{ height: '150px', background: 'linear-gradient(to top, #f8fafc, #fff)', display: 'flex', alignItems: 'flex-end', gap: '10px', padding: '10px' }}>
+              <div style={{ display: 'flex', alignItems: 'flex-end', gap: '10px', height: '100px' }}>
                 <div style={{ flex: 1, height: '40%', background: cafeColor, borderRadius: '4px' }}></div>
-                <div style={{ flex: 1, height: '70%', background: '#1e293b', borderRadius: '4px' }}></div>
-                <div style={{ flex: 1, height: '55%', background: cafeColor, borderRadius: '4px' }}></div>
+                <div style={{ flex: 1, height: '80%', background: '#1e293b', borderRadius: '4px' }}></div>
+                <div style={{ flex: 1, height: '50%', background: cafeColor, borderRadius: '4px' }}></div>
               </div>
             </div>
           </div>
@@ -135,49 +127,41 @@ export default function WearivoUltimateConsole() {
         {activeTab === 'style' && (
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
             <div style={cardStyle}>
-              <h3 style={{ fontSize: '18px', fontWeight: '800', marginBottom: '24px' }}>Brand Identity</h3>
+              <h3 style={{ fontSize: '18px', fontWeight: '800', marginBottom: '24px' }}>Brand Color</h3>
               <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-                <input type="color" value={cafeColor} onChange={(e) => setCafeColor(e.target.value)} style={{ width: '60px', height: '60px', border: 'none', borderRadius: '12px', cursor: 'pointer' }} />
-                <div>
-                  <p style={{ fontSize: '15px', fontWeight: '700' }}>Primary Cafe Theme</p>
-                  <p style={{ fontSize: '13px', color: '#64748b' }}>{cafeColor.toUpperCase()}</p>
-                </div>
+                <input type="color" value={cafeColor} onChange={(e) => setCafeColor(e.target.value)} style={{ width: '60px', height: '60px', border: 'none', borderRadius: '12px' }} />
+                <p style={{ fontSize: '15px', fontWeight: '700' }}>Primary: {cafeColor.toUpperCase()}</p>
               </div>
             </div>
             <div style={cardStyle}>
-              <h3 style={{ fontSize: '18px', fontWeight: '800', marginBottom: '24px' }}>Global Background</h3>
-              <select style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1px solid #e2e8f0', outline: 'none' }}>
-                <option>Soft Minimalist Beige</option>
-                <option>Pure Gallery White</option>
-                <option>Urban Concrete Gray</option>
+              <h3 style={{ fontSize: '18px', fontWeight: '800', marginBottom: '24px' }}>Global Style</h3>
+              <select style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                <option>Soft Beige Texture</option>
+                <option>Minimalist White</option>
+                <option>Dark Mode Slate</option>
               </select>
             </div>
           </div>
         )}
 
-        {/* 4. The Unified Add Product Modal */}
         {showAddProduct && (
           <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(15, 23, 42, 0.8)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9998 }}>
-            <div style={{ backgroundColor: '#fff', padding: '40px', borderRadius: '32px', width: '480px', boxShadow: '0 25px 50px rgba(0,0,0,0.2)' }}>
-              <h3 style={{ fontSize: '24px', fontWeight: '800', marginBottom: '24px' }}>Inventory Management</h3>
+            <div style={{ backgroundColor: '#fff', padding: '40px', borderRadius: '32px', width: '480px' }}>
+              <h3 style={{ fontSize: '24px', fontWeight: '800', marginBottom: '32px' }}>Add Product</h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <input type="text" placeholder="Product Title" style={{ padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', outline: 'none' }} />
+                <input type="text" placeholder="Title" style={{ padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }} />
                 <div style={{ display: 'flex', gap: '15px' }}>
-                  <input type="number" placeholder="Price (EGP)" style={{ flex: 1, padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }} />
+                  <input type="number" placeholder="Price" style={{ flex: 1, padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }} />
                   <select style={{ flex: 1, padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                    <option>Mens Section</option>
-                    <option>Womens Section</option>
-                    <option>Kids Section</option>
+                    <option>Mens Wear</option><option>Womens Wear</option><option>Kids Wear</option>
                   </select>
                 </div>
-                <textarea placeholder="Product description and details..." rows="3" style={{ padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', resize: 'none' }}></textarea>
-                <div style={{ border: '2px dashed #e2e8f0', padding: '20px', borderRadius: '12px', textAlign: 'center' }}>
-                   <input type="file" style={{ fontSize: '11px' }} />
-                </div>
+                <textarea placeholder="Description" rows="3" style={{ padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', resize: 'none' }}></textarea>
+                <input type="file" style={{ fontSize: '11px' }} />
               </div>
               <div style={{ display: 'flex', gap: '12px', marginTop: '32px' }}>
-                <button onClick={() => setShowAddProduct(false)} style={{ flex: 1, padding: '16px', borderRadius: '16px', border: '1px solid #e2e8f0', background: '#fff', fontWeight: '700', cursor: 'pointer' }}>Cancel</button>
-                <button style={{ flex: 1, padding: '16px', borderRadius: '16px', border: 'none', background: '#000', color: '#fff', fontWeight: '700', cursor: 'pointer' }}>Save Product</button>
+                <button onClick={() => setShowAddProduct(false)} style={{ flex: 1, padding: '16px', borderRadius: '16px', border: '1px solid #e2e8f0', background: '#fff', fontWeight: '700' }}>Cancel</button>
+                <button style={{ flex: 1, padding: '16px', borderRadius: '16px', border: 'none', background: '#000', color: '#fff', fontWeight: '700' }}>Save</button>
               </div>
             </div>
           </div>
