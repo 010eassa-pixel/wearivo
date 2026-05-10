@@ -28,10 +28,12 @@ export default function AdminDashboard() {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     handleResize();
     window.addEventListener('resize', handleResize);
+    
     const unsubscribe = onAuthStateChanged(auth, (u) => {
       if (u) setUser(u);
       else router.push('/login');
     });
+
     return () => {
       window.removeEventListener('resize', handleResize);
       unsubscribe();
@@ -40,13 +42,10 @@ export default function AdminDashboard() {
 
   if (!user) return null;
 
-  const style = {
-    font: { fontFamily: "'Inter', sans-serif" },
-    card: { backgroundColor: '#fff', borderRadius: '24px', border: '1px solid #f2f4f7', padding: '32px' }
-  };
+  const cardStyle = { backgroundColor: '#fff', borderRadius: '24px', border: '1px solid #f2f4f7', padding: '32px' };
 
   return (
-    <div style={{ ...style.font, display: 'flex', flexDirection: isMobile ? 'column' : 'row', minHeight: '100vh', backgroundColor: '#fcfdfe' }}>
+    <div style={{ fontFamily: "'Inter', sans-serif", display: 'flex', flexDirection: isMobile ? 'column' : 'row', minHeight: '100vh', backgroundColor: '#fcfdfe' }}>
       
       {showLogoutConfirm && (
         <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
@@ -84,14 +83,11 @@ export default function AdminDashboard() {
         {activeTab === 'home' && (
           <div style={{ animation: 'fadeIn 0.4s ease' }}>
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: '24px', marginBottom: '40px' }}>
-              {[{ l: 'TOTAL ITEMS', v: '3' }, { l: 'PENDING ORDERS', v: '0', c: '#f04438' }, { l: 'GROSS SALES', v: '0 EGP' }].map((s, i) => (
-                <div key={i} style={style.card}>
-                  <p style={{ fontSize: '11px', fontWeight: '600', color: '#667085', letterSpacing: '1px', marginBottom: '12px' }}>{s.l}</p>
-                  <p style={{ fontSize: '42px', fontWeight: '900', letterSpacing: '-2px', margin: 0, color: s.c || '#101828' }}>{s.v}</p>
-                </div>
-              ))}
+              <div style={cardStyle}><p style={{ fontSize: '11px', fontWeight: '600', color: '#667085', letterSpacing: '1px', marginBottom: '12px' }}>TOTAL ITEMS</p><p style={{ fontSize: '42px', fontWeight: '900', letterSpacing: '-2px', margin: 0 }}>3</p></div>
+              <div style={cardStyle}><p style={{ fontSize: '11px', fontWeight: '600', color: '#667085', letterSpacing: '1px', marginBottom: '12px' }}>PENDING ORDERS</p><p style={{ fontSize: '42px', fontWeight: '900', letterSpacing: '-2px', margin: 0, color: '#f04438' }}>0</p></div>
+              <div style={cardStyle}><p style={{ fontSize: '11px', fontWeight: '600', color: '#667085', letterSpacing: '1px', marginBottom: '12px' }}>GROSS SALES</p><p style={{ fontSize: '42px', fontWeight: '900', letterSpacing: '-2px', margin: 0 }}>0 EGP</p></div>
             </div>
-            <div style={style.card}>
+            <div style={cardStyle}>
               <h4 style={{ fontSize: '18px', fontWeight: '800', letterSpacing: '-0.5px', marginBottom: '32px' }}>Recent Activity</h4>
               <div style={{ padding: '100px 20px', textAlign: 'center', background: '#f9fafb', borderRadius: '24px', border: '1px dashed #eaecf0' }}>
                 <p style={{ color: '#667085', fontSize: '13px', fontWeight: '500' }}>STANDBY: NO RECENT LOGS FOUND</p>
@@ -104,8 +100,8 @@ export default function AdminDashboard() {
           <div style={{ animation: 'fadeIn 0.4s ease' }}>
             <h3 style={{ fontSize: '22px', fontWeight: '800', letterSpacing: '-1px', marginBottom: '40px' }}>Inventory Management</h3>
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: '24px' }}>
-              {['KIDS', 'WOMENS', 'MENS'].map(l => (
-                <div key={l} style={style.card}>
+              {['KIDS', 'WOMENS', 'MENS'].map((l) => (
+                <div key={l} style={cardStyle}>
                   <div style={{ width: '100%', height: '240px', background: '#f9fafb', borderRadius: '20px', marginBottom: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Icons.Camera /></div>
                   <button style={{ width: '100%', padding: '18px', background: '#000', color: '#fff', border: 'none', borderRadius: '16px', fontSize: '12px', fontWeight: '600', letterSpacing: '0.5px', cursor: 'pointer' }}>UPLOAD {l}</button>
                 </div>
