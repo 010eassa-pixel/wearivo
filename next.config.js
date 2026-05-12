@@ -1,9 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'export',
-  trailingSlash: true, // ده السر اللي هيخلي /admin/ و /category/kids/ يشتغلوا
+  trailingSlash: true, // مهم جداً عشان روابط الأقسام والداش بورد
   images: {
-    unoptimized: true,
+    unoptimized: true, // عشان صور Wearivo تظهر بوضوح
   },
 }
 
