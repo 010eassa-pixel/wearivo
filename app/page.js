@@ -20,47 +20,53 @@ export default function Home() {
         <p className="text-[9px] tracking-[0.4em] uppercase opacity-50 mt-2">Defining the art of modern sophistication</p>
       </section>
 
-      {/* 3. المربعات - نفس مقاساتك وتنسيقك بالملي */}
+      {/* 3. المربعات - مربوطة ديناميكياً بالأقسام */}
       <section className="flex flex-col items-center w-full py-12 px-4">
         
-        {/* مربع أطفالي */}
-        <div className="w-[300px] h-[450px] relative overflow-hidden bg-white mb-[20px]"> 
-          <img 
-            src="/child.jpg" 
-            className="absolute inset-0 w-full h-full object-cover" 
-            alt="Kids" 
-          />
-          <div className="absolute top-4 right-4 flex flex-col items-end z-10 text-right">
-            <span className="text-xl text-[#3d2b1f]" style={{ fontWeight: '900' }}>أطفالي</span>
-            <span className="text-[10px] text-[#3d2b1f]" style={{ fontWeight: '900', letterSpacing: '0.2em' }}>KIDS</span>
+        {/* مربع أطفالي - مربوط بقسم الـ kids */}
+        <Link href="/category/kids" className="block cursor-pointer">
+          <div className="w-[300px] h-[450px] relative overflow-hidden bg-white mb-[20px]"> 
+            <img 
+              src="/child.jpg" 
+              className="absolute inset-0 w-full h-full object-cover" 
+              alt="Kids" 
+            />
+            <div className="absolute top-4 right-4 flex flex-col items-end z-10 text-right">
+              <span className="text-xl text-[#3d2b1f]" style={{ fontWeight: '900' }}>أطفالي</span>
+              <span className="text-[10px] text-[#3d2b1f]" style={{ fontWeight: '900', letterSpacing: '0.2em' }}>KIDS</span>
+            </div>
           </div>
-        </div>
+        </Link>
 
-        {/* مربع حريمي */}
-        <div className="w-[300px] h-[450px] relative overflow-hidden bg-white mb-[20px]">
-          <img 
-            src="/coat.jpg" 
-            className="absolute inset-0 w-full h-full object-cover" 
-            alt="Women" 
-          />
-          <div className="absolute top-4 right-4 flex flex-col items-end z-10 text-right">
-            <span className="text-xl text-[#3d2b1f]" style={{ fontWeight: '900' }}>حريمي</span>
-            <span className="text-[10px] text-[#3d2b1f]" style={{ fontWeight: '900', letterSpacing: '0.2em' }}>WOMEN</span>
+        {/* مربع حريمي - مربوط بقسم الـ women */}
+        <Link href="/category/women" className="block cursor-pointer">
+          <div className="w-[300px] h-[450px] relative overflow-hidden bg-white mb-[20px]">
+            <img 
+              src="/coat.jpg" 
+              className="absolute inset-0 w-full h-full object-cover" 
+              alt="Women" 
+            />
+            <div className="absolute top-4 right-4 flex flex-col items-end z-10 text-right">
+              <span className="text-xl text-[#3d2b1f]" style={{ fontWeight: '900' }}>حريمي</span>
+              <span className="text-[10px] text-[#3d2b1f]" style={{ fontWeight: '900', letterSpacing: '0.2em' }}>WOMEN</span>
+            </div>
           </div>
-        </div>
+        </Link>
 
-        {/* مربع رجالي */}
-        <div className="w-[300px] h-[450px] relative overflow-hidden bg-white mb-[20px]">
-          <img 
-            src="/pants.jpg" 
-            className="absolute inset-0 w-full h-full object-cover" 
-            alt="Men" 
-          />
-          <div className="absolute top-4 right-4 flex flex-col items-end z-10 text-right">
-            <span className="text-xl text-[#3d2b1f]" style={{ fontWeight: '900' }}>رجالي</span>
-            <span className="text-[10px] text-[#3d2b1f]" style={{ fontWeight: '900', letterSpacing: '0.2em' }}>MEN</span>
+        {/* مربع رجالي - مربوط بقسم الـ men */}
+        <Link href="/category/men" className="block cursor-pointer">
+          <div className="w-[300px] h-[450px] relative overflow-hidden bg-white mb-[20px]">
+            <img 
+              src="/pants.jpg" 
+              className="absolute inset-0 w-full h-full object-cover" 
+              alt="Men" 
+            />
+            <div className="absolute top-4 right-4 flex flex-col items-end z-10 text-right">
+              <span className="text-xl text-[#3d2b1f]" style={{ fontWeight: '900' }}>رجالي</span>
+              <span className="text-[10px] text-[#3d2b1f]" style={{ fontWeight: '900', letterSpacing: '0.2em' }}>MEN</span>
+            </div>
           </div>
-        </div>
+        </Link>
 
       </section>
 
