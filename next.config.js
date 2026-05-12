@@ -1,8 +1,8 @@
 /** @type {import('next').NextConfig} */
-// output: 'export = {
-  output: 'export', // دي أهم حتة عشان يشتغل كـ Static Site
+const nextConfig = {
+  // تم تعطيل output: 'export' مؤقتاً عشان تشغيل الأقسام الديناميكية [id] 
   images: {
-    unoptimized: true, // عشان الصور اللي حطيناها تظهر من غير مشاكل
+    unoptimized: true, 
   },
 }
 
