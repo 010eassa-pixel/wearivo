@@ -18,10 +18,10 @@ export default function WearivoUltimateConsole() {
   const [user, setUser] = useState(null);
   const [activeTab, setActiveTab] = useState('orders');
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [cafeColor, setCafeColor] = useState('#D2B48C');
   const [isMobile, setIsMobile] = useState(false);
   const router = useRouter();
 
+  // Form State
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
   const [category, setCategory] = useState('Mens Wear');
@@ -29,7 +29,7 @@ export default function WearivoUltimateConsole() {
   const [imageFile, setImageFile] = useState(null); 
   const [loading, setLoading] = useState(false);
 
-  // بيانات Cloudinary بتاعتك
+  // Cloudinary Settings
   const CLOUD_NAME = "dmgja8ma7";
   const UPLOAD_PRESET = "wearivo_preset";
 
@@ -37,20 +37,15 @@ export default function WearivoUltimateConsole() {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     handleResize();
     window.addEventListener('resize', handleResize);
-    const link = document.createElement('link');
-    link.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap';
-    link.rel = 'stylesheet';
-    document.head.appendChild(link);
     onAuthStateChanged(auth, (u) => u ? setUser(u) : router.push('/login'));
     return () => window.removeEventListener('resize', handleResize);
   }, [router]);
 
   const handleSaveProduct = async () => {
     if (!name || !price || !imageFile) {
-      alert("يرجى إكمال البيانات واختيار صورة");
+      alert("Please fill all required fields");
       return;
     }
-
     setLoading(true);
     try {
       const formData = new FormData();
@@ -61,10 +56,8 @@ export default function WearivoUltimateConsole() {
         method: 'POST',
         body: formData
       });
-      
       const data = await response.json();
-      const downloadURL = data.secure_url;
-
+      
       const categoryMap = { "Mens Wear": "men", "Womens Wear": "women", "Kids Wear": "kids" };
 
       await addDoc(collection(db, "products"), {
@@ -72,106 +65,84 @@ export default function WearivoUltimateConsole() {
         price: Number(price),
         category: categoryMap[category],
         description,
-        imageUrl: downloadURL, 
+        imageUrl: data.secure_url,
         createdAt: new Date()
       });
 
-      alert("تمت الإضافة بنجاح!");
+      alert("Success!");
       setIsFormOpen(false);
       setName(''); setPrice(''); setDescription(''); setImageFile(null);
     } catch (e) {
-      alert("فشل الرفع");
+      alert("Error uploading");
     }
     setLoading(false);
   };
 
   if (!user) return null;
 
-  const cardStyle = { backgroundColor: '#fff', borderRadius: '16px', border: '1px solid #eef2f6', padding: '24px', display: 'flex', flexDirection: 'column' };
-
   return (
-    <div style={{ fontFamily: "'Inter', sans-serif", display: 'flex', flexDirection: isMobile ? 'column' : 'row', minHeight: '100vh', backgroundColor: '#f8fafc' }}>
+    <div style={{ fontFamily: "'Inter', sans-serif", display: 'flex', minHeight: '100vh', backgroundColor: '#f8fafc' }}>
       
-      <aside style={{ width: isMobile ? '100%' : '280px', backgroundColor: '#1e293b', padding: isMobile ? '10px' : '40 : '40px 24px', display: 'flex', flexDirection: isMobile ? 'row' : 'column', color: '#fff', position: 'fixed', height: isMobile ? '70px' : '100vh', bottom: isMobile ? 0 : 'auto', left: 0, zIndex: 1000 }}>
-        {!isMobile && (
-          <>
-            <div style={{ fontSize: '28px', fontWeight: '900', color: cafeColor, letterSpacing: '-1.5px', marginBottom: '10px', textAlign: 'center' }}>WEARIVO</div>
-            <button onClick={() => router.push('/')} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', padding: '12px', borderRadius: '10px', fontSize: '11px', fontWeight: '700', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '40px', cursor: 'pointer' }}>
-              <Icons.ExternalLink /> View Website
-            </button>
-          </>
-        )}
-        <nav style={{ flex: 1, width: '100%' }}>
-          <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: isMobile ? 'row' : 'column', justifyContent: 'space-around' }}>
-            <li onClick={() => setActiveTab('orders')} style={{ padding: '16px 20px', borderRadius: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '15px', background: activeTab === 'orders' ? '#334155' : 'transparent', color: activeTab === 'orders' ? cafeColor : '#94a3b8', fontWeight: '700' }}>
-              <Icons.LiveOrders /> {!isMobile && "Live Orders"}
+      {/* Sidebar - كما في الصورة image_828cfb.png */}
+      <aside style={{ width: '280px', backgroundColor: '#1e293b', padding: '40px 24px', display: 'flex', flexDirection: 'column', color: '#fff', position: 'fixed', height: '100vh', left: 0 }}>
+        <div style={{ fontSize: '28px', fontWeight: '900', color: '#D2B48C', letterSpacing: '-1.5px', marginBottom: '10px', textAlign: 'center' }}>WEARIVO</div>
+        <button onClick={() => router.push('/')} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', padding: '12px', borderRadius: '10px', fontSize: '11px', fontWeight: '700', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '40px', cursor: 'pointer' }}>
+          <Icons.ExternalLink /> View Website
+        </button>
+        
+        <nav style={{ flex: 1 }}>
+          <ul style={{ listStyle: 'none', padding: 0 }}>
+            <li onClick={() => setActiveTab('orders')} style={{ padding: '16px 20px', borderRadius: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '15px', background: activeTab === 'orders' ? 'rgba(210, 180, 140, 0.15)' : 'transparent', color: activeTab === 'orders' ? '#D2B48C' : '#94a3b8', fontWeight: '700', marginBottom: '8px' }}>
+              <Icons.LiveOrders /> Live Orders
             </li>
-            <li onClick={() => setActiveTab('manager')} style={{ padding: '16px 20px', borderRadius: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '15px', background: activeTab === 'manager' ? '#334155' : 'transparent', color: activeTab === 'manager' ? cafeColor : '#94a3b8', fontWeight: '700' }}>
-              <Icons.BrandManager /> {!isMobile && "Brand Manager"}
+            <li onClick={() => setActiveTab('manager')} style={{ padding: '16px 20px', borderRadius: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '15px', background: activeTab === 'manager' ? 'rgba(210, 180, 140, 0.15)' : 'transparent', color: activeTab === 'manager' ? '#D2B48C' : '#94a3b8', fontWeight: '700' }}>
+              <Icons.BrandManager /> Brand Manager
             </li>
           </ul>
         </nav>
 
-        <div onClick={() => signOut(auth)} style={{ padding: '20px', borderRadius: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '15px', color: '#fca5a5', fontWeight: '700', borderTop: isMobile ? 'none' : '1px solid #334155', marginTop: 'auto', marginBottom: isMobile ? '0px' : '45px' }}>
-          <Icons.Logout /> {!isMobile && "Logout Session"}
+        <div onClick={() => signOut(auth)} style={{ padding: '20px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '15px', color: '#fca5a5', fontWeight: '700', borderTop: '1px solid #334155' }}>
+          <Icons.Logout /> Logout
         </div>
       </aside>
 
-      <main style={{ flex: 1, marginLeft: isMobile ? 0 : '280px', marginBottom: isMobile ? '70px' : 0, padding: isMobile ? '20px' : '40px', boxSizing: 'border-box' }}>
-        <header style={{ backgroundColor: '#fff', padding: '15px 25px', borderRadius: '12px', marginBottom: '30px', border: '1px solid #f2f4f7', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
-          <div style={{ position: 'relative', width: isMobile ? '100%' : '350px' }}>
-            <span style={{ position: 'absolute', left: '15px', top: '50%', transform: 'translateY(-50%)', opacity: 0.3 }}><Icons.Search /></span>
-            <input type="text" placeholder={activeTab === 'orders' ? "Search Order Code (#WRV)..." : "Search Product Catalog..."} style={{ width: '100%', padding: '10px 10px 10px 40px', borderRadius: '8px', border: '1px solid #e2e8f0', outline: 'none' }} />
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span style={{ fontSize: '10px', fontWeight: '800', color: '#10b981' }}>ONLINE</span>
-            <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: cafeColor, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', fontWeight: '900' }}>EW</div>
-          </div>
+      <main style={{ flex: 1, marginLeft: '280px', padding: '40px' }}>
+        <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px' }}>
+          <h2 style={{ fontSize: '24px', fontWeight: '800', color: '#1e293b' }}>
+            {activeTab === 'orders' ? "Operational Statistics" : "Brand Style Manager"}
+          </h2>
+          <button onClick={() => setIsFormOpen(true)} style={{ background: '#000', color: '#fff', border: 'none', padding: '14px 28px', borderRadius: '14px', fontWeight: '700', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}>
+            <Icons.Plus /> ADD PRODUCT
+          </button>
         </header>
 
-        {activeTab === 'orders' ? (
-          <div>
-            <h2 style={{ fontSize: '24px', fontWeight: '800', marginBottom: '25px' }}>Operational Statistics</h2>
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: '24px', marginBottom: '24px' }}>
-              <div style={cardStyle}><p style={{ fontSize: '11px', fontWeight: '800', color: '#64748b' }}>TRANSACTIONS</p><h2 style={{ fontSize: '32px', fontWeight: '800', margin: '15px 0' }}>$208,187</h2></div>
-              <div style={cardStyle}><p style={{ fontSize: '11px', fontWeight: '800', color: '#64748b' }}>PROJECT RATING</p><h2 style={{ fontSize: '32px', fontWeight: '800', margin: '15px 0' }}>4.3 ★</h2></div>
-              <div style={cardStyle}><p style={{ fontSize: '11px', fontWeight: '800', color: '#64748b' }}>STATUS</p><div style={{ height: '8px', width: '90%', background: '#10b981', borderRadius: '10px', marginTop: '20px' }}></div></div>
-            </div>
-          </div>
-        ) : (
-          <div>
-            <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
-              <h2 style={{ fontWeight: '800', margin: 0 }}>Brand Style Manager</h2>
-              <button onClick={() => setIsFormOpen(true)} style={{ background: '#000', color: '#fff', border: 'none', padding: '14px 28px', borderRadius: '14px', fontWeight: '700', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}>
-                <Icons.Plus /> ADD PRODUCT
-              </button>
-            </header>
-          </div>
-        )}
-
+        {/* Modal - مطابق للصورة image_82895a.png */}
         {isFormOpen && (
-          <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(15, 23, 42, 0.8)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
-            <div style={{ backgroundColor: '#fff', padding: '40px', borderRadius: '32px', width: '480px' }}>
-              <h3 style={{ fontSize: '24px', fontWeight: '800', marginBottom: '32px' }}>New Item Upload</h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
-                <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Product Title" style={{ padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }} />
-                <div style={{ display: 'flex', gap: '15px' }}>
-                  <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="Price" style={{ flex: 1, padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }} />
-                  <select value={category} onChange={(e) => setCategory(e.target.value)} style={{ flex: 1, padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                    <option>Mens Wear</option>
-                    <option>Womens Wear</option>
-                    <option>Kids Wear</option>
-                  </select>
-                </div>
-                <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Description..." rows="3" style={{ padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}></textarea>
-                <div style={{ border: '1px dashed #cbd5e1', padding: '16px', borderRadius: '12px', textAlign: 'center' }}>
-                    <input type="file" accept="image/*" onChange={(e) => setImageFile(e.target.files[0])} />
+          <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(30, 41, 59, 0.8)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
+            <div style={{ backgroundColor: '#fff', padding: '48px', borderRadius: '32px', width: '500px', textAlign: 'center' }}>
+              <h3 style={{ fontSize: '26px', fontWeight: '900', marginBottom: '30px', color: '#000' }}>New Item Upload</h3>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Product Title" style={{ width: '100%', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', textAlign: 'right' }} />
+                <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="Price" style={{ width: '100%', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', textAlign: 'right' }} />
+                <select value={category} onChange={(e) => setCategory(e.target.value)} style={{ width: '100%', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', textAlign: 'right', appearance: 'none' }}>
+                  <option>Mens Wear</option>
+                  <option>Womens Wear</option>
+                  <option>Kids Wear</option>
+                </select>
+                <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="...Description" rows="4" style={{ width: '100%', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', textAlign: 'right', resize: 'none' }}></textarea>
+                
+                <div style={{ border: '1px dashed #cbd5e1', padding: '20px', borderRadius: '12px', background: '#f8fafc' }}>
+                   <input type="file" accept="image/*" onChange={(e) => setImageFile(e.target.files[0])} />
                 </div>
               </div>
-              <div style={{ display: 'flex', gap: '12px', marginTop: '32px' }}>
-                <button onClick={() => setIsFormOpen(false)} style={{ flex: 1, padding: '16px', borderRadius: '16px', border: '1px solid #e2e8f0', background: '#fff', fontWeight: '700' }}>Cancel</button>
-                <button onClick={handleSaveProduct} disabled={loading} style={{ flex: 1, padding: '16px', borderRadius: '16px', border: 'none', background: '#000', color: '#fff', fontWeight: '700', opacity: loading ? 0.5 : 1 }}>
-                  {loading ? "جاري الرفع..." : "Save Product"}
+
+              <div style={{ display: 'flex', gap: '15px', marginTop: '30px' }}>
+                <button onClick={handleSaveProduct} disabled={loading} style={{ flex: 1, padding: '18px', borderRadius: '16px', border: 'none', background: '#000', color: '#fff', fontWeight: '800', cursor: 'pointer' }}>
+                  {loading ? "Saving..." : "Save Product"}
+                </button>
+                <button onClick={() => setIsFormOpen(false)} style={{ flex: 1, padding: '18px', borderRadius: '16px', border: '1px solid #e2e8f0', background: '#fff', color: '#000', fontWeight: '800', cursor: 'pointer' }}>
+                  Cancel
                 </button>
               </div>
             </div>
