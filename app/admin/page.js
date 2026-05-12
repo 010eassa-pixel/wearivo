@@ -1,9 +1,8 @@
 "use client";
 import { useEffect, useState } from 'react';
-import { auth, db, storage } from '../../firebase'; // تأكد أن storage معرف في ملف الـ firebase
+import { auth, db } from '../../firebase'; 
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { collection, addDoc } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'; // استيراد دوال الرفع
 import { useRouter } from 'next/navigation';
 
 const Icons = {
@@ -18,7 +17,6 @@ const Icons = {
 export default function WearivoUltimateConsole() {
   const [user, setUser] = useState(null);
   const [activeTab, setActiveTab] = useState('orders');
-  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [cafeColor, setCafeColor] = useState('#D2B48C');
   const [isMobile, setIsMobile] = useState(false);
@@ -28,19 +26,17 @@ export default function WearivoUltimateConsole() {
   const [price, setPrice] = useState('');
   const [category, setCategory] = useState('Mens Wear');
   const [description, setDescription] = useState('');
-  
-  // تعديل: استخدام File Object بدل String
   const [imageFile, setImageFile] = useState(null); 
   const [loading, setLoading] = useState(false);
+
+  // إعدادات Cloudinary الخاصة بك
+  const CLOUD_NAME = "dmgja8ma7";
+  const UPLOAD_PRESET = "wearivo_preset";
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     handleResize();
     window.addEventListener('resize', handleResize);
-    const link = document.createElement('link');
-    link.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap';
-    link.rel = 'stylesheet';
-    document.head.appendChild(link);
     onAuthStateChanged(auth, (u) => u ? setUser(u) : router.push('/login'));
     return () => window.removeEventListener('resize', handleResize);
   }, [router]);
@@ -53,18 +49,28 @@ export default function WearivoUltimateConsole() {
 
     setLoading(true);
     try {
-      // 1. رفع الصورة لـ Storage أولاً
-      const storageRef = ref(storage, `products/${Date.now()}_${imageFile.name}`);
-      const uploadResult = await uploadBytes(storageRef, imageFile);
-      const downloadURL = await getDownloadURL(uploadResult.ref);
+      // 1. الرفع لـ Cloudinary (بديل مجاني لـ Firebase Storage)
+      const formData = new FormData();
+      formData.append('file', imageFile);
+      formData.append('upload_preset', UPLOAD_PRESET);
 
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+        { method: 'POST', body: formData }
+      );
+      
+      const data = await response.json();
+      if (!data.secure_url) throw new Error("Upload failed");
+      
+      const downloadURL = data.secure_url;
+
+      // 2. حفظ البيانات في Firestore
       const categoryMap = {
         "Mens Wear": "men",
         "Womens Wear": "women",
         "Kids Wear": "kids"
       };
 
-      // 2. حفظ البيانات مع رابط الصورة المرفوعة
       await addDoc(collection(db, "products"), {
         name,
         price: Number(price),
@@ -78,8 +84,8 @@ export default function WearivoUltimateConsole() {
       setIsFormOpen(false);
       setName(''); setPrice(''); setDescription(''); setImageFile(null);
     } catch (e) {
-      console.error("Error: ", e);
-      alert("فشل الرفع، تأكد من إعدادات Storage في فايربيز");
+      console.error(e);
+      alert("فشل الرفع، تأكد من إعدادات Cloudinary");
     }
     setLoading(false);
   };
@@ -90,7 +96,6 @@ export default function WearivoUltimateConsole() {
 
   return (
     <div style={{ fontFamily: "'Inter', sans-serif", display: 'flex', flexDirection: isMobile ? 'column' : 'row', minHeight: '100vh', backgroundColor: '#f8fafc' }}>
-      
       <aside style={{ width: isMobile ? '100%' : '280px', backgroundColor: '#1e293b', padding: isMobile ? '10px' : '40px 24px', display: 'flex', flexDirection: isMobile ? 'row' : 'column', color: '#fff', position: 'fixed', height: isMobile ? '70px' : '100vh', bottom: isMobile ? 0 : 'auto', left: 0, zIndex: 1000 }}>
         {!isMobile && (
           <>
@@ -110,34 +115,13 @@ export default function WearivoUltimateConsole() {
             </li>
           </ul>
         </nav>
-
         <div onClick={() => signOut(auth)} style={{ padding: '20px', borderRadius: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '15px', color: '#fca5a5', fontWeight: '700', borderTop: isMobile ? 'none' : '1px solid #334155', marginTop: 'auto', marginBottom: isMobile ? '0px' : '45px' }}>
-          <Icons.Logout /> {!isMobile && "Logout Session"}
+          <Icons.Logout /> {!isMobile && "Logout"}
         </div>
       </aside>
 
       <main style={{ flex: 1, marginLeft: isMobile ? 0 : '280px', marginBottom: isMobile ? '70px' : 0, padding: isMobile ? '20px' : '40px', boxSizing: 'border-box' }}>
-        <header style={{ backgroundColor: '#fff', padding: '15px 25px', borderRadius: '12px', marginBottom: '30px', border: '1px solid #f2f4f7', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
-          <div style={{ position: 'relative', width: isMobile ? '100%' : '350px' }}>
-            <span style={{ position: 'absolute', left: '15px', top: '50%', transform: 'translateY(-50%)', opacity: 0.3 }}><Icons.Search /></span>
-            <input type="text" placeholder={activeTab === 'orders' ? "Search Order Code (#WRV)..." : "Search Product Catalog..."} style={{ width: '100%', padding: '10px 10px 10px 40px', borderRadius: '8px', border: '1px solid #e2e8f0', outline: 'none' }} />
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span style={{ fontSize: '10px', fontWeight: '800', color: '#10b981' }}>ONLINE</span>
-            <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: cafeColor, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', fontWeight: '900' }}>EW</div>
-          </div>
-        </header>
-
-        {activeTab === 'orders' ? (
-          <div>
-            <h2 style={{ fontSize: '24px', fontWeight: '800', marginBottom: '25px' }}>Operational Statistics</h2>
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: '24px', marginBottom: '24px' }}>
-              <div style={cardStyle}><p style={{ fontSize: '11px', fontWeight: '800', color: '#64748b' }}>TRANSACTIONS</p><h2 style={{ fontSize: '32px', fontWeight: '800', margin: '15px 0' }}>$208,187</h2></div>
-              <div style={cardStyle}><p style={{ fontSize: '11px', fontWeight: '800', color: '#64748b' }}>PROJECT RATING</p><h2 style={{ fontSize: '32px', fontWeight: '800', margin: '15px 0' }}>4.3 ★</h2></div>
-              <div style={cardStyle}><p style={{ fontSize: '11px', fontWeight: '800', color: '#64748b' }}>STATUS</p><div style={{ height: '8px', width: '90%', background: '#10b981', borderRadius: '10px', marginTop: '20px' }}></div></div>
-            </div>
-          </div>
-        ) : (
+        {activeTab === 'manager' ? (
           <div>
             <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
               <h2 style={{ fontWeight: '800', margin: 0 }}>Brand Style Manager</h2>
@@ -146,6 +130,8 @@ export default function WearivoUltimateConsole() {
               </button>
             </header>
           </div>
+        ) : (
+          <h2 style={{ fontSize: '24px', fontWeight: '800' }}>Operational Statistics</h2>
         )}
 
         {isFormOpen && (
@@ -154,25 +140,15 @@ export default function WearivoUltimateConsole() {
               <h3 style={{ fontSize: '24px', fontWeight: '800', marginBottom: '32px' }}>New Item Upload</h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
                 <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Product Title" style={{ padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }} />
-                <div style={{ display: 'flex', gap: '15px' }}>
-                  <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="Price" style={{ flex: 1, padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }} />
-                  <select value={category} onChange={(e) => setCategory(e.target.value)} style={{ flex: 1, padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                    <option>Mens Wear</option>
-                    <option>Womens Wear</option>
-                    <option>Kids Wear</option>
-                  </select>
-                </div>
+                <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="Price" style={{ padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }} />
+                <select value={category} onChange={(e) => setCategory(e.target.value)} style={{ padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                  <option>Mens Wear</option>
+                  <option>Womens Wear</option>
+                  <option>Kids Wear</option>
+                </select>
                 <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Description..." rows="3" style={{ padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}></textarea>
-                
-                {/* تعديل عيسى: تحويل الخانة من نص إلى اختيار ملف */}
                 <div style={{ border: '1px dashed #cbd5e1', padding: '16px', borderRadius: '12px', textAlign: 'center' }}>
-                    <input 
-                        type="file" 
-                        accept="image/*" 
-                        onChange={(e) => setImageFile(e.target.files[0])} 
-                        style={{ fontSize: '12px' }}
-                    />
-                    {imageFile && <p style={{ fontSize: '10px', marginTop: '8px', color: '#64748b' }}>Selected: {imageFile.name}</p>}
+                    <input type="file" accept="image/*" onChange={(e) => setImageFile(e.target.files[0])} />
                 </div>
               </div>
               <div style={{ display: 'flex', gap: '12px', marginTop: '32px' }}>
