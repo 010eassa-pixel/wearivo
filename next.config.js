@@ -1,6 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'export',
-  images: { unoptimized: true }
-};
-module.exports = nextConfig;
+  trailingSlash: true, // ده السر اللي هيخلي /admin/ و /category/kids/ يشتغلوا
+  images: {
+    unoptimized: true,
+  },
+}
+
+module.exports = nextConfig
