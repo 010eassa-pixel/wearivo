@@ -4,6 +4,15 @@ import { db } from '../../../firebase';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { useParams } from 'next/navigation';
 
+// ضيف الدالة دي فوق أو تحت الـ Component
+export async function generateStaticParams() {
+  return [
+    { id: 'kids' },
+    { id: 'women' },
+    { id: 'men' },
+  ];
+}
+
 export default function CategoryPage() {
   const params = useParams();
   const id = params?.id;
@@ -14,7 +23,6 @@ export default function CategoryPage() {
 
   useEffect(() => {
     if (!id) return;
-
     const q = query(collection(db, "products"), where("category", "==", id));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       setProducts(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
