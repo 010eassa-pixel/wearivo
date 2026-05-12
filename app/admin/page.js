@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { auth, db } from '../../firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 
 const Icons = {
@@ -23,6 +23,14 @@ export default function WearivoUltimateConsole() {
   const [isMobile, setIsMobile] = useState(false);
   const router = useRouter();
 
+  // States لبيانات المنتج الجديد
+  const [name, setName] = useState('');
+  const [price, setPrice] = useState('');
+  const [category, setCategory] = useState('Mens Wear');
+  const [description, setDescription] = useState('');
+  const [imageUrl, setImageUrl] = useState(''); // هنا المفروض تحط لينك الصورة بعد الرفع
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     handleResize();
@@ -34,6 +42,41 @@ export default function WearivoUltimateConsole() {
     onAuthStateChanged(auth, (u) => u ? setUser(u) : router.push('/login'));
     return () => window.removeEventListener('resize', handleResize);
   }, [router]);
+
+  // دالة الحفظ النهائية
+  const handleSaveProduct = async () => {
+    if (!name || !price) {
+      alert("يرجى إدخال الاسم والسعر");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // تحويل الاختيار للكلمة اللي الكود بيفهمها في الأقسام
+      const categoryMap = {
+        "Mens Wear": "men",
+        "Womens Wear": "women",
+        "Kids Wear": "kids"
+      };
+
+      await addDoc(collection(db, "products"), {
+        name,
+        price: Number(price),
+        category: categoryMap[category],
+        description,
+        imageUrl: imageUrl || "https://via.placeholder.com/300", // مؤقتاً لو مفيش صورة
+        createdAt: new Date()
+      });
+
+      alert("تمت الإضافة بنجاح!");
+      setIsFormOpen(false);
+      setName(''); setPrice(''); setDescription('');
+    } catch (e) {
+      console.error("Error adding document: ", e);
+      alert("حدث خطأ أثناء الحفظ");
+    }
+    setLoading(false);
+  };
 
   if (!user) return null;
 
@@ -62,23 +105,7 @@ export default function WearivoUltimateConsole() {
           </ul>
         </nav>
 
-        {/* التعديل الوحيد: رفعنا الـ marginBottom عشان الزرار يظهر كامل فوق شريط الويندوز */}
-        <div 
-          onClick={() => setShowLogoutConfirm(true)} 
-          style={{ 
-            padding: '20px', 
-            borderRadius: '12px', 
-            cursor: 'pointer', 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: '15px', 
-            color: '#fca5a5', 
-            fontWeight: '700', 
-            borderTop: isMobile ? 'none' : '1px solid #334155', 
-            marginTop: 'auto',
-            marginBottom: isMobile ? '0px' : '45px' 
-          }}
-        >
+        <div onClick={() => setShowLogoutConfirm(true)} style={{ padding: '20px', borderRadius: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '15px', color: '#fca5a5', fontWeight: '700', borderTop: isMobile ? 'none' : '1px solid #334155', marginTop: 'auto', marginBottom: isMobile ? '0px' : '45px' }}>
           <Icons.Logout /> {!isMobile && "Logout Session"}
         </div>
       </aside>
@@ -103,10 +130,6 @@ export default function WearivoUltimateConsole() {
               <div style={cardStyle}><p style={{ fontSize: '11px', fontWeight: '800', color: '#64748b' }}>PROJECT RATING</p><h2 style={{ fontSize: '32px', fontWeight: '800', margin: '15px 0' }}>4.3 ★</h2></div>
               <div style={cardStyle}><p style={{ fontSize: '11px', fontWeight: '800', color: '#64748b' }}>STATUS</p><div style={{ height: '8px', width: '90%', background: '#10b981', borderRadius: '10px', marginTop: '20px' }}></div></div>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1.2fr 2fr', gap: '24px' }}>
-                <div style={cardStyle}><h3 style={{ fontSize: '14px', fontWeight: '800', marginBottom: '20px' }}>Phone Calls</h3><div style={{ width: '160px', height: '160px', borderRadius: '50%', border: '20px solid #1e293b', borderTopColor: cafeColor, borderRightColor: '#10b981', margin: '0 auto' }}></div></div>
-                <div style={cardStyle}><h3 style={{ fontSize: '14px', fontWeight: '800', marginBottom: '20px' }}>Recent Orders History</h3><div style={{ textAlign: 'center', padding: '60px', border: '1px dashed #e2e8f0', borderRadius: '12px', color: '#94a3b8' }}>Waiting for data stream...</div></div>
-            </div>
           </div>
         ) : (
           <div>
@@ -116,10 +139,6 @@ export default function WearivoUltimateConsole() {
                 <Icons.Plus /> ADD PRODUCT
               </button>
             </header>
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '24px' }}>
-              <div style={cardStyle}><h4 style={{ fontSize: '14px', fontWeight: '800', marginBottom: '15px' }}>Cafe Theme Color</h4><input type="color" value={cafeColor} onChange={(e) => setCafeColor(e.target.value)} style={{ width: '60px', height: '60px', border: 'none', borderRadius: '10px', cursor: 'pointer' }} /></div>
-              <div style={cardStyle}><h4 style={{ fontSize: '14px', fontWeight: '800', marginBottom: '15px' }}>Store Background</h4><select style={{ padding: '12px', borderRadius: '10px', border: '1px solid #e2e8f0' }}><option>Soft Beige Texture</option><option>Pure White</option></select></div>
-            </div>
           </div>
         )}
 
@@ -128,29 +147,23 @@ export default function WearivoUltimateConsole() {
             <div style={{ backgroundColor: '#fff', padding: '40px', borderRadius: '32px', width: '480px' }}>
               <h3 style={{ fontSize: '24px', fontWeight: '800', marginBottom: '32px' }}>New Item Upload</h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
-                <input type="text" placeholder="Product Title" style={{ padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }} />
+                <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Product Title" style={{ padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }} />
                 <div style={{ display: 'flex', gap: '15px' }}>
-                  <input type="number" placeholder="Price" style={{ flex: 1, padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }} />
-                  <select style={{ flex: 1, padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}><option>Mens Wear</option><option>Womens Wear</option><option>Kids Wear</option></select>
+                  <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="Price" style={{ flex: 1, padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }} />
+                  <select value={category} onChange={(e) => setCategory(e.target.value)} style={{ flex: 1, padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                    <option>Mens Wear</option>
+                    <option>Womens Wear</option>
+                    <option>Kids Wear</option>
+                  </select>
                 </div>
-                <textarea placeholder="Description..." rows="3" style={{ padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}></textarea>
-                <input type="file" style={{ fontSize: '11px' }} />
+                <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Description..." rows="3" style={{ padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}></textarea>
+                <input type="text" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="Image URL (Paste link for now)" style={{ padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }} />
               </div>
               <div style={{ display: 'flex', gap: '12px', marginTop: '32px' }}>
                 <button onClick={() => setIsFormOpen(false)} style={{ flex: 1, padding: '16px', borderRadius: '16px', border: '1px solid #e2e8f0', background: '#fff', fontWeight: '700' }}>Cancel</button>
-                <button style={{ flex: 1, padding: '16px', borderRadius: '16px', border: 'none', background: '#000', color: '#fff', fontWeight: '700' }}>Save Product</button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {showLogoutConfirm && (
-          <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(15, 23, 42, 0.7)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
-            <div style={{ backgroundColor: '#fff', padding: '40px', borderRadius: '24px', textAlign: 'center', width: '350px' }}>
-              <h3 style={{ fontWeight: '800' }}>Confirm Logout?</h3>
-              <div style={{ display: 'flex', gap: '12px', marginTop: '30px' }}>
-                <button onClick={() => setShowLogoutConfirm(false)} style={{ flex: 1, padding: '14px', borderRadius: '12px', border: '1px solid #e2e8f0', background: '#fff', fontWeight: '700' }}>No</button>
-                <button onClick={() => signOut(auth)} style={{ flex: 1, padding: '14px', borderRadius: '12px', border: 'none', background: '#ef4444', color: '#fff', fontWeight: '700' }}>Yes</button>
+                <button onClick={handleSaveProduct} disabled={loading} style={{ flex: 1, padding: '16px', borderRadius: '16px', border: 'none', background: '#000', color: '#fff', fontWeight: '700', opacity: loading ? 0.5 : 1 }}>
+                  {loading ? "Saving..." : "Save Product"}
+                </button>
               </div>
             </div>
           </div>
