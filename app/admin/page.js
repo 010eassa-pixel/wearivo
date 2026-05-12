@@ -1,8 +1,9 @@
 "use client";
 import { useEffect, useState } from 'react';
-import { auth, db } from '../../firebase';
+import { auth, db, storage } from '../../firebase'; // تأكد أن storage معرف في ملف الـ firebase
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { collection, addDoc } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'; // استيراد دوال الرفع
 import { useRouter } from 'next/navigation';
 
 const Icons = {
@@ -23,12 +24,13 @@ export default function WearivoUltimateConsole() {
   const [isMobile, setIsMobile] = useState(false);
   const router = useRouter();
 
-  // States لبيانات المنتج الجديد
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
   const [category, setCategory] = useState('Mens Wear');
   const [description, setDescription] = useState('');
-  const [imageUrl, setImageUrl] = useState(''); // هنا المفروض تحط لينك الصورة بعد الرفع
+  
+  // تعديل: استخدام File Object بدل String
+  const [imageFile, setImageFile] = useState(null); 
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -43,37 +45,41 @@ export default function WearivoUltimateConsole() {
     return () => window.removeEventListener('resize', handleResize);
   }, [router]);
 
-  // دالة الحفظ النهائية
   const handleSaveProduct = async () => {
-    if (!name || !price) {
-      alert("يرجى إدخال الاسم والسعر");
+    if (!name || !price || !imageFile) {
+      alert("يرجى إكمال البيانات واختيار صورة");
       return;
     }
 
     setLoading(true);
     try {
-      // تحويل الاختيار للكلمة اللي الكود بيفهمها في الأقسام
+      // 1. رفع الصورة لـ Storage أولاً
+      const storageRef = ref(storage, `products/${Date.now()}_${imageFile.name}`);
+      const uploadResult = await uploadBytes(storageRef, imageFile);
+      const downloadURL = await getDownloadURL(uploadResult.ref);
+
       const categoryMap = {
         "Mens Wear": "men",
         "Womens Wear": "women",
         "Kids Wear": "kids"
       };
 
+      // 2. حفظ البيانات مع رابط الصورة المرفوعة
       await addDoc(collection(db, "products"), {
         name,
         price: Number(price),
         category: categoryMap[category],
         description,
-        imageUrl: imageUrl || "https://via.placeholder.com/300", // مؤقتاً لو مفيش صورة
+        imageUrl: downloadURL, 
         createdAt: new Date()
       });
 
       alert("تمت الإضافة بنجاح!");
       setIsFormOpen(false);
-      setName(''); setPrice(''); setDescription('');
+      setName(''); setPrice(''); setDescription(''); setImageFile(null);
     } catch (e) {
-      console.error("Error adding document: ", e);
-      alert("حدث خطأ أثناء الحفظ");
+      console.error("Error: ", e);
+      alert("فشل الرفع، تأكد من إعدادات Storage في فايربيز");
     }
     setLoading(false);
   };
@@ -105,7 +111,7 @@ export default function WearivoUltimateConsole() {
           </ul>
         </nav>
 
-        <div onClick={() => setShowLogoutConfirm(true)} style={{ padding: '20px', borderRadius: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '15px', color: '#fca5a5', fontWeight: '700', borderTop: isMobile ? 'none' : '1px solid #334155', marginTop: 'auto', marginBottom: isMobile ? '0px' : '45px' }}>
+        <div onClick={() => signOut(auth)} style={{ padding: '20px', borderRadius: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '15px', color: '#fca5a5', fontWeight: '700', borderTop: isMobile ? 'none' : '1px solid #334155', marginTop: 'auto', marginBottom: isMobile ? '0px' : '45px' }}>
           <Icons.Logout /> {!isMobile && "Logout Session"}
         </div>
       </aside>
@@ -157,12 +163,22 @@ export default function WearivoUltimateConsole() {
                   </select>
                 </div>
                 <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Description..." rows="3" style={{ padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}></textarea>
-                <input type="text" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="Image URL (Paste link for now)" style={{ padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }} />
+                
+                {/* تعديل عيسى: تحويل الخانة من نص إلى اختيار ملف */}
+                <div style={{ border: '1px dashed #cbd5e1', padding: '16px', borderRadius: '12px', textAlign: 'center' }}>
+                    <input 
+                        type="file" 
+                        accept="image/*" 
+                        onChange={(e) => setImageFile(e.target.files[0])} 
+                        style={{ fontSize: '12px' }}
+                    />
+                    {imageFile && <p style={{ fontSize: '10px', marginTop: '8px', color: '#64748b' }}>Selected: {imageFile.name}</p>}
+                </div>
               </div>
               <div style={{ display: 'flex', gap: '12px', marginTop: '32px' }}>
                 <button onClick={() => setIsFormOpen(false)} style={{ flex: 1, padding: '16px', borderRadius: '16px', border: '1px solid #e2e8f0', background: '#fff', fontWeight: '700' }}>Cancel</button>
                 <button onClick={handleSaveProduct} disabled={loading} style={{ flex: 1, padding: '16px', borderRadius: '16px', border: 'none', background: '#000', color: '#fff', fontWeight: '700', opacity: loading ? 0.5 : 1 }}>
-                  {loading ? "Saving..." : "Save Product"}
+                  {loading ? "جاري الرفع..." : "Save Product"}
                 </button>
               </div>
             </div>
