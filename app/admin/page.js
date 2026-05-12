@@ -2,151 +2,103 @@
 import { useEffect, useState } from 'react';
 import { auth, db } from '../../firebase'; 
 import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { collection, addDoc } from 'firebase/firestore';
+import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 
+// أيقونات احترافية متناسقة مع سيم image_822095.png
 const Icons = {
-  LiveOrders: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>,
-  BrandManager: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 20v-6M6 20V10M18 20V4"/></svg>,
-  Search: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>,
-  Logout: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fca5a5" strokeWidth="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>,
-  Plus: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M12 5v14M5 12h14"/></svg>,
-  ExternalLink: () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
+  Live: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2"><path d="M3 3v18h18"/><path d="M18 9l-5 5-2-2-4 4"/></svg>,
+  Control: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1V15a2 2 0 0 1-2-2 2 2 0 0 1 2-2v-.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2v.09a1.65 1.65 0 0 0-1.51 1z"/></svg>,
+  Bell: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>,
+  Logout: () => <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
 };
 
-export default function WearivoUltimateConsole() {
-  const [user, setUser] = useState(null);
-  const [activeTab, setActiveTab] = useState('orders');
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+export default function WearivoFixedDashboard() {
+  const [activeTab, setActiveTab] = useState('live');
+  const [orders, setOrders] = useState([]);
+  const [searchCode, setSearchCode] = useState('');
   const router = useRouter();
 
-  // Form State
-  const [name, setName] = useState('');
-  const [price, setPrice] = useState('');
-  const [category, setCategory] = useState('Mens Wear');
-  const [description, setDescription] = useState('');
-  const [imageFile, setImageFile] = useState(null); 
-  const [loading, setLoading] = useState(false);
-
-  // Cloudinary Settings
-  const CLOUD_NAME = "dmgja8ma7";
-  const UPLOAD_PRESET = "wearivo_preset";
-
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    onAuthStateChanged(auth, (u) => u ? setUser(u) : router.push('/login'));
-    return () => window.removeEventListener('resize', handleResize);
+    onAuthStateChanged(auth, (u) => !u && router.push('/login'));
+    const q = query(collection(db, "orders"), orderBy("createdAt", "desc"));
+    return onSnapshot(q, (snap) => setOrders(snap.docs.map(d => ({ id: d.id, ...d.data() }))));
   }, [router]);
 
-  const handleSaveProduct = async () => {
-    if (!name || !price || !imageFile) {
-      alert("Please fill all required fields");
-      return;
-    }
-    setLoading(true);
-    try {
-      const formData = new FormData();
-      formData.append('file', imageFile);
-      formData.append('upload_preset', UPLOAD_PRESET);
-
-      const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
-        method: 'POST',
-        body: formData
-      });
-      const data = await response.json();
-      
-      const categoryMap = { "Mens Wear": "men", "Womens Wear": "women", "Kids Wear": "kids" };
-
-      await addDoc(collection(db, "products"), {
-        name,
-        price: Number(price),
-        category: categoryMap[category],
-        description,
-        imageUrl: data.secure_url,
-        createdAt: new Date()
-      });
-
-      alert("Success!");
-      setIsFormOpen(false);
-      setName(''); setPrice(''); setDescription(''); setImageFile(null);
-    } catch (e) {
-      alert("Error uploading");
-    }
-    setLoading(false);
-  };
-
-  if (!user) return null;
-
   return (
-    <div style={{ fontFamily: "'Inter', sans-serif", display: 'flex', minHeight: '100vh', backgroundColor: '#f8fafc' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#0b0e14', color: '#fff' }}>
       
-      {/* Sidebar - كما في الصورة image_828cfb.png */}
-      <aside style={{ width: '280px', backgroundColor: '#1e293b', padding: '40px 24px', display: 'flex', flexDirection: 'column', color: '#fff', position: 'fixed', height: '100vh', left: 0 }}>
-        <div style={{ fontSize: '28px', fontWeight: '900', color: '#D2B48C', letterSpacing: '-1.5px', marginBottom: '10px', textAlign: 'center' }}>WEARIVO</div>
-        <button onClick={() => router.push('/')} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', padding: '12px', borderRadius: '10px', fontSize: '11px', fontWeight: '700', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '40px', cursor: 'pointer' }}>
-          <Icons.ExternalLink /> View Website
-        </button>
+      {/* Sidebar - النسخة الأصلية */}
+      <aside style={{ width: '250px', backgroundColor: '#11151c', borderRight: '1px solid #1e2530', display: 'flex', flexDirection: 'column', padding: '30px 20px', position: 'fixed', height: '100vh' }}>
+        <h2 style={{ fontSize: '24px', fontWeight: '900', color: '#3b82f6', marginBottom: '50px' }}>Dashboard</h2>
         
         <nav style={{ flex: 1 }}>
-          <ul style={{ listStyle: 'none', padding: 0 }}>
-            <li onClick={() => setActiveTab('orders')} style={{ padding: '16px 20px', borderRadius: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '15px', background: activeTab === 'orders' ? 'rgba(210, 180, 140, 0.15)' : 'transparent', color: activeTab === 'orders' ? '#D2B48C' : '#94a3b8', fontWeight: '700', marginBottom: '8px' }}>
-              <Icons.LiveOrders /> Live Orders
-            </li>
-            <li onClick={() => setActiveTab('manager')} style={{ padding: '16px 20px', borderRadius: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '15px', background: activeTab === 'manager' ? 'rgba(210, 180, 140, 0.15)' : 'transparent', color: activeTab === 'manager' ? '#D2B48C' : '#94a3b8', fontWeight: '700' }}>
-              <Icons.BrandManager /> Brand Manager
-            </li>
-          </ul>
+          <div onClick={() => setActiveTab('live')} style={{ padding: '15px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '15px', cursor: 'pointer', backgroundColor: activeTab === 'live' ? '#1c222d' : 'transparent', color: activeTab === 'live' ? '#3b82f6' : '#64748b', fontWeight: '700' }}>
+            <Icons.Live /> Live Orders
+          </div>
+          <div onClick={() => setActiveTab('control')} style={{ padding: '15px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '15px', cursor: 'pointer', marginTop: '10px', backgroundColor: activeTab === 'control' ? '#1c222d' : 'transparent', color: activeTab === 'control' ? '#3b82f6' : '#64748b', fontWeight: '700' }}>
+            <Icons.Control /> Control
+          </div>
         </nav>
 
-        <div onClick={() => signOut(auth)} style={{ padding: '20px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '15px', color: '#fca5a5', fontWeight: '700', borderTop: '1px solid #334155' }}>
-          <Icons.Logout /> Logout
+        {/* زرار اللوج اوت - واضح جداً وتحت خالص */}
+        <div onClick={() => signOut(auth)} style={{ padding: '20px 10px', borderTop: '1px solid #1e2530', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px', color: '#ef4444', fontWeight: '900', fontSize: '16px' }}>
+          <Icons.Logout /> Logout Account
         </div>
       </aside>
 
-      <main style={{ flex: 1, marginLeft: '280px', padding: '40px' }}>
+      {/* المحتوى الرئيسي */}
+      <main style={{ flex: 1, marginLeft: '250px', padding: '40px' }}>
+        
+        {/* الهيدر - التنبيهات واضحة هنا */}
         <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px' }}>
-          <h2 style={{ fontSize: '24px', fontWeight: '800', color: '#1e293b' }}>
-            {activeTab === 'orders' ? "Operational Statistics" : "Brand Style Manager"}
-          </h2>
-          <button onClick={() => setIsFormOpen(true)} style={{ background: '#000', color: '#fff', border: 'none', padding: '14px 28px', borderRadius: '14px', fontWeight: '700', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}>
-            <Icons.Plus /> ADD PRODUCT
-          </button>
+          <input 
+            type="text" 
+            placeholder="Search by Order Code..." 
+            value={searchCode}
+            onChange={(e) => setSearchCode(e.target.value)}
+            style={{ width: '400px', padding: '14px 20px', borderRadius: '12px', backgroundColor: '#11151c', border: '1px solid #1e2530', color: '#fff', outline: 'none' }}
+          />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '25px' }}>
+            {/* زرار التنبيه (Bell) */}
+            <div style={{ cursor: 'pointer', position: 'relative', backgroundColor: '#11151c', padding: '10px', borderRadius: '12px', border: '1px solid #1e2530' }}>
+               <Icons.Bell />
+               <span style={{ position: 'absolute', top: '8px', right: '8px', width: '10px', height: '10px', backgroundColor: '#3b82f6', borderRadius: '50%', border: '2px solid #11151c' }}></span>
+            </div>
+            <div style={{ width: '45px', height: '45px', borderRadius: '50%', backgroundColor: '#1c222d', border: '1px solid #3b82f6' }}></div>
+          </div>
         </header>
 
-        {/* Modal - مطابق للصورة image_82895a.png */}
-        {isFormOpen && (
-          <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(30, 41, 59, 0.8)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
-            <div style={{ backgroundColor: '#fff', padding: '48px', borderRadius: '32px', width: '500px', textAlign: 'center' }}>
-              <h3 style={{ fontSize: '26px', fontWeight: '900', marginBottom: '30px', color: '#000' }}>New Item Upload</h3>
-              
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Product Title" style={{ width: '100%', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', textAlign: 'right' }} />
-                <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="Price" style={{ width: '100%', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', textAlign: 'right' }} />
-                <select value={category} onChange={(e) => setCategory(e.target.value)} style={{ width: '100%', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', textAlign: 'right', appearance: 'none' }}>
-                  <option>Mens Wear</option>
-                  <option>Womens Wear</option>
-                  <option>Kids Wear</option>
-                </select>
-                <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="...Description" rows="4" style={{ width: '100%', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', textAlign: 'right', resize: 'none' }}></textarea>
-                
-                <div style={{ border: '1px dashed #cbd5e1', padding: '20px', borderRadius: '12px', background: '#f8fafc' }}>
-                   <input type="file" accept="image/*" onChange={(e) => setImageFile(e.target.files[0])} />
+        {activeTab === 'live' && (
+          <section>
+            {/* الإحصائيات - طبق الأصل */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '25px', marginBottom: '40px' }}>
+              <div style={{ backgroundColor: '#11151c', padding: '30px', borderRadius: '25px', border: '1px solid #1e2530' }}>
+                <p style={{ color: '#64748b' }}>Total Revenue</p>
+                <h2 style={{ fontSize: '34px', fontWeight: '900', margin: '10px 0' }}>$8,450</h2>
+                <span style={{ color: '#ef4444' }}>▼ 15%</span>
+              </div>
+              <div style={{ backgroundColor: '#11151c', padding: '30px', borderRadius: '25px', border: '1px solid #1e2530' }}>
+                <p style={{ color: '#64748b' }}>Live Orders</p>
+                <h2 style={{ fontSize: '34px', fontWeight: '900', margin: '10px 0' }}>23</h2>
+                <div style={{ width: '100%', height: '8px', backgroundColor: '#1c222d', borderRadius: '10px', marginTop: '15px' }}>
+                    <div style={{ width: '72%', height: '100%', backgroundColor: '#3b82f6', borderRadius: '10px' }}></div>
                 </div>
               </div>
-
-              <div style={{ display: 'flex', gap: '15px', marginTop: '30px' }}>
-                <button onClick={handleSaveProduct} disabled={loading} style={{ flex: 1, padding: '18px', borderRadius: '16px', border: 'none', background: '#000', color: '#fff', fontWeight: '800', cursor: 'pointer' }}>
-                  {loading ? "Saving..." : "Save Product"}
-                </button>
-                <button onClick={() => setIsFormOpen(false)} style={{ flex: 1, padding: '18px', borderRadius: '16px', border: '1px solid #e2e8f0', background: '#fff', color: '#000', fontWeight: '800', cursor: 'pointer' }}>
-                  Cancel
-                </button>
-              </div>
             </div>
-          </div>
+
+            {/* سلة المشتريات / الأوردرات */}
+            <h3 style={{ fontSize: '20px', fontWeight: '800', marginBottom: '20px' }}>Orders Stream</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+              {orders.filter(o => o.id.includes(searchCode)).map((order) => (
+                <div key={order.id} style={{ backgroundColor: '#11151c', padding: '20px 30px', borderRadius: '20px', border: '1px solid #1e2530', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontWeight: '900', color: '#3b82f6' }}>CODE: {order.id.slice(0,8)}</span>
+                  <span style={{ color: '#fff' }}>{order.customerName}</span>
+                  <span style={{ fontWeight: 'bold' }}>${order.total}</span>
+                </div>
+              ))}
+            </div>
+          </section>
         )}
       </main>
     </div>
