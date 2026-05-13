@@ -31,7 +31,6 @@ export default function WearivoFinalDashboard() {
     return () => { unsubOrders(); unsubProducts(); };
   }, [router]);
 
-  // تعديل: عند فتح المودال، نجعل القسم الافتراضي هو القسم الذي يقف عليه المستخدم حالياً
   const openModal = () => {
     setCategory(controlTab); 
     setIsModalOpen(true);
@@ -50,13 +49,26 @@ export default function WearivoFinalDashboard() {
       const formData = new FormData();
       formData.append('file', imageFile);
       formData.append('upload_preset', "wearivo_preset");
-      const res = await fetch(`https://api.cloudinary.com/v1_1/dmgja8ma7/image/upload`, { method: 'POST', body: formData });
+      
+      const res = await fetch(`https://api.cloudinary.com/v1_1/dmgja8ma7/image/upload`, { 
+        method: 'POST', 
+        body: formData 
+      });
+      
       const data = await res.json();
+
+      // التعديل: التحقق من وجود خطأ في رد Cloudinary
+      if (data.error) {
+        console.error("Cloudinary Error:", data.error.message);
+        alert("خطأ من كلوديناري: " + data.error.message);
+        setLoading(false);
+        return;
+      }
 
       await addDoc(collection(db, "products"), {
         name: productName, 
         price: Number(productPrice),
-        category: category, // الربط هنا سليم 100% مع الأقسام
+        category: category,
         imageUrl: data.secure_url,
         createdAt: new Date()
       });
@@ -66,7 +78,7 @@ export default function WearivoFinalDashboard() {
       setProductName(''); setProductPrice(''); setImageFile(null);
     } catch (e) { 
       console.error(e);
-      alert("عطل في الرفع"); 
+      alert("عطل في الرفع: تأكد من اتصال الإنترنت"); 
     }
     setLoading(false);
   };
@@ -88,7 +100,6 @@ export default function WearivoFinalDashboard() {
         {activeTab === 'live' ? (
           <section>
              <h2 style={{ marginBottom: '30px' }}>الطلبات المباشرة ({orders.length})</h2>
-             {/* قائمة الأوردرات */}
           </section>
         ) : (
           <section>
