@@ -45,14 +45,13 @@ export default function WearivoFinalDashboard() {
     if (!productName || !productPrice || !imageFile) return alert("اكمل البيانات");
     
     setLoading(true);
-    let uploadedImageUrl = "";
 
     try {
-      // المرحلة الأولى: الرفع لـ Cloudinary
       const formData = new FormData();
       formData.append('file', imageFile);
-      formData.append('upload_preset', "wearivo_preset");
+      formData.append('upload_preset', "wearivo_preset"); // تأكد إن الـ Preset ده Unsigned في Cloudinary
       
+      // تنفيذ الرفع
       const response = await fetch(`https://api.cloudinary.com/v1_1/dmgja8ma7/image/upload`, { 
         method: 'POST', 
         body: formData
@@ -61,27 +60,27 @@ export default function WearivoFinalDashboard() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error?.message || "فشل الرفع من Cloudinary");
+        throw new Error(data.error?.message || "Cloudinary error");
       }
 
-      uploadedImageUrl = data.secure_url;
-
-      // المرحلة الثانية: الحفظ في Firebase
+      // الحفظ في Firebase
       await addDoc(collection(db, "products"), {
         name: productName, 
         price: Number(productPrice),
         category: category,
-        imageUrl: uploadedImageUrl,
+        imageUrl: data.secure_url,
         createdAt: new Date()
       });
 
-      resetForm(); // إغلاق المودال وتصفير الحالة فور النجاح
+      // تصفير وإغلاق المودال
+      resetForm();
 
     } catch (e) {
-      console.error("Critical Error:", e);
-      alert("حدث خطأ: " + e.message);
+      console.error("Critical Failure:", e);
+      alert("فشل الرفع: " + e.message);
     } finally {
-      // هذا الجزء هو الأهم لضمان عدم بقاء الزر في حالة "جاري الرفع"
+      // السطر ده هو اللي هيمنع الشكل اللي في صورة image_1d1b95.png
+      // هيخلي الزرار يرجع لحالته الطبيعية حتى لو العملية فشلت
       setLoading(false);
     }
   };
