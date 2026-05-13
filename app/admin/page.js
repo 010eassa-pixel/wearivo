@@ -36,16 +36,19 @@ export default function WearivoFinalDashboard() {
     setIsModalOpen(true);
   };
 
-  const handleDelete = async (id) => {
-    if(confirm("هل تريد حذف هذا المنتج نهائياً؟")) {
-      await deleteDoc(doc(db, "products", id));
-    }
+  // دالة المسح بتعديل بسيط للـ Reset
+  const resetForm = () => {
+    setProductName('');
+    setProductPrice('');
+    setImageFile(null);
+    setIsModalOpen(false);
+    setLoading(false);
   };
 
   const handleUploadAndSave = async () => {
     if (!productName || !productPrice || !imageFile) return alert("اكمل البيانات");
     
-    setLoading(true); // تفعيل وضع التحميل
+    setLoading(true);
     
     try {
       const formData = new FormData();
@@ -57,14 +60,11 @@ export default function WearivoFinalDashboard() {
         body: formData
       });
       
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error?.message || "فشل الرفع");
-      }
+      if (!res.ok) throw new Error("فشل الرفع لـ Cloudinary");
 
       const data = await res.json();
 
-      // حفظ المنتج في Firestore
+      // الحل الجذري: ننتظر الـ Firestore يخلص وبعدين نقفل فوراً
       await addDoc(collection(db, "products"), {
         name: productName, 
         price: Number(productPrice),
@@ -73,23 +73,14 @@ export default function WearivoFinalDashboard() {
         createdAt: new Date()
       });
 
-      // التعديل التقني: غلق المودال وتفريغ الحقول قبل إظهار التنبيه لضمان عدم التعليق
-      setIsModalOpen(false);
-      setProductName('');
-      setProductPrice('');
-      setImageFile(null);
-      
-      // التنبيه يظهر بعد غلق النافذة
-      setTimeout(() => {
-        alert("تم الحفظ بنجاح!");
-      }, 100);
+      // إغلاق وتنظيف الحالة فوراً
+      resetForm();
+      console.log("تم الحفظ بنجاح");
 
     } catch (e) { 
       console.error(e);
-      alert("مشكلة: " + e.message); 
-    } finally {
-      // ضمان إيقاف حالة التحميل في كل الحالات (نجاح أو فشل)
-      setLoading(false);
+      alert("حدث خطأ: " + e.message);
+      setLoading(false); // نرجع الزرار شغال لو فشل
     }
   };
 
@@ -130,7 +121,7 @@ export default function WearivoFinalDashboard() {
                   <img src={product.imageUrl} alt="" style={{ width: '100%', height: '150px', objectFit: 'cover', borderRadius: '15px', marginBottom: '10px' }} />
                   <h4 style={{ fontSize: '14px', marginBottom: '5px' }}>{product.name}</h4>
                   <p style={{ color: '#3b82f6', fontWeight: 'bold', marginBottom: '15px' }}>{product.price} EGP</p>
-                  <button onClick={() => handleDelete(product.id)} style={{ color: '#ff4d4d', background: 'none', border: 'none', cursor: 'pointer', fontSize: '12px' }}>حذف القطعة</button>
+                  <button onClick={() => { if(confirm("حذف؟")) deleteDoc(doc(db, "products", product.id)) }} style={{ color: '#ff4d4d', background: 'none', border: 'none', cursor: 'pointer', fontSize: '12px' }}>حذف القطعة</button>
                 </div>
               ))}
             </div>
@@ -138,7 +129,7 @@ export default function WearivoFinalDashboard() {
         )}
 
         {isModalOpen && (
-          <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.9)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
+          <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.85)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
             <div style={{ backgroundColor: '#0a0d14', padding: '40px', borderRadius: '30px', width: '450px', border: '1px solid #1a1f2b' }}>
               <h3 style={{ marginBottom: '25px', textAlign: 'center' }}>إضافة منتج لـ {category}</h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
@@ -156,7 +147,7 @@ export default function WearivoFinalDashboard() {
               </div>
               <div style={{ display: 'flex', gap: '15px', marginTop: '30px' }}>
                 <button onClick={() => setIsModalOpen(false)} style={{ flex: 1, padding: '15px', borderRadius: '12px', background: 'transparent', border: '1px solid #ff4d4d', color: '#ff4d4d' }}>إلغاء</button>
-                <button onClick={handleUploadAndSave} disabled={loading} style={{ flex: 1, padding: '15px', borderRadius: '12px', background: '#3b82f6', color: '#fff', fontWeight: 'bold' }}>{loading ? "جاري الرفع..." : "حفظ"}</button>
+                <button onClick={handleUploadAndSave} disabled={loading} style={{ flex: 1, padding: '15px', borderRadius: '12px', background: loading ? '#1a1f2b' : '#3b82f6', color: '#fff', fontWeight: 'bold', cursor: loading ? 'not-allowed' : 'pointer' }}>{loading ? "جاري الرفع..." : "حفظ"}</button>
               </div>
             </div>
           </div>
