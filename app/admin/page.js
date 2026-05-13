@@ -48,9 +48,11 @@ export default function WearivoFinalDashboard() {
     if (!productName || !productPrice || !imageFile) return alert("اكمل البيانات");
     
     setLoading(true);
-    let uploadedImageUrl = "";
 
-    // 1. مرحلة الرفع لـ Cloudinary
+    // إضافة وحدة تحكم للإلغاء (AbortController) لكسر التعليق بعد 15 ثانية
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
+
     try {
       const formData = new FormData();
       formData.append('file', imageFile);
@@ -58,38 +60,39 @@ export default function WearivoFinalDashboard() {
       
       const res = await fetch(`https://api.cloudinary.com/v1_1/dmgja8ma7/image/upload`, { 
         method: 'POST', 
-        body: formData
+        body: formData,
+        signal: controller.signal // ربط الرفع بنظام المهلة
       });
       
-      const data = await res.json();
-      if (!res.ok || !data.secure_url) throw new Error("فشل الرفع");
-      uploadedImageUrl = data.secure_url;
-      
-    } catch (e) {
-      console.error(e);
-      alert("فشل رفع الصورة: " + e.message);
-      setLoading(false);
-      return; 
-    }
+      clearTimeout(timeoutId);
 
-    // 2. مرحلة الحفظ في Firestore
-    try {
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error?.message || "فشل الرفع");
+      }
+
+      const data = await res.json();
+
+      // الحفظ في Firestore
       await addDoc(collection(db, "products"), {
         name: productName, 
         price: Number(productPrice),
         category: category,
-        imageUrl: uploadedImageUrl,
+        imageUrl: data.secure_url,
         createdAt: new Date()
       });
 
-      // إغلاق وتنظيف فوراً لضمان عدم التعليق
+      // إغلاق المودال وتنظيف البيانات فوراً
       resetForm();
-      console.log("Product saved successfully");
 
-    } catch (e) { 
+    } catch (e) {
       console.error(e);
-      alert("خطأ في قاعدة البيانات: " + e.message);
       setLoading(false);
+      if (e.name === 'AbortError') {
+        alert("انتهت المهلة: السيرفر لا يستجيب، جرب مرة أخرى");
+      } else {
+        alert("حدث خطأ: " + e.message);
+      }
     }
   };
 
