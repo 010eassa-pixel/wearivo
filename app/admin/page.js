@@ -36,7 +36,6 @@ export default function WearivoFinalDashboard() {
     setIsModalOpen(true);
   };
 
-  // دالة المسح بتعديل بسيط للـ Reset
   const resetForm = () => {
     setProductName('');
     setProductPrice('');
@@ -49,7 +48,9 @@ export default function WearivoFinalDashboard() {
     if (!productName || !productPrice || !imageFile) return alert("اكمل البيانات");
     
     setLoading(true);
-    
+    let uploadedImageUrl = "";
+
+    // 1. مرحلة الرفع لـ Cloudinary
     try {
       const formData = new FormData();
       formData.append('file', imageFile);
@@ -60,27 +61,35 @@ export default function WearivoFinalDashboard() {
         body: formData
       });
       
-      if (!res.ok) throw new Error("فشل الرفع لـ Cloudinary");
-
       const data = await res.json();
+      if (!res.ok || !data.secure_url) throw new Error("فشل الرفع");
+      uploadedImageUrl = data.secure_url;
+      
+    } catch (e) {
+      console.error(e);
+      alert("فشل رفع الصورة: " + e.message);
+      setLoading(false);
+      return; 
+    }
 
-      // الحل الجذري: ننتظر الـ Firestore يخلص وبعدين نقفل فوراً
+    // 2. مرحلة الحفظ في Firestore
+    try {
       await addDoc(collection(db, "products"), {
         name: productName, 
         price: Number(productPrice),
         category: category,
-        imageUrl: data.secure_url,
+        imageUrl: uploadedImageUrl,
         createdAt: new Date()
       });
 
-      // إغلاق وتنظيف الحالة فوراً
+      // إغلاق وتنظيف فوراً لضمان عدم التعليق
       resetForm();
-      console.log("تم الحفظ بنجاح");
+      console.log("Product saved successfully");
 
     } catch (e) { 
       console.error(e);
-      alert("حدث خطأ: " + e.message);
-      setLoading(false); // نرجع الزرار شغال لو فشل
+      alert("خطأ في قاعدة البيانات: " + e.message);
+      setLoading(false);
     }
   };
 
