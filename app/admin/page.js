@@ -44,7 +44,9 @@ export default function WearivoFinalDashboard() {
 
   const handleUploadAndSave = async () => {
     if (!productName || !productPrice || !imageFile) return alert("اكمل البيانات");
-    setLoading(true);
+    
+    setLoading(true); // تفعيل وضع التحميل
+    
     try {
       const formData = new FormData();
       formData.append('file', imageFile);
@@ -62,6 +64,7 @@ export default function WearivoFinalDashboard() {
 
       const data = await res.json();
 
+      // حفظ المنتج في Firestore
       await addDoc(collection(db, "products"), {
         name: productName, 
         price: Number(productPrice),
@@ -70,18 +73,22 @@ export default function WearivoFinalDashboard() {
         createdAt: new Date()
       });
 
-      // التعديل: ضمان قفل المودال وتصفير الحالة فور النجاح
+      // التعديل التقني: غلق المودال وتفريغ الحقول قبل إظهار التنبيه لضمان عدم التعليق
       setIsModalOpen(false);
       setProductName('');
       setProductPrice('');
       setImageFile(null);
-      alert("تم الحفظ بنجاح!");
       
+      // التنبيه يظهر بعد غلق النافذة
+      setTimeout(() => {
+        alert("تم الحفظ بنجاح!");
+      }, 100);
+
     } catch (e) { 
       console.error(e);
       alert("مشكلة: " + e.message); 
     } finally {
-      // التعديل: التأكد من إيقاف وضع التحميل في كل الحالات
+      // ضمان إيقاف حالة التحميل في كل الحالات (نجاح أو فشل)
       setLoading(false);
     }
   };
