@@ -21,13 +21,10 @@ export default function WearivoFinalDashboard() {
 
   useEffect(() => {
     onAuthStateChanged(auth, (u) => !u && router.push('/login'));
-    
     const qOrders = query(collection(db, "orders"), orderBy("createdAt", "desc"));
     const unsubOrders = onSnapshot(qOrders, (snap) => setOrders(snap.docs.map(d => ({ id: d.id, ...d.data() }))));
-
     const qProducts = query(collection(db, "products"), orderBy("createdAt", "desc"));
     const unsubProducts = onSnapshot(qProducts, (snap) => setProducts(snap.docs.map(d => ({ id: d.id, ...d.data() }))));
-
     return () => { unsubOrders(); unsubProducts(); };
   }, [router]);
 
@@ -40,59 +37,52 @@ export default function WearivoFinalDashboard() {
     setProductName('');
     setProductPrice('');
     setImageFile(null);
-    setIsModalOpen(false);
     setLoading(false);
+    setIsModalOpen(false);
   };
 
   const handleUploadAndSave = async () => {
     if (!productName || !productPrice || !imageFile) return alert("اكمل البيانات");
     
     setLoading(true);
-
-    // إضافة وحدة تحكم للإلغاء (AbortController) لكسر التعليق بعد 15 ثانية
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 15000);
+    let uploadedImageUrl = "";
 
     try {
+      // المرحلة الأولى: الرفع لـ Cloudinary
       const formData = new FormData();
       formData.append('file', imageFile);
       formData.append('upload_preset', "wearivo_preset");
       
-      const res = await fetch(`https://api.cloudinary.com/v1_1/dmgja8ma7/image/upload`, { 
+      const response = await fetch(`https://api.cloudinary.com/v1_1/dmgja8ma7/image/upload`, { 
         method: 'POST', 
-        body: formData,
-        signal: controller.signal // ربط الرفع بنظام المهلة
+        body: formData
       });
-      
-      clearTimeout(timeoutId);
 
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error?.message || "فشل الرفع");
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error?.message || "فشل الرفع من Cloudinary");
       }
 
-      const data = await res.json();
+      uploadedImageUrl = data.secure_url;
 
-      // الحفظ في Firestore
+      // المرحلة الثانية: الحفظ في Firebase
       await addDoc(collection(db, "products"), {
         name: productName, 
         price: Number(productPrice),
         category: category,
-        imageUrl: data.secure_url,
+        imageUrl: uploadedImageUrl,
         createdAt: new Date()
       });
 
-      // إغلاق المودال وتنظيف البيانات فوراً
-      resetForm();
+      resetForm(); // إغلاق المودال وتصفير الحالة فور النجاح
 
     } catch (e) {
-      console.error(e);
+      console.error("Critical Error:", e);
+      alert("حدث خطأ: " + e.message);
+    } finally {
+      // هذا الجزء هو الأهم لضمان عدم بقاء الزر في حالة "جاري الرفع"
       setLoading(false);
-      if (e.name === 'AbortError') {
-        alert("انتهت المهلة: السيرفر لا يستجيب، جرب مرة أخرى");
-      } else {
-        alert("حدث خطأ: " + e.message);
-      }
     }
   };
 
@@ -109,7 +99,6 @@ export default function WearivoFinalDashboard() {
       </aside>
 
       <main style={{ padding: '40px', overflowY: 'auto' }}>
-        
         {activeTab === 'live' ? (
           <section>
              <h2 style={{ marginBottom: '30px' }}>الطلبات المباشرة ({orders.length})</h2>
@@ -158,7 +147,7 @@ export default function WearivoFinalDashboard() {
                 </div>
               </div>
               <div style={{ display: 'flex', gap: '15px', marginTop: '30px' }}>
-                <button onClick={() => setIsModalOpen(false)} style={{ flex: 1, padding: '15px', borderRadius: '12px', background: 'transparent', border: '1px solid #ff4d4d', color: '#ff4d4d' }}>إلغاء</button>
+                <button onClick={resetForm} style={{ flex: 1, padding: '15px', borderRadius: '12px', background: 'transparent', border: '1px solid #ff4d4d', color: '#ff4d4d' }}>إلغاء</button>
                 <button onClick={handleUploadAndSave} disabled={loading} style={{ flex: 1, padding: '15px', borderRadius: '12px', background: loading ? '#1a1f2b' : '#3b82f6', color: '#fff', fontWeight: 'bold', cursor: loading ? 'not-allowed' : 'pointer' }}>{loading ? "جاري الرفع..." : "حفظ"}</button>
               </div>
             </div>
