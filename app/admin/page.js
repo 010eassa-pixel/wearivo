@@ -50,16 +50,16 @@ export default function WearivoFinalDashboard() {
       formData.append('file', imageFile);
       formData.append('upload_preset', "wearivo_preset");
       
+      // التعديل هنا: إضافة mode: 'cors' للتعامل مع سياسة المتصفح وكشف الخطأ
       const res = await fetch(`https://api.cloudinary.com/v1_1/dmgja8ma7/image/upload`, { 
         method: 'POST', 
-        body: formData 
+        body: formData,
+        mode: 'cors'
       });
       
       const data = await res.json();
 
-      // التعديل: التحقق من وجود خطأ في رد Cloudinary
       if (data.error) {
-        console.error("Cloudinary Error:", data.error.message);
         alert("خطأ من كلوديناري: " + data.error.message);
         setLoading(false);
         return;
@@ -78,7 +78,7 @@ export default function WearivoFinalDashboard() {
       setProductName(''); setProductPrice(''); setImageFile(null);
     } catch (e) { 
       console.error(e);
-      alert("عطل في الرفع: تأكد من اتصال الإنترنت"); 
+      alert("عطل في الرفع: تأكد من اتصال الإنترنت أو إعدادات CORS"); 
     }
     setLoading(false);
   };
