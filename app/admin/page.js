@@ -70,7 +70,6 @@ export default function WearivoFinalDashboard() {
         createdAt: new Date()
       });
 
-      // تعديل: قفل المودال وتصفير الحالة فور النجاح
       setIsModalOpen(false);
       setProductName('');
       setProductPrice('');
@@ -156,4 +155,3 @@ export default function WearivoFinalDashboard() {
     </div>
   );
 }
-  };
