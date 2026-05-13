@@ -70,6 +70,7 @@ export default function WearivoFinalDashboard() {
         createdAt: new Date()
       });
 
+      // التعديل: ضمان قفل المودال وتصفير الحالة فور النجاح
       setIsModalOpen(false);
       setProductName('');
       setProductPrice('');
@@ -79,8 +80,10 @@ export default function WearivoFinalDashboard() {
     } catch (e) { 
       console.error(e);
       alert("مشكلة: " + e.message); 
+    } finally {
+      // التعديل: التأكد من إيقاف وضع التحميل في كل الحالات
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
