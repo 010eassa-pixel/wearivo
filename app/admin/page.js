@@ -42,7 +42,7 @@ export default function WearivoFinalDashboard() {
     }
   };
 
- const handleUploadAndSave = async () => {
+  const handleUploadAndSave = async () => {
     if (!productName || !productPrice || !imageFile) return alert("اكمل البيانات");
     setLoading(true);
     try {
@@ -50,15 +50,16 @@ export default function WearivoFinalDashboard() {
       formData.append('file', imageFile);
       formData.append('upload_preset', "wearivo_preset");
       
-      // التعديل: استخدام طلب مباشر أكثر استقراراً
-      const res = await fetch(`https://api.cloudinary.com/v1_1/dmgja8ma7/upload`, { 
+      const res = await fetch(`https://api.cloudinary.com/v1_1/dmgja8ma7/image/upload`, { 
         method: 'POST', 
-        body: formData
+        body: formData 
       });
       
       const data = await res.json();
 
+      // التعديل: التحقق من وجود خطأ في رد Cloudinary
       if (data.error) {
+        console.error("Cloudinary Error:", data.error.message);
         alert("خطأ من كلوديناري: " + data.error.message);
         setLoading(false);
         return;
@@ -72,15 +73,6 @@ export default function WearivoFinalDashboard() {
         createdAt: new Date()
       });
 
-      alert("تم الحفظ بنجاح!");
-      setIsModalOpen(false);
-      setProductName(''); setProductPrice(''); setImageFile(null);
-    } catch (e) { 
-      console.error("Fetch Error:", e);
-      alert("عطل في الاتصال: جرب غلق أي إضافة AdBlocker في المتصفح"); 
-    }
-    setLoading(false);
-  };
       alert("تم الحفظ بنجاح في قسم " + category);
       setIsModalOpen(false);
       setProductName(''); setProductPrice(''); setImageFile(null);
