@@ -6,15 +6,14 @@ import { collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc } from '
 import { useRouter } from 'next/navigation';
 
 export default function WearivoFinalDashboard() {
-  const [activeTab, setActiveTab] = useState('live'); // التبويب الرئيسي (أوردرات أو تحكم)
-  const [controlTab, setControlTab] = useState('men'); // التبويب الفرعي للأقسام (رجالي، حريمي، أطفالي)
+  const [activeTab, setActiveTab] = useState('live');
+  const [controlTab, setControlTab] = useState('men');
   const [orders, setOrders] = useState([]);
   const [products, setProducts] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  // بيانات المنتج الجديد
   const [productName, setProductName] = useState('');
   const [productPrice, setProductPrice] = useState('');
   const [category, setCategory] = useState('men'); 
@@ -23,18 +22,21 @@ export default function WearivoFinalDashboard() {
   useEffect(() => {
     onAuthStateChanged(auth, (u) => !u && router.push('/login'));
     
-    // جلب الأوردرات لايف
     const qOrders = query(collection(db, "orders"), orderBy("createdAt", "desc"));
     const unsubOrders = onSnapshot(qOrders, (snap) => setOrders(snap.docs.map(d => ({ id: d.id, ...d.data() }))));
 
-    // جلب المنتجات لايف لتقسيمها
     const qProducts = query(collection(db, "products"), orderBy("createdAt", "desc"));
     const unsubProducts = onSnapshot(qProducts, (snap) => setProducts(snap.docs.map(d => ({ id: d.id, ...d.data() }))));
 
     return () => { unsubOrders(); unsubProducts(); };
   }, [router]);
 
-  // حذف منتج
+  // تعديل: عند فتح المودال، نجعل القسم الافتراضي هو القسم الذي يقف عليه المستخدم حالياً
+  const openModal = () => {
+    setCategory(controlTab); 
+    setIsModalOpen(true);
+  };
+
   const handleDelete = async (id) => {
     if(confirm("هل تريد حذف هذا المنتج نهائياً؟")) {
       await deleteDoc(doc(db, "products", id));
@@ -52,22 +54,26 @@ export default function WearivoFinalDashboard() {
       const data = await res.json();
 
       await addDoc(collection(db, "products"), {
-        name: productName, price: Number(productPrice),
-        category: category, imageUrl: data.secure_url,
+        name: productName, 
+        price: Number(productPrice),
+        category: category, // الربط هنا سليم 100% مع الأقسام
+        imageUrl: data.secure_url,
         createdAt: new Date()
       });
 
-      alert("تم الحفظ بنجاح!");
+      alert("تم الحفظ بنجاح في قسم " + category);
       setIsModalOpen(false);
       setProductName(''); setProductPrice(''); setImageFile(null);
-    } catch (e) { alert("عطل في الرفع"); }
+    } catch (e) { 
+      console.error(e);
+      alert("عطل في الرفع"); 
+    }
     setLoading(false);
   };
 
   return (
     <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px', height: '100vh', backgroundColor: '#05070a', color: '#fff', direction: 'rtl', overflow: 'hidden' }}>
       
-      {/* السايد بار */}
       <aside style={{ backgroundColor: '#0a0d14', borderLeft: '1px solid #1a1f2b', padding: '40px 20px', display: 'flex', flexDirection: 'column' }}>
         <h1 style={{ fontSize: '24px', fontWeight: '900', color: '#3b82f6', marginBottom: '60px', textAlign: 'center' }}>WEARIVO</h1>
         <nav style={{ flex: 1 }}>
@@ -77,7 +83,6 @@ export default function WearivoFinalDashboard() {
         <button onClick={() => signOut(auth)} style={{ color: '#ff4d4d', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}>تسجيل الخروج</button>
       </aside>
 
-      {/* المحتوى الرئيسي */}
       <main style={{ padding: '40px', overflowY: 'auto' }}>
         
         {activeTab === 'live' ? (
@@ -89,17 +94,15 @@ export default function WearivoFinalDashboard() {
           <section>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px' }}>
               <h2 style={{ fontWeight: '900' }}>إدارة أقسام المتجر</h2>
-              <button onClick={() => setIsModalOpen(true)} style={{ backgroundColor: '#3b82f6', color: '#fff', padding: '12px 30px', borderRadius: '12px', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}>+ إضافة منتج</button>
+              <button onClick={openModal} style={{ backgroundColor: '#3b82f6', color: '#fff', padding: '12px 30px', borderRadius: '12px', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}>+ إضافة منتج</button>
             </div>
 
-            {/* تبويبات الأقسام المنفصلة */}
             <div style={{ display: 'flex', gap: '20px', marginBottom: '30px', borderBottom: '1px solid #1a1f2b', paddingBottom: '15px' }}>
               <button onClick={() => setControlTab('men')} style={{ background: 'none', border: 'none', color: controlTab === 'men' ? '#3b82f6' : '#5b6a82', fontSize: '18px', fontWeight: 'bold', cursor: 'pointer', borderBottom: controlTab === 'men' ? '2px solid #3b82f6' : 'none' }}>رجالي</button>
               <button onClick={() => setControlTab('women')} style={{ background: 'none', border: 'none', color: controlTab === 'women' ? '#3b82f6' : '#5b6a82', fontSize: '18px', fontWeight: 'bold', cursor: 'pointer', borderBottom: controlTab === 'women' ? '2px solid #3b82f6' : 'none' }}>حريمي</button>
               <button onClick={() => setControlTab('kids')} style={{ background: 'none', border: 'none', color: controlTab === 'kids' ? '#3b82f6' : '#5b6a82', fontSize: '18px', fontWeight: 'bold', cursor: 'pointer', borderBottom: controlTab === 'kids' ? '2px solid #3b82f6' : 'none' }}>أطفالي</button>
             </div>
 
-            {/* عرض المنتجات حسب القسم المختار فقط */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '20px' }}>
               {products.filter(p => p.category === controlTab).map(product => (
                 <div key={product.id} style={{ backgroundColor: '#0a0d14', borderRadius: '20px', border: '1px solid #1a1f2b', overflow: 'hidden', textAlign: 'center', padding: '15px' }}>
@@ -113,7 +116,6 @@ export default function WearivoFinalDashboard() {
           </section>
         )}
 
-        {/* Modal الإضافة (نفس التصميم المعتمد) */}
         {isModalOpen && (
           <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.9)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
             <div style={{ backgroundColor: '#0a0d14', padding: '40px', borderRadius: '30px', width: '450px', border: '1px solid #1a1f2b' }}>
