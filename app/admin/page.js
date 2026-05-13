@@ -44,43 +44,41 @@ export default function WearivoFinalDashboard() {
   const handleUploadAndSave = async () => {
     if (!productName || !productPrice || !imageFile) return alert("اكمل البيانات");
     
-    setLoading(true);
+    setLoading(true); // تفعيل حالة التحميل الظاهرة في image_1cc578.png
 
     try {
       const formData = new FormData();
       formData.append('file', imageFile);
-      formData.append('upload_preset', "wearivo_preset"); // تأكد إن الـ Preset ده Unsigned في Cloudinary
+      formData.append('upload_preset', "wearivo_preset");
       
-      // تنفيذ الرفع
-      const response = await fetch(`https://api.cloudinary.com/v1_1/dmgja8ma7/image/upload`, { 
+      // تنفيذ عملية الرفع
+      const res = await fetch(`https://api.cloudinary.com/v1_1/dmgja8ma7/image/upload`, { 
         method: 'POST', 
         body: formData
       });
 
-      const data = await response.json();
+      const data = await res.json();
 
-      if (!response.ok) {
-        throw new Error(data.error?.message || "Cloudinary error");
-      }
+      if (!res.ok) throw new Error(data.error?.message || "فشل الرفع");
 
-      // الحفظ في Firebase
+      // الحفظ في Firestore باستخدام رابط Cloudinary
       await addDoc(collection(db, "products"), {
         name: productName, 
         price: Number(productPrice),
         category: category,
-        imageUrl: data.secure_url,
+        imageUrl: data.secure_url, // استخدام الرابط المباشر
         createdAt: new Date()
       });
 
-      // تصفير وإغلاق المودال
+      // تنظيف النموذج وإغلاق النافذة فور النجاح
       resetForm();
 
     } catch (e) {
-      console.error("Critical Failure:", e);
-      alert("فشل الرفع: " + e.message);
+      console.error(e);
+      alert("حدث خطأ: " + e.message);
     } finally {
-      // السطر ده هو اللي هيمنع الشكل اللي في صورة image_1d1b95.png
-      // هيخلي الزرار يرجع لحالته الطبيعية حتى لو العملية فشلت
+      // الكود السحري الذي سيحل مشكلة التعليق في image_1cc578.png
+      // سيتم تنفيذ هذا السطر سواء نجحت العملية أو فشلت لضمان رجوع الزرار
       setLoading(false);
     }
   };
