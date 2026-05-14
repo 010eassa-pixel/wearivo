@@ -1,91 +1,99 @@
 "use client";
-import { useState, useEffect } from 'react';
-import { db } from '../../../firebase'; 
+import { useEffect, useState } from 'react';
+import { db } from '../../firebase'; // تأكد من المسار حسب فولدراتك
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 
-export default function CategoryClient({ id }) {
+export default function CategoryClient({ categoryId }) {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const categoryNames = { kids: 'أطفالي', women: 'حريمي', men: 'رجالي' };
 
   useEffect(() => {
-    if (!id) return;
-    const q = query(collection(db, "products"), where("category", "==", id));
+    // الربط مع Firebase بفلتر القسم
+    // استخدمنا toLowerCase لضمان التطابق مع داتا الـ Admin
+    const q = query(
+      collection(db, "products"), 
+      where("category", "==", categoryId.toLowerCase())
+    );
+
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      setProducts(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setProducts(items);
+      setLoading(false);
+    }, (error) => {
+      console.error("Firestore Error:", error);
       setLoading(false);
     });
+
     return () => unsubscribe();
-  }, [id]);
+  }, [categoryId]);
+
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh', color: '#8b7e6a' }}>
+        جاري تحميل الأناقة...
+      </div>
+    );
+  }
 
   return (
-    <main className="min-h-screen bg-[#f4ece1] p-4 md:p-8" dir="rtl">
-      {/* الهيدر العلوي */}
-      <header className="flex justify-between items-center mb-10 border-b border-[#3d2b1f]/10 pb-4">
-        <div className="text-[10px] tracking-[0.3em] opacity-50 uppercase">COLLECTION</div>
-        <h1 className="text-2xl font-black tracking-widest text-[#3d2b1f]">WEARIVO</h1>
+    <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
+      <header style={{ marginBottom: '40px', textAlign: 'center' }}>
+        <h1 style={{ fontSize: '32px', textTransform: 'uppercase', letterSpacing: '4px', color: '#2c2c2c' }}>
+          {categoryId} Collection
+        </h1>
       </header>
 
-      {loading ? (
-        <div className="text-center py-20 opacity-50 text-[#3d2b1f] animate-pulse">جاري تحميل الأناقة...</div>
+      {products.length === 0 ? (
+        <p style={{ textAlign: 'center', color: '#999' }}>لا توجد قطع متوفرة في هذا القسم حالياً.</p>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-x-3 gap-y-12">
-          {products.map(product => {
-            const hasDiscount = product.oldPrice && product.oldPrice > product.price;
-            const discountPercentage = hasDiscount 
-              ? Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100) 
-              : null;
-
-            return (
-              <div key={product.id} className="group cursor-pointer flex flex-col">
-                {/* حاوية الصورة */}
-                <div className="relative aspect-[3/4] bg-[#f2f2f2] mb-3 overflow-hidden">
-                  {hasDiscount && (
-                    <span className="absolute top-2 left-2 bg-[#e63946] text-white text-[10px] font-bold px-1.5 py-0.5 z-10">
-                      -{discountPercentage}%
-                    </span>
-                  )}
-                  <img 
-                    src={product.imageUrl || '/placeholder.jpg'} 
-                    alt={product.name}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-                </div>
-
-                {/* تفاصيل المنتج */}
-                <div className="text-left space-y-1 px-1">
-                  <p className="text-[9px] uppercase tracking-tighter opacity-50 font-bold">WEARIVO PREMIER</p>
-                  <h3 className="text-[11px] font-medium leading-tight h-8 overflow-hidden text-[#3d2b1f]">
-                    {product.name}
-                  </h3>
-                  
-                  <div className="flex flex-col mt-1">
-                    <span className="text-[13px] font-black text-[#3d2b1f]">
-                      LE {product.price.toLocaleString()}
-                    </span>
-                    {hasDiscount && (
-                      <span className="text-[10px] line-through opacity-40">
-                        LE {product.oldPrice.toLocaleString()}
-                      </span>
-                    )}
-                  </div>
-                  
-                  {/* ألوان إضافية (اختياري) */}
-                  <p className="text-[9px] opacity-40 mt-1">+{Math.floor(Math.random() * 5) + 1} colors</p>
-                </div>
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', 
+          gap: '30px' 
+        }}>
+          {products.map((product) => (
+            <div key={product.id} className="product-card" style={{
+              backgroundColor: '#fff',
+              borderRadius: '8px',
+              overflow: 'hidden',
+              transition: 'transform 0.3s ease',
+              cursor: 'pointer'
+            }}>
+              {/* حاوية الصورة */}
+              <div style={{ width: '100%', height: '350px', backgroundColor: '#f5f5f5', overflow: 'hidden' }}>
+                <img 
+                  src={product.imageUrl} 
+                  alt={product.name}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
               </div>
-            );
-          })}
+
+              {/* تفاصيل المنتج */}
+              <div style={{ padding: '15px', textAlign: 'center' }}>
+                <h3 style={{ fontSize: '16px', fontWeight: '500', marginBottom: '8px', color: '#333' }}>
+                  {product.name}
+                </h3>
+                <p style={{ fontSize: '18px', fontWeight: 'bold', color: '#8b7e6a' }}>
+                  {product.price} EGP
+                </p>
+                <button style={{
+                  marginTop: '15px',
+                  width: '100%',
+                  padding: '10px',
+                  backgroundColor: '#000',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '14px'
+                }}>
+                  عرض التفاصيل
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
       )}
-
-      {products.length === 0 && !loading && (
-        <div className="text-center py-20 opacity-40">لا توجد قطع متاحة في هذا القسم حالياً</div>
-      )}
-
-      <footer className="mt-20 text-center opacity-30 text-[9px] tracking-[0.5em] uppercase">
-        Wearivo © 2026 - Digital Elegance
-      </footer>
-    </main>
+    </div>
   );
 }
