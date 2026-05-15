@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from 'react';
-// التعديل هنا: استخدام @ للوصول لملف الـ firebase بشكل صحيح ومختصر
-import { db } from '@/firebase'; 
+// التعديل الجوهري: استخدام المسار المباشر لضمان وصول الكود لملف الفايربيز
+import { db } from '../../firebase'; 
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 
 export default function CategoryClient({ categoryId }) {
@@ -9,7 +9,9 @@ export default function CategoryClient({ categoryId }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // الربط مع Firebase بفلتر القسم
+    // التأكد من أن db موجود قبل بدأ الاستعلام
+    if (!db) return;
+
     const q = query(
       collection(db, "products"), 
       where("category", "==", categoryId.toLowerCase())
@@ -52,7 +54,6 @@ export default function CategoryClient({ categoryId }) {
           gap: '30px' 
         }}>
           {products.map((product) => (
-            /* التعديل الجوهري: استخدام <a> لضمان التوافق الكامل مع مسارات Cloudflare بدون تغيير config */
             <a key={product.id} href={`/product/${product.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
               <div className="product-card" style={{
                 backgroundColor: '#fff',
@@ -62,7 +63,6 @@ export default function CategoryClient({ categoryId }) {
                 cursor: 'pointer',
                 border: '1px solid #f0f0f0'
               }}>
-                {/* حاوية الصورة */}
                 <div style={{ width: '100%', height: '350px', backgroundColor: '#f5f5f5', overflow: 'hidden' }}>
                   <img 
                     src={product.imageUrl} 
@@ -71,7 +71,6 @@ export default function CategoryClient({ categoryId }) {
                   />
                 </div>
 
-                {/* تفاصيل المنتج */}
                 <div style={{ padding: '15px', textAlign: 'center' }}>
                   <h3 style={{ fontSize: '16px', fontWeight: '500', marginBottom: '8px', color: '#333' }}>
                     {product.name}
