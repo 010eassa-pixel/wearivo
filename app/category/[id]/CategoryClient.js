@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from 'react';
-import { db } from '../../firebase'; // تأكد من المسار حسب فولدراتك
+// التعديل هنا: رجعنا 3 خطوات لورا عشان نوصل لملف firebase من جوه فولدر الـ [id]
+import { db } from '../../../firebase'; 
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 
 export default function CategoryClient({ categoryId }) {
