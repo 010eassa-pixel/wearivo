@@ -42,13 +42,11 @@ export default function WearivoFinalDashboard() {
   };
 
   const handleUploadAndSave = async () => {
-    if (!productName || !productPrice || !imageFile) return alert("برجاء إكمال البيانات");
+    if (!productName || !productPrice || !imageFile) return alert("اكمل البيانات");
     
     setLoading(true);
-    console.log("🚀 بدأت عملية الحفظ والرفع...");
 
     try {
-      // 1. الرفع لـ Cloudinary
       const formData = new FormData();
       formData.append('file', imageFile);
       formData.append('upload_preset', "wearivo_preset");
@@ -59,39 +57,30 @@ export default function WearivoFinalDashboard() {
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error?.message || "فشل الرفع لـ Cloudinary");
+      if (!res.ok) throw new Error("Cloudinary Failed");
 
-      console.log("✅ تم الرفع بنجاح، جاري الحفظ في Firestore...");
+      // --- الحركة الذكية هنا ---
+      // هنقفل الشاشة السوداء فوراً بمجرد ما الصورة تترفع
+      setIsModalOpen(false); 
+      setLoading(false);
 
-      // 2. الحفظ في Firestore
-      await addDoc(collection(db, "products"), {
+      // الحفظ في Firestore يكمل براحته في الخلفية
+      addDoc(collection(db, "products"), {
         name: productName, 
         price: Number(productPrice),
         category: category,
         imageUrl: data.secure_url,
         createdAt: new Date()
+      }).then(() => {
+        console.log("✅ Firestore Updated");
+        resetForm();
       });
 
-      // --- التعديل القاطع لفك التعليقة فوراً ---
-      console.log("✅ تمت العملية بنجاح كامل!");
-      
-      // نغلق المودال يدوياً ونصفر كل شيء لضمان تحديث الواجهة
-      setIsModalOpen(false); 
-      setLoading(false);
-      setProductName('');
-      setProductPrice('');
-      setImageFile(null);
-
     } catch (e) {
-      console.error("❌ حدث خطأ:", e);
-      alert("حدث خطأ: " + e.message);
-      setLoading(false); // فك التعليق في حالة الخطأ
-    } finally {
-      // صمام أمان أخير لضمان رجوع الزرار لحالته الأصلية
+      alert("Error: " + e.message);
       setLoading(false);
     }
   };
-
   return (
     <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px', height: '100vh', backgroundColor: '#05070a', color: '#fff', direction: 'rtl', overflow: 'hidden' }}>
       
