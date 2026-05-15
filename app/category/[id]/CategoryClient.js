@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 // التعديل هنا: استخدام @ للوصول لملف الـ firebase بشكل صحيح ومختصر
 import { db } from '@/firebase'; 
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
-import Link from 'next/link'; // أضفنا Link لربط الصفحات
 
 export default function CategoryClient({ categoryId }) {
   const [products, setProducts] = useState([]);
@@ -53,8 +52,8 @@ export default function CategoryClient({ categoryId }) {
           gap: '30px' 
         }}>
           {products.map((product) => (
-            /* التعديل الجوهري هنا: إضافة / في نهاية الـ href لضمان عمل الرابط على Cloudflare */
-            <Link key={product.id} href={`/product/${product.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
+            /* التعديل الجوهري: استخدام <a> لضمان التوافق الكامل مع مسارات Cloudflare بدون تغيير config */
+            <a key={product.id} href={`/product/${product.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
               <div className="product-card" style={{
                 backgroundColor: '#fff',
                 borderRadius: '8px',
@@ -81,7 +80,6 @@ export default function CategoryClient({ categoryId }) {
                     {product.price} EGP
                   </p>
                   
-                  {/* الزرار دلوقتي بقى مجرد شكل لأن الـ Link مغطي الكارت كله */}
                   <div style={{
                     marginTop: '15px',
                     width: '100%',
@@ -96,7 +94,7 @@ export default function CategoryClient({ categoryId }) {
                   </div>
                 </div>
               </div>
-            </Link>
+            </a>
           ))}
         </div>
       )}
