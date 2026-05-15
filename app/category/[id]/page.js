@@ -1,4 +1,4 @@
-import CategoryClient from './CategoryClient'; // السطر ده لازم يكون موجود ومكتوب صح
+import CategoryClient from './CategoryClient';
 
 export async function generateStaticParams() {
   return [
@@ -8,7 +8,11 @@ export async function generateStaticParams() {
   ];
 }
 
-export default function Page({ params }) {
-  // بنبعت الـ id للملف التاني عشان يربط الداتا
-  return <CategoryClient categoryId={params.id} />;
+// التعديل الجذري لضمان عدم حدوث Crash
+export default async function Page({ params }) {
+  // لازم ننتظر params عشان نضمن إن الـ ID وصل صح قبل ما نبعته
+  const resolvedParams = await params;
+  const { id } = resolvedParams;
+
+  return <CategoryClient categoryId={id} />;
 }
