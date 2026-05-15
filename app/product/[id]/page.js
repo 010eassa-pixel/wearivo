@@ -1,12 +1,12 @@
 import ProductClient from './ProductClient';
 
-// دي الدالة اللي Next.js بيطلبها في الـ Static Export
-export async function generateStaticParams() {
-  return []; 
-}
+// السطر ده هو اللي هيخلي الـ Build ينجح غصب عن Next.js
+export const dynamicParams = false; 
 
-// السطر ده بيعرفه إننا هنجيب الداتا لايف
-export const dynamicParams = true;
+export async function generateStaticParams() {
+  // بنقول له متعملش أي صفحات وقت الـ Build، سيبها فاضية
+  return [];
+}
 
 export default function Page({ params }) {
   return <ProductClient id={params.id} />;
