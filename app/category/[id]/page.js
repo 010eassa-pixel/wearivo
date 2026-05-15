@@ -1,5 +1,4 @@
-import CategoryClient from './CategoryClient';
-
+import { db } from '../../../firebase';
 // دي اللي Cloudflare محتاجها عشان الـ Build ينجح
 export async function generateStaticParams() {
   return [
