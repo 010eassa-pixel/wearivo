@@ -38,13 +38,14 @@ export default function WearivoFinalDashboard() {
     setProductName('');
     setProductPrice('');
     setImageFile(null);
-    setIsModalOpen(false); // دي اللي بتقفل الشاشة السوداء
+    setIsModalOpen(false);
   };
 
   const handleUploadAndSave = async () => {
-    if (!productName || !productPrice || !imageFile) return alert("اكمل البيانات");
+    if (!productName || !productPrice || !imageFile) return alert("برجاء إكمال البيانات");
     
     setLoading(true);
+    console.log("🚀 بدأت عملية الحفظ...");
 
     try {
       // 1. الرفع لـ Cloudinary
@@ -58,7 +59,9 @@ export default function WearivoFinalDashboard() {
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error?.message || "فشل الرفع");
+      if (!res.ok) throw new Error(data.error?.message || "فشل الرفع لـ Cloudinary");
+
+      console.log("✅ تم الرفع بنجاح، جاري الحفظ في Firestore...");
 
       // 2. الحفظ في Firestore
       await addDoc(collection(db, "products"), {
@@ -69,15 +72,16 @@ export default function WearivoFinalDashboard() {
         createdAt: new Date()
       });
 
-      // --- التعديل الجوهري لفك التعليقة فوراً ---
-      setIsModalOpen(false); // نقفل النافذة قسرياً
-      resetForm(); // نصفر البيانات واللودينج
+      // إغلاق النافذة فور النجاح
+      console.log("✅ تمت العملية بنجاح!");
+      resetForm();
 
     } catch (e) {
-      console.error(e);
+      console.error("❌ حدث خطأ:", e);
       alert("حدث خطأ: " + e.message);
-      setLoading(false); 
+      setLoading(false); // فك التعليق فوراً في حالة الخطأ
     } finally {
+      // صمام أمان أخير لضمان رجوع الزرار لحالته الأصلية
       setLoading(false);
     }
   };
@@ -128,7 +132,7 @@ export default function WearivoFinalDashboard() {
         {isModalOpen && (
           <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.85)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
             <div style={{ backgroundColor: '#0a0d14', padding: '40px', borderRadius: '30px', width: '450px', border: '1px solid #1a1f2b' }}>
-              <h3 style={{ marginBottom: '25px', textAlign: 'center' }}>إضافة منتج لـ {category}</h3>
+              <h3 style={{ marginBottom: '25px', textAlign: 'center' }}>إضافة منتج لـ {category === 'men' ? 'رجالي' : category === 'women' ? 'حريمي' : 'أطفالي'}</h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                 <input type="text" placeholder="اسم المنتج" value={productName} onChange={(e) => setProductName(e.target.value)} style={{ padding: '15px', borderRadius: '12px', background: '#05070a', border: '1px solid #1a1f2b', color: '#fff' }} />
                 <input type="number" placeholder="السعر" value={productPrice} onChange={(e) => setProductPrice(e.target.value)} style={{ padding: '15px', borderRadius: '12px', background: '#05070a', border: '1px solid #1a1f2b', color: '#fff' }} />
@@ -138,8 +142,11 @@ export default function WearivoFinalDashboard() {
                   <option value="kids">أطفالي</option>
                 </select>
                 <div style={{ border: '2px dashed #1a1f2b', padding: '20px', borderRadius: '12px', textAlign: 'center', position: 'relative' }}>
-                  <input type="file" onChange={(e) => setImageFile(e.target.files[0])} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }} />
-                  <p style={{ color: '#5b6a82' }}>{imageFile ? imageFile.name : "ارفع الصورة هنا"}</p>
+                  <input type="file" onChange={(e) => {
+                    console.log("📁 تم اختيار ملف:", e.target.files[0]?.name);
+                    setImageFile(e.target.files[0]);
+                  }} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }} />
+                  <p style={{ color: '#5b6a82' }}>{imageFile ? `✅ ${imageFile.name}` : "ارفع الصورة هنا"}</p>
                 </div>
               </div>
               <div style={{ display: 'flex', gap: '15px', marginTop: '30px' }}>
