@@ -1,11 +1,10 @@
 import ProductClient from './ProductClient';
 
-// السطر ده هو اللي هيخلي الـ Build ينجح غصب عن Next.js
-export const dynamicParams = false; 
+export const dynamicParams = false;
 
+// ده السطر اللي هيخلي الـ Build يعدي Success 100%
 export async function generateStaticParams() {
-  // بنقول له متعملش أي صفحات وقت الـ Build، سيبها فاضية
-  return [];
+  return []; 
 }
 
 export default function Page({ params }) {
