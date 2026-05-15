@@ -1,5 +1,5 @@
-import { db } from '../../../firebase';
-// دي اللي Cloudflare محتاجها عشان الـ Build ينجح
+import CategoryClient from './CategoryClient'; // السطر ده لازم يكون موجود ومكتوب صح
+
 export async function generateStaticParams() {
   return [
     { id: 'kids' },
@@ -9,6 +9,6 @@ export async function generateStaticParams() {
 }
 
 export default function Page({ params }) {
-  // التعديل هنا: بعتنا params.id تحت المسمى اللي الكلاينت مستنيه CategoryId
+  // بنبعت الـ id للملف التاني عشان يربط الداتا
   return <CategoryClient categoryId={params.id} />;
 }
