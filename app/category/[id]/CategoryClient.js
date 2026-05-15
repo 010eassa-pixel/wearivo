@@ -1,8 +1,9 @@
 "use client";
 import { useEffect, useState } from 'react';
-// التعديل هنا: رجعنا 3 خطوات لورا عشان نوصل لملف firebase من جوه فولدر الـ [id]
-import { db } from '@/firebase'; // استخدام @ يشير لمجلد src أو root في Next.jsimport { db } from '../../../firebase'; 
+// التعديل هنا: استخدام @ للوصول لملف الـ firebase بشكل صحيح ومختصر
+import { db } from '@/firebase'; 
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import Link from 'next/link'; // أضفنا Link لربط الصفحات
 
 export default function CategoryClient({ categoryId }) {
   const [products, setProducts] = useState([]);
@@ -10,7 +11,6 @@ export default function CategoryClient({ categoryId }) {
 
   useEffect(() => {
     // الربط مع Firebase بفلتر القسم
-    // استخدمنا toLowerCase لضمان التطابق مع داتا الـ Admin
     const q = query(
       collection(db, "products"), 
       where("category", "==", categoryId.toLowerCase())
@@ -53,45 +53,50 @@ export default function CategoryClient({ categoryId }) {
           gap: '30px' 
         }}>
           {products.map((product) => (
-            <div key={product.id} className="product-card" style={{
-              backgroundColor: '#fff',
-              borderRadius: '8px',
-              overflow: 'hidden',
-              transition: 'transform 0.3s ease',
-              cursor: 'pointer'
-            }}>
-              {/* حاوية الصورة */}
-              <div style={{ width: '100%', height: '350px', backgroundColor: '#f5f5f5', overflow: 'hidden' }}>
-                <img 
-                  src={product.imageUrl} 
-                  alt={product.name}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                />
-              </div>
+            /* التعديل الجوهري: إضافة Link حول الكارت بالكامل */
+            <Link key={product.id} href={`/product/${product.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+              <div className="product-card" style={{
+                backgroundColor: '#fff',
+                borderRadius: '8px',
+                overflow: 'hidden',
+                transition: 'transform 0.3s ease',
+                cursor: 'pointer',
+                border: '1px solid #f0f0f0'
+              }}>
+                {/* حاوية الصورة */}
+                <div style={{ width: '100%', height: '350px', backgroundColor: '#f5f5f5', overflow: 'hidden' }}>
+                  <img 
+                    src={product.imageUrl} 
+                    alt={product.name}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                </div>
 
-              {/* تفاصيل المنتج */}
-              <div style={{ padding: '15px', textAlign: 'center' }}>
-                <h3 style={{ fontSize: '16px', fontWeight: '500', marginBottom: '8px', color: '#333' }}>
-                  {product.name}
-                </h3>
-                <p style={{ fontSize: '18px', fontWeight: 'bold', color: '#8b7e6a' }}>
-                  {product.price} EGP
-                </p>
-                <button style={{
-                  marginTop: '15px',
-                  width: '100%',
-                  padding: '10px',
-                  backgroundColor: '#000',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  fontSize: '14px'
-                }}>
-                  عرض التفاصيل
-                </button>
+                {/* تفاصيل المنتج */}
+                <div style={{ padding: '15px', textAlign: 'center' }}>
+                  <h3 style={{ fontSize: '16px', fontWeight: '500', marginBottom: '8px', color: '#333' }}>
+                    {product.name}
+                  </h3>
+                  <p style={{ fontSize: '18px', fontWeight: 'bold', color: '#8b7e6a' }}>
+                    {product.price} EGP
+                  </p>
+                  
+                  {/* الزرار دلوقتي بقى مجرد شكل لأن الـ Link مغطي الكارت كله */}
+                  <div style={{
+                    marginTop: '15px',
+                    width: '100%',
+                    padding: '10px',
+                    backgroundColor: '#000',
+                    color: '#fff',
+                    textAlign: 'center',
+                    borderRadius: '4px',
+                    fontSize: '14px'
+                  }}>
+                    عرض التفاصيل
+                  </div>
+                </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       )}
