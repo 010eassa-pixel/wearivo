@@ -34,7 +34,7 @@ export default function WearivoFinalDashboard() {
   };
 
   const resetForm = () => {
-    setLoading(false); // ضمان فك حالة التحميل عند الإغلاق
+    setLoading(false);
     setProductName('');
     setProductPrice('');
     setImageFile(null);
@@ -59,7 +59,6 @@ export default function WearivoFinalDashboard() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error?.message || "فشل الرفع");
 
-      // الحفظ في Firestore
       await addDoc(collection(db, "products"), {
         name: productName, 
         price: Number(productPrice),
@@ -68,16 +67,13 @@ export default function WearivoFinalDashboard() {
         createdAt: new Date()
       });
 
-      // نجاح العملية -> تنظيف قسري وفوري
       resetForm();
 
     } catch (e) {
       console.error(e);
       alert("حدث خطأ: " + e.message);
-      // فك التعليق فوراً في حالة الخطأ لضمان عدم بقاء الزر على "جاري الرفع"
       setLoading(false); 
     } finally {
-      // صمام أمان أخير لضمان رجوع الزرار لحالته الأصلية تحت أي ظرف
       setLoading(false);
     }
   };
@@ -143,8 +139,15 @@ export default function WearivoFinalDashboard() {
                 </div>
               </div>
               <div style={{ display: 'flex', gap: '15px', marginTop: '30px' }}>
-                <button onClick={resetForm} style={{ flex: 1, padding: '15px', borderRadius: '12px', background: 'transparent', border: '1px solid #ff4d4d', color: '#ff4d4d' }}>إلغاء</button>
-                <button onClick={handleUploadAndSave} disabled={loading} style={{ flex: 1, padding: '15px', borderRadius: '12px', background: loading ? '#1a1f2b' : '#3b82f6', color: '#fff', fontWeight: 'bold', cursor: loading ? 'not-allowed' : 'pointer' }}>
+                <button type="button" onClick={resetForm} style={{ flex: 1, padding: '15px', borderRadius: '12px', background: 'transparent', border: '1px solid #ff4d4d', color: '#ff4d4d' }}>إلغاء</button>
+                
+                {/* --- التعديل الجوهري هنا --- */}
+                <button 
+                  type="button" 
+                  onClick={(e) => { e.preventDefault(); handleUploadAndSave(); }} 
+                  disabled={loading} 
+                  style={{ flex: 1, padding: '15px', borderRadius: '12px', background: loading ? '#1a1f2b' : '#3b82f6', color: '#fff', fontWeight: 'bold', cursor: loading ? 'not-allowed' : 'pointer' }}
+                >
                   {loading ? "جاري الرفع..." : "حفظ المنتج"}
                 </button>
               </div>
