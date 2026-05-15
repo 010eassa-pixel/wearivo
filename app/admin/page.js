@@ -74,9 +74,10 @@ export default function WearivoFinalDashboard() {
     } catch (e) {
       console.error(e);
       alert("حدث خطأ: " + e.message);
-      setLoading(false); // فك التعليق فوراً في حالة الخطأ
+      // فك التعليق فوراً في حالة الخطأ لضمان عدم بقاء الزر على "جاري الرفع"
+      setLoading(false); 
     } finally {
-      // صمام أمان أخير لضمان رجوع الزرار لحالته الأصلية
+      // صمام أمان أخير لضمان رجوع الزرار لحالته الأصلية تحت أي ظرف
       setLoading(false);
     }
   };
@@ -143,7 +144,6 @@ export default function WearivoFinalDashboard() {
               </div>
               <div style={{ display: 'flex', gap: '15px', marginTop: '30px' }}>
                 <button onClick={resetForm} style={{ flex: 1, padding: '15px', borderRadius: '12px', background: 'transparent', border: '1px solid #ff4d4d', color: '#ff4d4d' }}>إلغاء</button>
-                {/* تم تعديل التسمية هنا لتعكس الحالة الحقيقية */}
                 <button onClick={handleUploadAndSave} disabled={loading} style={{ flex: 1, padding: '15px', borderRadius: '12px', background: loading ? '#1a1f2b' : '#3b82f6', color: '#fff', fontWeight: 'bold', cursor: loading ? 'not-allowed' : 'pointer' }}>
                   {loading ? "جاري الرفع..." : "حفظ المنتج"}
                 </button>
