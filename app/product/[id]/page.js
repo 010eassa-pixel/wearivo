@@ -4,6 +4,9 @@ import { db } from '@/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { useParams } from 'next/navigation';
 
+// التعديل 1: تعريف الـ runtime لضمان العمل على Cloudflare
+export const runtime = 'edge';
+
 export default function ProductDetails() {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
@@ -12,10 +15,16 @@ export default function ProductDetails() {
 
   useEffect(() => {
     const fetchProduct = async () => {
-      const docRef = doc(db, "products", id);
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        setProduct(docSnap.data());
+      // التأكد من وجود ID قبل طلب البيانات
+      if (!id) return;
+      try {
+        const docRef = doc(db, "products", id);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          setProduct(docSnap.data());
+        }
+      } catch (error) {
+        console.error("Error fetching product:", error);
       }
       setLoading(false);
     };
@@ -33,7 +42,7 @@ export default function ProductDetails() {
          <div style={{ flex: 1 }}>
             <img src={product.imageUrl} alt={product.name} style={{ width: '100%', borderRadius: '12px', objectFit: 'cover' }} />
          </div>
-         {/* الصور الصغيرة الجانبية (ممكن نضيفها مستقبلاً لو رفعنا أكتر من صورة) */}
+         {/* الصور الصغيرة الجانبية */}
          <div style={{ width: '80px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
             <img src={product.imageUrl} style={{ width: '100%', borderRadius: '8px', border: '2px solid #3b82f6' }} />
          </div>
@@ -76,4 +85,9 @@ export default function ProductDetails() {
 
     </div>
   );
+}
+
+// التعديل 2: إضافة generateStaticParams لمنع أخطاء الـ Build في البيئات المستضافة
+export async function generateStaticParams() {
+  return [];
 }
