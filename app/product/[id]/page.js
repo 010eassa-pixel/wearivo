@@ -1,8 +1,11 @@
 "use client";
 import { useEffect, useState } from 'react';
-import { db } from '../../../firebase'; // تأكد إنك راجع 3 خطوات
+import { db } from '../../../firebase'; 
 import { doc, getDoc } from 'firebase/firestore';
 import { useParams } from 'next/navigation';
+
+// التعديل الجوهري: السطر ده بيقول لـ Next.js متقلقش من الـ ID وقت الـ Build
+export const dynamicParams = true; 
 
 export default function ProductPage() {
   const { id } = useParams();
@@ -41,7 +44,7 @@ export default function ProductPage() {
       {/* القسم الأيسر: تفاصيل المنتج */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}>
         <h1 style={{ fontSize: '32px', fontWeight: 'bold', color: '#1e293b' }}>{product.name}</h1>
-        <div style={{ fontSize: '28px', color: '#1e3a8a', fontWeight: '900' }}>{product.price} EGP</div>
+        <div style={{ fontSize: '24px', color: '#1e3a8a', fontWeight: '900' }}>{product.price} EGP</div>
         
         <hr style={{ border: '0.5px solid #e2e8f0' }} />
 
@@ -72,4 +75,9 @@ export default function ProductPage() {
       </div>
     </div>
   );
+}
+
+// التعديل الجوهري التاني: دالة فاضية عشان نرضي الـ Build بتاع الـ Static Export
+export async function generateStaticParams() {
+  return [];
 }
