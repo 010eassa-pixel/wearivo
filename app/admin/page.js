@@ -34,18 +34,18 @@ export default function WearivoFinalDashboard() {
   };
 
   const resetForm = () => {
-    setLoading(false);
+    setLoading(false); // فك حالة التحميل
     setProductName('');
     setProductPrice('');
     setImageFile(null);
-    setIsModalOpen(false);
+    setIsModalOpen(false); // إغلاق النافذة
   };
 
   const handleUploadAndSave = async () => {
     if (!productName || !productPrice || !imageFile) return alert("برجاء إكمال البيانات");
     
     setLoading(true);
-    console.log("🚀 بدأت عملية الحفظ...");
+    console.log("🚀 بدأت عملية الحفظ والرفع...");
 
     try {
       // 1. الرفع لـ Cloudinary
@@ -72,14 +72,20 @@ export default function WearivoFinalDashboard() {
         createdAt: new Date()
       });
 
-      // إغلاق النافذة فور النجاح
-      console.log("✅ تمت العملية بنجاح!");
-      resetForm();
+      // --- التعديل القاطع لفك التعليقة فوراً ---
+      console.log("✅ تمت العملية بنجاح كامل!");
+      
+      // نغلق المودال يدوياً ونصفر كل شيء لضمان تحديث الواجهة
+      setIsModalOpen(false); 
+      setLoading(false);
+      setProductName('');
+      setProductPrice('');
+      setImageFile(null);
 
     } catch (e) {
       console.error("❌ حدث خطأ:", e);
       alert("حدث خطأ: " + e.message);
-      setLoading(false); // فك التعليق فوراً في حالة الخطأ
+      setLoading(false); // فك التعليق في حالة الخطأ
     } finally {
       // صمام أمان أخير لضمان رجوع الزرار لحالته الأصلية
       setLoading(false);
