@@ -10,5 +10,6 @@ export async function generateStaticParams() {
 }
 
 export default function Page({ params }) {
-  return <CategoryClient id={params.id} />;
+  // التعديل هنا: بعتنا params.id تحت المسمى اللي الكلاينت مستنيه CategoryId
+  return <CategoryClient categoryId={params.id} />;
 }
