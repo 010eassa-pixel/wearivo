@@ -1,12 +1,15 @@
-import ProductClient from './ProductClient';
+import ProductDetailsClient from './ProductDetailsClient';
 
-export const dynamicParams = false;
-
-// ده السطر اللي هيخلي الـ Build يعدي Success 100%
+// 1. دي أهم دالة عشان الـ Build بتاع Cloudflare يعدي
 export async function generateStaticParams() {
-  return []; 
+  // بنرجع مصفوفة فاضية عشان Next.js ميسألش عن الـ IDs وقت الـ Build
+  return [];
 }
 
+// 2. بنعرفه إن البيانات ديناميكية وهتيجي من الـ Client
+export const dynamicParams = true;
+
 export default function Page({ params }) {
-  return <ProductClient id={params.id} />;
+  // بنبعت الـ id للملف التاني اللي فيه التصميم والـ use client
+  return <ProductDetailsClient id={params.id} />;
 }
