@@ -1,9 +1,13 @@
 "use client";
 import { useEffect, useState } from 'react';
-import { auth, db } from '../../firebase'; 
+// التعديل 1: تأكد من مسار firebase (استخدم @/firebase أفضل)
+import { auth, db } from '@/firebase'; 
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
+
+// التعديل 2: إضافة الـ runtime عشان Cloudflare ميضربش
+export const runtime = 'edge';
 
 export default function WearivoFinalDashboard() {
   const [activeTab, setActiveTab] = useState('live');
@@ -20,12 +24,18 @@ export default function WearivoFinalDashboard() {
   const [imageFile, setImageFile] = useState(null);
 
   useEffect(() => {
-    onAuthStateChanged(auth, (u) => !u && router.push('/login'));
+    // مراقبة تسجيل الدخول
+    const unsubAuth = onAuthStateChanged(auth, (u) => {
+      if (!u) router.push('/login');
+    });
+
     const qOrders = query(collection(db, "orders"), orderBy("createdAt", "desc"));
     const unsubOrders = onSnapshot(qOrders, (snap) => setOrders(snap.docs.map(d => ({ id: d.id, ...d.data() }))));
+    
     const qProducts = query(collection(db, "products"), orderBy("createdAt", "desc"));
     const unsubProducts = onSnapshot(qProducts, (snap) => setProducts(snap.docs.map(d => ({ id: d.id, ...d.data() }))));
-    return () => { unsubOrders(); unsubProducts(); };
+    
+    return () => { unsubAuth(); unsubOrders(); unsubProducts(); };
   }, [router]);
 
   const openModal = () => {
@@ -34,11 +44,11 @@ export default function WearivoFinalDashboard() {
   };
 
   const resetForm = () => {
-    setLoading(false); // فك حالة التحميل
+    setLoading(false);
     setProductName('');
     setProductPrice('');
     setImageFile(null);
-    setIsModalOpen(false); // إغلاق النافذة
+    setIsModalOpen(false);
   };
 
   const handleUploadAndSave = async () => {
@@ -59,44 +69,43 @@ export default function WearivoFinalDashboard() {
       const data = await res.json();
       if (!res.ok) throw new Error("Cloudinary Failed");
 
-      // --- الحركة الذكية هنا ---
-      // هنقفل الشاشة السوداء فوراً بمجرد ما الصورة تترفع
-      setIsModalOpen(false); 
-      setLoading(false);
-
-      // الحفظ في Firestore يكمل براحته في الخلفية
-      addDoc(collection(db, "products"), {
+      // الحفظ في Firestore
+      await addDoc(collection(db, "products"), {
         name: productName, 
         price: Number(productPrice),
         category: category,
         imageUrl: data.secure_url,
         createdAt: new Date()
-      }).then(() => {
-        console.log("✅ Firestore Updated");
-        resetForm();
       });
+
+      console.log("✅ Firestore Updated");
+      resetForm();
 
     } catch (e) {
       alert("Error: " + e.message);
       setLoading(false);
     }
   };
+
   return (
     <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px', height: '100vh', backgroundColor: '#05070a', color: '#fff', direction: 'rtl', overflow: 'hidden' }}>
       
+      {/* Sidebar */}
       <aside style={{ backgroundColor: '#0a0d14', borderLeft: '1px solid #1a1f2b', padding: '40px 20px', display: 'flex', flexDirection: 'column' }}>
         <h1 style={{ fontSize: '24px', fontWeight: '900', color: '#3b82f6', marginBottom: '60px', textAlign: 'center' }}>WEARIVO</h1>
         <nav style={{ flex: 1 }}>
-          <div onClick={() => setActiveTab('live')} style={{ padding: '15px', borderRadius: '12px', cursor: 'pointer', backgroundColor: activeTab === 'live' ? '#141b2b' : 'transparent', color: activeTab === 'live' ? '#3b82f6' : '#5b6a82', marginBottom: '10px', fontWeight: 'bold' }}>📊 Live Orders</div>
-          <div onClick={() => setActiveTab('control')} style={{ padding: '15px', borderRadius: '12px', cursor: 'pointer', backgroundColor: activeTab === 'control' ? '#141b2b' : 'transparent', color: activeTab === 'control' ? '#3b82f6' : '#5b6a82', fontWeight: 'bold' }}>⚙️ Control</div>
+          <div onClick={() => setActiveTab('live')} style={{ padding: '15px', borderRadius: '12px', cursor: 'pointer', backgroundColor: activeTab === 'live' ? '#141b2b' : 'transparent', color: activeTab === 'live' ? '#3b82f6' : '#5b6a82', marginBottom: '10px', fontWeight: 'bold', transition: '0.3s' }}>📊 Live Orders</div>
+          <div onClick={() => setActiveTab('control')} style={{ padding: '15px', borderRadius: '12px', cursor: 'pointer', backgroundColor: activeTab === 'control' ? '#141b2b' : 'transparent', color: activeTab === 'control' ? '#3b82f6' : '#5b6a82', fontWeight: 'bold', transition: '0.3s' }}>⚙️ Control</div>
         </nav>
         <button onClick={() => signOut(auth)} style={{ color: '#ff4d4d', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}>تسجيل الخروج</button>
       </aside>
 
+      {/* Main Content */}
       <main style={{ padding: '40px', overflowY: 'auto' }}>
         {activeTab === 'live' ? (
           <section>
-             <h2 style={{ marginBottom: '30px' }}>الطلبات المباشرة ({orders.length})</h2>
+             <h2 style={{ marginBottom: '30px', fontWeight: '900' }}>الطلبات المباشرة ({orders.length})</h2>
+             {/* هنا تقدر تعرض كروت الطلبات */}
           </section>
         ) : (
           <section>
@@ -105,12 +114,26 @@ export default function WearivoFinalDashboard() {
               <button onClick={openModal} style={{ backgroundColor: '#3b82f6', color: '#fff', padding: '12px 30px', borderRadius: '12px', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}>+ إضافة منتج</button>
             </div>
 
+            {/* Tabs الأقسام */}
             <div style={{ display: 'flex', gap: '20px', marginBottom: '30px', borderBottom: '1px solid #1a1f2b', paddingBottom: '15px' }}>
-              <button onClick={() => setControlTab('men')} style={{ background: 'none', border: 'none', color: controlTab === 'men' ? '#3b82f6' : '#5b6a82', fontSize: '18px', fontWeight: 'bold', cursor: 'pointer', borderBottom: controlTab === 'men' ? '2px solid #3b82f6' : 'none' }}>رجالي</button>
-              <button onClick={() => setControlTab('women')} style={{ background: 'none', border: 'none', color: controlTab === 'women' ? '#3b82f6' : '#5b6a82', fontSize: '18px', fontWeight: 'bold', cursor: 'pointer', borderBottom: controlTab === 'women' ? '2px solid #3b82f6' : 'none' }}>حريمي</button>
-              <button onClick={() => setControlTab('kids')} style={{ background: 'none', border: 'none', color: controlTab === 'kids' ? '#3b82f6' : '#5b6a82', fontSize: '18px', fontWeight: 'bold', cursor: 'pointer', borderBottom: controlTab === 'kids' ? '2px solid #3b82f6' : 'none' }}>أطفالي</button>
+              {['men', 'women', 'kids'].map((tab) => (
+                <button 
+                  key={tab}
+                  onClick={() => setControlTab(tab)} 
+                  style={{ 
+                    background: 'none', border: 'none', 
+                    color: controlTab === tab ? '#3b82f6' : '#5b6a82', 
+                    fontSize: '18px', fontWeight: 'bold', cursor: 'pointer', 
+                    borderBottom: controlTab === tab ? '2px solid #3b82f6' : 'none',
+                    paddingBottom: '10px'
+                  }}
+                >
+                  {tab === 'men' ? 'رجالي' : tab === 'women' ? 'حريمي' : 'أطفالي'}
+                </button>
+              ))}
             </div>
 
+            {/* عرض المنتجات */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '20px' }}>
               {products.filter(p => p.category === controlTab).map(product => (
                 <div key={product.id} style={{ backgroundColor: '#0a0d14', borderRadius: '20px', border: '1px solid #1a1f2b', overflow: 'hidden', textAlign: 'center', padding: '15px' }}>
@@ -124,6 +147,7 @@ export default function WearivoFinalDashboard() {
           </section>
         )}
 
+        {/* Modal الإضافة */}
         {isModalOpen && (
           <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.85)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
             <div style={{ backgroundColor: '#0a0d14', padding: '40px', borderRadius: '30px', width: '450px', border: '1px solid #1a1f2b' }}>
@@ -137,18 +161,15 @@ export default function WearivoFinalDashboard() {
                   <option value="kids">أطفالي</option>
                 </select>
                 <div style={{ border: '2px dashed #1a1f2b', padding: '20px', borderRadius: '12px', textAlign: 'center', position: 'relative' }}>
-                  <input type="file" onChange={(e) => {
-                    console.log("📁 تم اختيار ملف:", e.target.files[0]?.name);
-                    setImageFile(e.target.files[0]);
-                  }} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }} />
+                  <input type="file" onChange={(e) => setImageFile(e.target.files[0])} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }} />
                   <p style={{ color: '#5b6a82' }}>{imageFile ? `✅ ${imageFile.name}` : "ارفع الصورة هنا"}</p>
                 </div>
               </div>
               <div style={{ display: 'flex', gap: '15px', marginTop: '30px' }}>
-                <button type="button" onClick={resetForm} style={{ flex: 1, padding: '15px', borderRadius: '12px', background: 'transparent', border: '1px solid #ff4d4d', color: '#ff4d4d' }}>إلغاء</button>
+                <button type="button" onClick={resetForm} style={{ flex: 1, padding: '15px', borderRadius: '12px', background: 'transparent', border: '1px solid #ff4d4d', color: '#ff4d4d', cursor: 'pointer' }}>إلغاء</button>
                 <button 
                   type="button" 
-                  onClick={(e) => { e.preventDefault(); handleUploadAndSave(); }} 
+                  onClick={handleUploadAndSave} 
                   disabled={loading} 
                   style={{ flex: 1, padding: '15px', borderRadius: '12px', background: loading ? '#1a1f2b' : '#3b82f6', color: '#fff', fontWeight: 'bold', cursor: loading ? 'not-allowed' : 'pointer' }}
                 >
