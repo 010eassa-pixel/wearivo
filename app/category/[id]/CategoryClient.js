@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from 'react';
-// التعديل الجوهري: استخدام المسار المباشر لضمان وصول الكود لملف الفايربيز
-import { db } from '../../firebase'; 
+// التعديل الصح للمسار: 3 خطوات لورا
+import { db } from '../../../firebase'; 
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 
 export default function CategoryClient({ categoryId }) {
