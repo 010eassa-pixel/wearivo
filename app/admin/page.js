@@ -34,7 +34,6 @@ export default function WearivoFinalDashboard() {
   };
 
   const resetForm = () => {
-    // نضمن تصفير اللودينج أولاً لفك قفل الزرار
     setLoading(false);
     setProductName('');
     setProductPrice('');
@@ -64,20 +63,20 @@ export default function WearivoFinalDashboard() {
       await addDoc(collection(db, "products"), {
         name: productName, 
         price: Number(productPrice),
-        category: category,
+        category: category, // سيتم الحفظ بـ (men, women, kids)
         imageUrl: data.secure_url,
         createdAt: new Date()
       });
 
-      // نجاح العملية -> تنظيف قسري وفوري
+      // إغلاق المودال وتصفير الحالة فوراً
       resetForm();
 
     } catch (e) {
       console.error(e);
       alert("حدث خطأ: " + e.message);
-      setLoading(false); // فك التعليق في حالة الخطأ
+      setLoading(false); 
     } finally {
-      // صمام أمان أخير لضمان عدم بقاء الزر على "جاري الرفع"
+      // صمام أمان لضمان رجوع الزرار لحالته الأصلية
       setLoading(false);
     }
   };
@@ -132,11 +131,14 @@ export default function WearivoFinalDashboard() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                 <input type="text" placeholder="اسم المنتج" value={productName} onChange={(e) => setProductName(e.target.value)} style={{ padding: '15px', borderRadius: '12px', background: '#05070a', border: '1px solid #1a1f2b', color: '#fff' }} />
                 <input type="number" placeholder="السعر" value={productPrice} onChange={(e) => setProductPrice(e.target.value)} style={{ padding: '15px', borderRadius: '12px', background: '#05070a', border: '1px solid #1a1f2b', color: '#fff' }} />
+                
+                {/* تم التأكد من أن القيم هنا تطابق روابط الأقسام تماماً */}
                 <select value={category} onChange={(e) => setCategory(e.target.value)} style={{ padding: '15px', borderRadius: '12px', background: '#05070a', border: '1px solid #1a1f2b', color: '#fff' }}>
                   <option value="men">رجالي</option>
                   <option value="women">حريمي</option>
                   <option value="kids">أطفالي</option>
                 </select>
+
                 <div style={{ border: '2px dashed #1a1f2b', padding: '20px', borderRadius: '12px', textAlign: 'center', position: 'relative' }}>
                   <input type="file" onChange={(e) => setImageFile(e.target.files[0])} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }} />
                   <p style={{ color: '#5b6a82' }}>{imageFile ? imageFile.name : "ارفع الصورة هنا"}</p>
