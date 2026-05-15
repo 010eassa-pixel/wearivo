@@ -53,8 +53,8 @@ export default function CategoryClient({ categoryId }) {
           gap: '30px' 
         }}>
           {products.map((product) => (
-            /* التعديل الجوهري: إضافة Link حول الكارت بالكامل */
-            <Link key={product.id} href={`/product/${product.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+            /* التعديل الجوهري هنا: إضافة / في نهاية الـ href لضمان عمل الرابط على Cloudflare */
+            <Link key={product.id} href={`/product/${product.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
               <div className="product-card" style={{
                 backgroundColor: '#fff',
                 borderRadius: '8px',
