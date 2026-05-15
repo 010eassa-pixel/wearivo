@@ -34,51 +34,50 @@ export default function WearivoFinalDashboard() {
   };
 
   const resetForm = () => {
+    // نضمن تصفير اللودينج أولاً لفك قفل الزرار
+    setLoading(false);
     setProductName('');
     setProductPrice('');
     setImageFile(null);
-    setLoading(false);
     setIsModalOpen(false);
   };
 
   const handleUploadAndSave = async () => {
     if (!productName || !productPrice || !imageFile) return alert("اكمل البيانات");
     
-    setLoading(true); // تفعيل حالة التحميل الظاهرة في image_1cc578.png
+    setLoading(true);
 
     try {
       const formData = new FormData();
       formData.append('file', imageFile);
       formData.append('upload_preset', "wearivo_preset");
       
-      // تنفيذ عملية الرفع
       const res = await fetch(`https://api.cloudinary.com/v1_1/dmgja8ma7/image/upload`, { 
         method: 'POST', 
         body: formData
       });
 
       const data = await res.json();
-
       if (!res.ok) throw new Error(data.error?.message || "فشل الرفع");
 
-      // الحفظ في Firestore باستخدام رابط Cloudinary
+      // الحفظ في Firestore
       await addDoc(collection(db, "products"), {
         name: productName, 
         price: Number(productPrice),
         category: category,
-        imageUrl: data.secure_url, // استخدام الرابط المباشر
+        imageUrl: data.secure_url,
         createdAt: new Date()
       });
 
-      // تنظيف النموذج وإغلاق النافذة فور النجاح
+      // نجاح العملية -> تنظيف قسري وفوري
       resetForm();
 
     } catch (e) {
       console.error(e);
       alert("حدث خطأ: " + e.message);
+      setLoading(false); // فك التعليق في حالة الخطأ
     } finally {
-      // الكود السحري الذي سيحل مشكلة التعليق في image_1cc578.png
-      // سيتم تنفيذ هذا السطر سواء نجحت العملية أو فشلت لضمان رجوع الزرار
+      // صمام أمان أخير لضمان عدم بقاء الزر على "جاري الرفع"
       setLoading(false);
     }
   };
