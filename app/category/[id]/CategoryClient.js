@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from 'react';
 // التعديل هنا: رجعنا 3 خطوات لورا عشان نوصل لملف firebase من جوه فولدر الـ [id]
-import { db } from '../../../firebase'; 
+import { db } from '@/firebase'; // استخدام @ يشير لمجلد src أو root في Next.jsimport { db } from '../../../firebase'; 
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 
 export default function CategoryClient({ categoryId }) {
