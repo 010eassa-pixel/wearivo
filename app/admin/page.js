@@ -108,51 +108,74 @@ export default function WearivoFinalDashboard() {
   };
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px', height: '100vh', backgroundColor: '#05070a', color: '#fff', direction: 'rtl', overflow: 'hidden' }}>
+    <div style={{ 
+      display: 'flex', 
+      flexDirection: 'row', 
+      height: '100vh', 
+      width: '100vw', 
+      backgroundColor: '#05070a', 
+      color: '#fff', 
+      direction: 'rtl', 
+      overflow: 'hidden',
+      position: 'fixed',
+      inset: 0
+    }} className="dashboard-container">
       
-      {/* Sidebar - محتفظين بيه وبتصميمه بالمللي */}
-      <aside style={{ backgroundColor: '#0a0d14', borderLeft: '1px solid #1a1f2b', padding: '40px 20px', display: 'flex', flexDirection: 'column' }}>
-        <h1 style={{ fontSize: '24px', fontWeight: '900', color: '#3b82f6', marginBottom: '60px', textAlign: 'center' }}>WEARIVO</h1>
-        <nav style={{ flex: 1 }}>
-          <div onClick={() => setActiveTab('live')} style={{ padding: '15px', borderRadius: '12px', cursor: 'pointer', backgroundColor: activeTab === 'live' ? '#141b2b' : 'transparent', color: activeTab === 'live' ? '#3b82f6' : '#5b6a82', marginBottom: '10px', fontWeight: 'bold', transition: '0.3s' }}>📊 Live Orders</div>
-          <div onClick={() => setActiveTab('control')} style={{ padding: '15px', borderRadius: '12px', cursor: 'pointer', backgroundColor: activeTab === 'control' ? '#141b2b' : 'transparent', color: activeTab === 'control' ? '#3b82f6' : '#5b6a82', fontWeight: 'bold', transition: '0.3s' }}>⚙️ Control</div>
+      {/* Sidebar - تم حل مشكلة الحواف وتظبيطه للموبايل والكمبيوتر بالمللي */}
+      <aside style={{ 
+        backgroundColor: '#0a0d14', 
+        borderLeft: '1px solid #1a1f2b', 
+        padding: '30px 20px', 
+        display: 'flex', 
+        flexDirection: 'column',
+        width: '280px',
+        minWidth: '280px',
+        height: '100vh',
+        boxSizing: 'border-box'
+      }} className="sidebar-responsive">
+        <h1 style={{ fontSize: '24px', fontWeight: '900', color: '#3b82f6', marginBottom: '40px', textAlign: 'center' }}>WEARIVO</h1>
+        <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <div onClick={() => setActiveTab('live')} style={{ padding: '15px', borderRadius: '12px', cursor: 'pointer', backgroundColor: activeTab === 'live' ? '#141b2b' : 'transparent', color: activeTab === 'live' ? '#3b82f6' : '#5b6a82', fontWeight: 'bold', transition: '0.3s', display: 'flex', alignItems: 'center', gap: '10px' }}>📊 Live Orders</div>
+          <div onClick={() => setActiveTab('control')} style={{ padding: '15px', borderRadius: '12px', cursor: 'pointer', backgroundColor: activeTab === 'control' ? '#141b2b' : 'transparent', color: activeTab === 'control' ? '#3b82f6' : '#5b6a82', fontWeight: 'bold', transition: '0.3s', display: 'flex', alignItems: 'center', gap: '10px' }}>⚙️ Control</div>
         </nav>
-        <button onClick={() => signOut(auth)} style={{ color: '#ff4d4d', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}>تسجيل الخروج</button>
+        <button onClick={() => signOut(auth)} style={{ color: '#ff4d4d', background: 'none', border: '1px solid rgba(255, 77, 77, 0.2)', padding: '12px', borderRadius: '10px', cursor: 'pointer', fontWeight: 'bold', transition: '0.2s' }}>تسجيل الخروج</button>
       </aside>
 
       {/* Main Content */}
-      <main style={{ padding: '40px', overflowY: 'auto' }}>
+      <main style={{ flex: 1, padding: '40px', overflowY: 'auto', height: '100vh', boxSizing: 'border-box' }} className="main-responsive">
         {activeTab === 'live' ? (
-          /* تفصيل وتفعيل قسم الطلبات المباشرة من غير ما نبوظ الهوية البصرية للداشبورد */
-          <section>
-             <h2 style={{ marginBottom: '30px', fontWeight: '900' }}>الطلبات المباشرة ({orders.length})</h2>
+          /* تفصيل وتفعيل قسم الطلبات المباشرة بتنسيق كروت فخم واحترافي جداً */
+          <section style={{ width: '100%' }}>
+             <h2 style={{ marginBottom: '35px', fontWeight: '900', fontSize: '24px' }}>الطلبات المباشرة ({orders.length})</h2>
              
              {orders.length === 0 ? (
                <p style={{ color: '#5b6a82', textAlign: 'center', marginTop: '50px' }}>لا توجد طلبات حية في الوقت الحالي.</p>
              ) : (
-               <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+               /* تنسيق الكروت بشكل شبكي (Grid) احترافي ومريح للعين ويمنع تداخل النصوص */
+               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '20px', width: '100%' }}>
                  {orders.map((order) => (
                    <div 
                      key={order.id} 
                      onClick={() => setSelectedOrder(order)}
-                     style={{ backgroundColor: '#0a0d14', borderRadius: '16px', border: '1px solid #1a1f2b', padding: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', transition: '0.3s' }}
-                     onMouseEnter={(e) => e.currentTarget.style.borderColor = '#3b82f6'}
-                     onMouseLeave={(e) => e.currentTarget.style.borderColor = '#1a1f2b'}
+                     style={{ 
+                       backgroundColor: '#0a0d14', 
+                       borderRadius: '16px', 
+                       border: '1px solid #1a1f2b', 
+                       padding: '20px', 
+                       display: 'flex', 
+                       flexDirection: 'column', 
+                       gap: '15px',
+                       cursor: 'pointer', 
+                       transition: '0.3s',
+                       boxShadow: '0 4px 15px rgba(0,0,0,0.3)'
+                     }}
+                     onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#3b82f6'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                     onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#1a1f2b'; e.currentTarget.style.transform = 'translateY(0)'; }}
                    >
-                     <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
-                       <div style={{ fontFamily: 'monospace', fontSize: '18px', fontWeight: 'bold', color: '#3b82f6', backgroundColor: '#141b2b', padding: '8px 15px', borderRadius: '10px' }}>
+                     {/* الصف العلوي: رقم الطلب والحالة */}
+                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                       <div style={{ fontFamily: 'monospace', fontSize: '16px', fontWeight: 'bold', color: '#3b82f6', backgroundColor: '#141b2b', padding: '5px 12px', borderRadius: '8px' }}>
                          {order.orderNumber}
-                       </div>
-                       <div>
-                         <h4 style={{ margin: '0 0 5px 0', fontSize: '16px', fontWeight: 'bold' }}>{order.customer?.firstName} {order.customer?.lastName}</h4>
-                         <p style={{ margin: 0, fontSize: '13px', color: '#5b6a82' }}>📱 {order.customer?.phone} | 📍 {order.customer?.governorate}</p>
-                       </div>
-                     </div>
-
-                     <div style={{ display: 'flex', gap: '30px', alignItems: 'center' }}>
-                       <div style={{ textAlign: 'left' }}>
-                         <div style={{ fontWeight: 'bold', color: '#10b981', fontSize: '16px' }}>{order.productDetails?.totalPrice} EGP</div>
-                         <div style={{ fontSize: '12px', color: '#5b6a82', marginTop: '4px' }}>قيمة القطعة شاملة الشحن</div>
                        </div>
                        <span style={{ 
                          padding: '6px 14px', 
@@ -162,8 +185,31 @@ export default function WearivoFinalDashboard() {
                          backgroundColor: order.status === 'pending' ? 'rgba(217, 119, 6, 0.15)' : order.status === 'confirmed' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)',
                          color: order.status === 'pending' ? '#d97706' : order.status === 'confirmed' ? '#10b981' : '#ff4d4d'
                        }}>
-                         {order.status === 'pending' ? '⏳ معلق' : order.status === 'confirmed' ? '✅ تم التأكيد' : '❌ ملغي'}
+                         {order.status === 'pending' ? '⏳ معلق' : order.status === 'confirmed' ? '✅ تم الشحن' : '❌ ملغي'}
                        </span>
+                     </div>
+
+                     {/* الوسط: بيانات العميل */}
+                     <div style={{ borderBottom: '1px solid #1a1f2b', paddingBottom: '10px' }}>
+                       <h4 style={{ margin: '0 0 5px 0', fontSize: '16px', fontWeight: 'bold', color: '#f8fafc' }}>
+                         {order.customer?.firstName} {order.customer?.lastName}
+                       </h4>
+                       <div style={{ fontSize: '13px', color: '#8a99ad', display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '6px' }}>
+                         <span>📱 {order.customer?.phone}</span>
+                         <span>📍 {order.customer?.governorate}</span>
+                       </div>
+                     </div>
+
+                     {/* الصف السفلي: المنتج والماليات */}
+                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                       <div>
+                         <span style={{ fontSize: '11px', color: '#5b6a82', display: 'block', marginBottom: '2px' }}>المنتج والمقاس</span>
+                         <span style={{ fontSize: '13px', color: '#cbd5e1', fontWeight: '500' }}>{order.productDetails?.name} ({order.productDetails?.size || 'M'})</span>
+                       </div>
+                       <div style={{ textAlign: 'left' }}>
+                         <span style={{ fontSize: '11px', color: '#5b6a82', display: 'block', marginBottom: '2px' }}>الحساب الكلي</span>
+                         <span style={{ fontWeight: 'bold', color: '#10b981', fontSize: '16px' }}>{order.productDetails?.totalPrice} EGP</span>
+                       </div>
                      </div>
                    </div>
                  ))}
@@ -172,7 +218,7 @@ export default function WearivoFinalDashboard() {
           </section>
         ) : (
           /* قسم الـ Control - محتفظين بكودك وتصميم الكروت بتاعك بالظبط */
-          <section>
+          <section style={{ width: '100%' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px' }}>
               <h2 style={{ fontWeight: '900' }}>إدارة أقسام المتجر</h2>
               <button onClick={openModal} style={{ backgroundColor: '#3b82f6', color: '#fff', padding: '12px 30px', borderRadius: '12px', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}>+ إضافة منتج</button>
@@ -211,16 +257,16 @@ export default function WearivoFinalDashboard() {
 
         {/* الـ Modal المنبثق لاستعراض تفاصيل الأوردر بالكامل وببياناته الحقيقية */}
         {selectedOrder && (
-          <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.85)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 2000 }} onClick={() => setSelectedOrder(null)}>
-            <div style={{ backgroundColor: '#0a0d14', padding: '30px', borderRadius: '24px', width: '90%', maxWidth: '650px', border: '1px solid #1a1f2b', display: 'flex', flexDirection: 'column', gap: '20px', maxHeight: '90vh', overflowY: 'auto' }} onClick={(e) => e.stopPropagation()}>
+          <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.85)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 2000, padding: '15px' }} onClick={() => setSelectedOrder(null)}>
+            <div style={{ backgroundColor: '#0a0d14', padding: '30px', borderRadius: '24px', width: '95%', maxWidth: '650px', border: '1px solid #1a1f2b', display: 'flex', flexDirection: 'column', gap: '20px', maxHeight: '90vh', overflowY: 'auto' }} onClick={(e) => e.stopPropagation()}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #1a1f2b', paddingBottom: '15px' }}>
                 <h3 style={{ margin: 0, fontWeight: 'bold' }}>تفاصيل طلب رقم: <span style={{ color: '#3b82f6', fontFamily: 'monospace' }}>{selectedOrder.orderNumber}</span></h3>
                 <button onClick={() => setSelectedOrder(null)} style={{ background: 'none', border: 'none', color: '#5b6a82', fontSize: '20px', cursor: 'pointer' }}>✕</button>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                 <div style={{ backgroundColor: '#05070a', padding: '15px', borderRadius: '12px', border: '1px solid #1a1f2b' }}>
-                  <h4 style={{ color: '#3b82f6', margin: '0 0 10px 0', fontSize: '14px' }}>👤 بيانات العميل والشحن</h4>
+                  <h4 style={{ color: '#3b82f6', margin: '0 0 10px 0', fontSize: '14px', fontWeight: 'bold' }}>👤 بيانات العميل والشحن</h4>
                   <p style={{ fontSize: '13px', margin: '6px 0' }}><strong>الاسم:</strong> {selectedOrder.customer?.firstName} {selectedOrder.customer?.lastName}</p>
                   <p style={{ fontSize: '13px', margin: '6px 0' }}><strong>الجوال:</strong> {selectedOrder.customer?.phone}</p>
                   <p style={{ fontSize: '13px', margin: '6px 0' }}><strong>المحافظة:</strong> {selectedOrder.customer?.governorate}</p>
@@ -229,47 +275,88 @@ export default function WearivoFinalDashboard() {
                   {selectedOrder.customer?.apartment && <p style={{ fontSize: '13px', margin: '6px 0' }}><strong>معلم:</strong> {selectedOrder.customer?.apartment}</p>}
                 </div>
 
-                <div style={{ backgroundColor: '#05070a', padding: '15px', borderRadius: '12px', border: '1px solid #1a1f2b', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                  <div>
-                    <h4 style={{ color: '#3b82f6', margin: '0 0 10px 0', fontSize: '14px' }}>🛍️ المنتج المطلوب</h4>
-                    <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '10px' }}>
-                      <img src={selectedOrder.productDetails?.imageUrl} style={{ width: '45px', height: '55px', objectFit: 'cover', borderRadius: '6px' }} />
-                      <div>
-                        <div style={{ fontSize: '13px', fontWeight: 'bold' }}>{selectedOrder.productDetails?.name}</div>
-                        <div style={{ fontSize: '12px', color: '#5b6a82', marginTop: '2px' }}>المقاس: {selectedOrder.productDetails?.size}</div>
-                      </div>
+                <div style={{ backgroundColor: '#05070a', padding: '15px', borderRadius: '12px', border: '1px solid #1a1f2b' }}>
+                  <h4 style={{ color: '#3b82f6', margin: '0 0 10px 0', fontSize: '14px', fontWeight: 'bold' }}>🛍️ المنتج المطلوب</h4>
+                  <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '10px' }}>
+                    <img src={selectedOrder.productDetails?.imageUrl} style={{ width: '45px', height: '55px', objectFit: 'cover', borderRadius: '6px' }} />
+                    <div>
+                      <div style={{ fontSize: '13px', fontWeight: 'bold' }}>{selectedOrder.productDetails?.name}</div>
+                      <div style={{ fontSize: '12px', color: '#5b6a82', marginTop: '2px' }}>المقاس: {selectedOrder.productDetails?.size} | العدد: {selectedOrder.productDetails?.quantity || 1}</div>
                     </div>
-                    <p style={{ fontSize: '13px', margin: '4px 0' }}><strong>الكمية:</strong> {selectedOrder.productDetails?.quantity} قطعة</p>
-                    <p style={{ fontSize: '13px', margin: '4px 0' }}><strong>الشحن:</strong> {selectedOrder.productDetails?.shippingCost} EGP</p>
                   </div>
-                  <div style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)', padding: '10px', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', fontSize: '14px', color: '#10b981' }}>
+                  <div style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)', padding: '10px', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', fontSize: '14px', color: '#10b981', marginTop: '10px' }}>
                     <span>الحساب الكلي:</span>
                     <span>{selectedOrder.productDetails?.totalPrice} EGP</span>
                   </div>
                 </div>
               </div>
 
-              <div style={{ display: 'flex', gap: '10px', marginTop: '10px', borderTop: '1px solid #1a1f2b', paddingTop: '15px' }}>
-                <button onClick={() => handleUpdateStatus(selectedOrder.id, 'confirmed')} disabled={selectedOrder.status === 'confirmed'} style={{ flex: 1, padding: '12px', borderRadius: '10px', backgroundColor: '#10b981', color: '#fff', border: 'none', fontWeight: 'bold', cursor: selectedOrder.status === 'confirmed' ? 'not-allowed' : 'pointer', opacity: selectedOrder.status === 'confirmed' ? 0.5 : 1 }}>تأكيد وشحن</button>
-                <button onClick={() => handleUpdateStatus(selectedOrder.id, 'cancelled')} disabled={selectedOrder.status === 'cancelled'} style={{ flex: 1, padding: '12px', borderRadius: '10px', backgroundColor: '#ff4d4d', color: '#fff', border: 'none', fontWeight: 'bold', cursor: selectedOrder.status === 'cancelled' ? 'not-allowed' : 'pointer', opacity: selectedOrder.status === 'cancelled' ? 0.5 : 1 }}>إلغاء الطلب</button>
+              <div style={{ display: 'flex', gap: '10px', marginTop: '5px', borderTop: '1px solid #1a1f2b', paddingTop: '15px' }}>
+                <button onClick={() => handleUpdateStatus(selectedOrder.id, 'confirmed')} disabled={selectedOrder.status === 'confirmed'} style={{ flex: 1, padding: '12px', borderRadius: '10px', backgroundColor: '#10b981', color: '#fff', border: 'none', fontWeight: 'bold', cursor: 'pointer' }}>تأكيد وشحن</button>
+                <button onClick={() => handleUpdateStatus(selectedOrder.id, 'cancelled')} disabled={selectedOrder.status === 'cancelled'} style={{ flex: 1, padding: '12px', borderRadius: '10px', backgroundColor: '#ff4d4d', color: '#fff', border: 'none', fontWeight: 'bold', cursor: 'pointer' }}>إلغاء الطلب</button>
               </div>
             </div>
           </div>
         )}
 
-        {/* Modal الإضافة المعدل بإضافة حقول الوصف والمقاسات للحفاظ على الـ Dark UI المتناسق بتاعك */}
+        {/* الـ CSS التجاوبي السحري للموبايل لمنع أي أخطاء عرض وتهيئة الشاشة */}
+        <style jsx global>{`
+          body {
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: hidden;
+            background-color: '#05070a';
+          }
+          @media (max-width: 768px) {
+            .dashboard-container {
+              flex-direction: column-reverse !important;
+            }
+            .sidebar-responsive {
+              width: 100% !important;
+              min-width: 100% !important;
+              height: 70px !important;
+              padding: 10px 15px !important;
+              border-left: none !important;
+              border-top: 1px solid #1a1f2b !important;
+              flex-direction: row !important;
+              align-items: center !important;
+              justify-content: space-between !important;
+            }
+            .sidebar-responsive h1 {
+              display: none !important;
+            }
+            .sidebar-responsive nav {
+              flex-direction: row !important;
+              gap: 15px !important;
+              margin-bottom: 0 !important;
+            }
+            .sidebar-responsive nav div {
+              margin-bottom: 0 !important;
+              padding: 10px 15px !important;
+              font-size: 14px !important;
+            }
+            .sidebar-responsive button {
+              padding: 8px 12px !important;
+              font-size: 12px !important;
+            }
+            .main-responsive {
+              padding: 20px !important;
+              height: calc(100vh - 70px) !important;
+            }
+          }
+        `}</style>
+
+        {/* Modal الإضافة المعدل */}
         {isModalOpen && (
-          <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.85)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
+          <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.85)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000, padding: '15px' }}>
             <div style={{ backgroundColor: '#0a0d14', padding: '40px', borderRadius: '30px', width: '450px', border: '1px solid #1a1f2b', maxHeight: '90vh', overflowY: 'auto' }}>
               <h3 style={{ marginBottom: '25px', textAlign: 'center' }}>إضافة منتج لـ {category === 'men' ? 'رجالي' : category === 'women' ? 'حريمي' : 'أطفالي'}</h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                 <input type="text" placeholder="اسم المنتج" value={productName} onChange={(e) => setProductName(e.target.value)} style={{ padding: '15px', borderRadius: '12px', background: '#05070a', border: '1px solid #1a1f2b', color: '#fff' }} />
                 <input type="number" placeholder="السعر" value={productPrice} onChange={(e) => setProductPrice(e.target.value)} style={{ padding: '15px', borderRadius: '12px', background: '#05070a', border: '1px solid #1a1f2b', color: '#fff' }} />
                 
-                {/* الحقل الجديد للوصف والخامة متناسق مع تصميمك الـ Dark */}
                 <textarea placeholder="وصف المنتج والخامة بالتفصيل" value={description} onChange={(e) => setDescription(e.target.value)} style={{ padding: '15px', borderRadius: '12px', background: '#05070a', border: '1px solid #1a1f2b', color: '#fff', minHeight: '80px', fontFamily: 'inherit' }} />
 
-                {/* الحقل الجديد للمقاسات */}
                 <div style={{ background: '#05070a', padding: '12px', borderRadius: '12px', border: '1px solid #1a1f2b' }}>
                   <p style={{ margin: '0 0 10px 0', fontSize: '13px', color: '#5b6a82' }}>المقاسات المتاحة للقطعة:</p>
                   <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
