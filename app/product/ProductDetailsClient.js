@@ -20,7 +20,7 @@ export default function ProductDetailsClient({ id }) {
           const data = docSnap.data();
           setProduct(data);
           setActiveImage(data.imageUrl || '');
-          // لو في مقاسات جاية من الداشبورد نختار أول مقاس تلقائي بدل 'M' الثابتة
+          // إذا كانت هناك مقاسات ديناميكية قادمة من الداشبورد نحدد أول مقاس تلقائياً
           if (data.sizes && data.sizes.length > 0) {
             setSelectedSize(data.sizes[0]);
           }
@@ -40,18 +40,25 @@ export default function ProductDetailsClient({ id }) {
   );
 
   if (!product) return (
-    <div style={{ textAlign: 'center', marginTop: '100px', fontSize: '20px', color: '#ef4444' }}>
+    <div style={{ textDirection: 'rtl', textAlign: 'center', marginTop: '100px', fontSize: '20px', color: '#ef4444' }}>
       عذراً، هذا المنتج غير متوفر حالياً.
     </div>
   );
 
-  // التعديل 1: مصفوفة الصور تقرأ "images" الإضافية لو موجودة، وإلا ترجع للصورة الرئيسية فقط
+  // التعديل 1: قراءة مصفوفة الصور الإضافية المتغيرة لكل منتج، أو العودة للصورة الرئيسية
   const imagesList = product.images && product.images.length > 0 
     ? product.images 
     : [product.imageUrl];
 
-  // التعديل 2: المقاسات تقرأ "sizes" من الداشبورد، لو مفيش تعرض الافتراضي بتاعك
+  // التعديل 2: قراءة المقاسات المحددة للمنتج ديناميكياً، أو عرض المقاسات القياسية الافتراضية
   const availableSizes = product.sizes && product.sizes.length > 0 ? product.sizes : ['M', 'L', 'XL', '2XL'];
+
+  // التعديل 3: قراءة مصفوفة مميزات الشحن والاسترجاع ديناميكياً لو رغبت في تغييرها لكل منتج، أو عرض نصوصك الافتراضية
+  const availableFeatures = product.features && product.features.length > 0 ? product.features : [
+    { icon: "🚚", title: "شحن وتوصيل مريح:", text: "سوف يتم توصيل الأوردر في خلال من يومين إلى 5 أيام." },
+    { icon: "📏", title: "تأكد من قياسك:", text: "تأكد من مقاسك من جدول المقاسات المرفق." },
+    { icon: "🔄", title: "سياسة مرنة:", text: "يمكنك عمل استبدال أو استرجاع خلال 14 يوم من تاريخ استلام الأوردر." }
+  ];
 
   return (
     <div style={{ 
@@ -88,7 +95,7 @@ export default function ProductDetailsClient({ id }) {
           ))}
         </div>
 
-        {/* الصورة الرئيسية الكبيرة */}
+        {/* Image Display */}
         <div style={{ 
           flex: 1, 
           borderRadius: '16px', 
@@ -128,7 +135,7 @@ export default function ProductDetailsClient({ id }) {
 
         <hr style={{ border: 'none', borderTop: '1px solid #e2e8f0' }} />
 
-        {/* حقل الوصف التفصيلي - التعديل 3: يقرأ description من الفايربيز لو موجود */}
+        {/* حقل الوصف التفصيلي - يقرأ الآن ديناميكياً من الداشبورد لو أضفته */}
         <div>
           <p style={{ fontWeight: 'bold', color: '#334155', marginBottom: '8px' }}>الخامة والوصف:</p>
           <p style={{ color: '#64748b', fontSize: '15px', lineHeight: '1.7' }}>
@@ -208,7 +215,7 @@ export default function ProductDetailsClient({ id }) {
           اشتري الآن
         </button>
 
-        {/* جدول الثقة والأمان البرمجي */}
+        {/* جدول الثقة والأمان البرمجي - يقرأ المصفوفة بمرونة */}
         <div style={{ 
           marginTop: '10px', 
           padding: '20px', 
@@ -219,9 +226,19 @@ export default function ProductDetailsClient({ id }) {
           border: '1px solid #f1f5f9',
           lineHeight: '1.8'
         }}>
-          <p style={{ margin: '0 0 8px 0' }}>🚚 <strong>شحن وتوصيل مريح:</strong> سوف يتم توصيل الأوردر في خلال من يومين إلى 5 أيام.</p>
-          <p style={{ margin: '0 0 8px 0' }}>📏 <strong>تأكد من قياسك:</strong> تأكد من مقاسك من جدول المقاسات المرفق.</p>
-          <p style={{ margin: 0 }}>🔄 <strong>سياسة مرنة:</strong> يمكنك عمل استبدال أو استرجاع خلال 14 يوم من تاريخ استلام الأوردر.</p>
+          {typeof availableFeatures[0] === 'string' ? (
+            // لو تم إدخالها كمصفوفة نصوص بسيطة من الداشبورد
+            availableFeatures.map((feat, idx) => (
+              <p key={idx} style={{ margin: idx === availableFeatures.length - 1 ? 0 : '0 0 8px 0' }}>• {feat}</p>
+            ))
+          ) : (
+            // لو بتقرأ الهيكل الافتراضي الحالي للتصميم
+            availableFeatures.map((feat, idx) => (
+              <p key={idx} style={{ margin: idx === availableFeatures.length - 1 ? 0 : '0 0 8px 0' }}>
+                {feat.icon} <strong>{feat.title}</strong> {feat.text}
+              </p>
+            ))
+          )}
         </div>
 
       </div>
