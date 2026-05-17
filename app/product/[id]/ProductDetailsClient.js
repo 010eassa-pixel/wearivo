@@ -20,6 +20,7 @@ export default function ProductDetailsClient({ id }) {
           const data = docSnap.data();
           setProduct(data);
           setActiveImage(data.imageUrl || '');
+          // لو في مقاسات جاية من الداشبورد نختار أول مقاس تلقائي بدل 'M' الثابتة
           if (data.sizes && data.sizes.length > 0) {
             setSelectedSize(data.sizes[0]);
           }
@@ -44,12 +45,12 @@ export default function ProductDetailsClient({ id }) {
     </div>
   );
 
-  // مصفوفة الصور (الرئيسية + الإضافية لو وجدت في الداشبورد)
+  // التعديل 1: مصفوفة الصور تقرأ "images" الإضافية لو موجودة، وإلا ترجع للصورة الرئيسية فقط
   const imagesList = product.images && product.images.length > 0 
     ? product.images 
     : [product.imageUrl];
 
-  // المقاسات المتاحة ديناميكياً أو افتراضياً لسلامة التصميم
+  // التعديل 2: المقاسات تقرأ "sizes" من الداشبورد، لو مفيش تعرض الافتراضي بتاعك
   const availableSizes = product.sizes && product.sizes.length > 0 ? product.sizes : ['M', 'L', 'XL', '2XL'];
 
   return (
@@ -114,21 +115,20 @@ export default function ProductDetailsClient({ id }) {
             {product.name}
           </h1>
           
-          {/* نجوم التقييم الثابتة كشكل جمالي وطبيعي للواجهة */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#fbbf24', fontSize: '14px' }}>
             <span>⭐⭐⭐⭐⭐</span>
             <span style={{ color: '#64748b', marginRight: '5px' }}>(1,754 تقييم)</span>
           </div>
         </div>
 
-        {/* السعر الحقيقي جايبينه من الفايربيز */}
+        {/* السعر الحقيقي */}
         <div style={{ fontSize: '34px', color: '#0f172a', fontWeight: '900' }}>
           {product.price} EGP
         </div>
 
         <hr style={{ border: 'none', borderTop: '1px solid #e2e8f0' }} />
 
-        {/* حقل الوصف التفصيلي */}
+        {/* حقل الوصف التفصيلي - التعديل 3: يقرأ description من الفايربيز لو موجود */}
         <div>
           <p style={{ fontWeight: 'bold', color: '#334155', marginBottom: '8px' }}>الخامة والوصف:</p>
           <p style={{ color: '#64748b', fontSize: '15px', lineHeight: '1.7' }}>
