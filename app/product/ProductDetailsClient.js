@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from 'react';
-import { db } from '../../../firebase'; 
+import { db } from '../../firebase'; // شيلنا نقطتين وسلاش عشان المسار يتظبط صح
 import { doc, getDoc } from 'firebase/firestore';
 
 export default function ProductDetailsClient({ id }) {
