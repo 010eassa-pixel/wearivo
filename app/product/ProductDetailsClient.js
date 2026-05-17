@@ -147,6 +147,7 @@ export default function ProductDetailsClient({ id }) {
   const productPrice = Number(product.price) || 0;
 
   return (
+    /* ضفنا className للـ Container ولأقسام الجاليري والداتا والمودال للتحكم بها تجاوبياً */
     <div style={{ 
       maxWidth: '1200px', 
       margin: '40px auto', 
@@ -156,12 +157,12 @@ export default function ProductDetailsClient({ id }) {
       gap: '50px', 
       direction: 'rtl',
       fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
-    }}>
+    }} className="product-details-page">
       
       {/* القسم الأيمن: معرض الصور */}
-      <div style={{ display: 'flex', gap: '20px', position: 'sticky', top: '20px', height: 'fit-content' }}>
+      <div style={{ display: 'flex', gap: '20px', position: 'sticky', top: '20px', height: 'fit-content' }} className="gallery-layout">
         {/* الصور المصغرة الجانبية */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }} className="thumbs-list">
           {imagesList.map((img, idx) => (
             <div 
               key={idx}
@@ -189,7 +190,7 @@ export default function ProductDetailsClient({ id }) {
           backgroundColor: '#f8f9fa',
           boxShadow: '0 10px 25px rgba(0,0,0,0.05)',
           height: '600px'
-        }}>
+        }} className="main-image-display">
           <img 
             src={activeImage || product.imageUrl} 
             alt={product.name} 
@@ -199,7 +200,7 @@ export default function ProductDetailsClient({ id }) {
       </div>
 
       {/* القسم الأيسر: تفاصيل القطعة والشراء */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '25px' }} className="details-layout">
         
         {/* الاسم والوسم والتقييم */}
         <div>
@@ -235,7 +236,7 @@ export default function ProductDetailsClient({ id }) {
             <p style={{ fontWeight: '700', color: '#334155', margin: 0 }}>المقاس:</p>
             <span style={{ fontSize: '13px', color: '#2563eb', cursor: 'pointer', textDecoration: 'underline' }}>دليل المقاسات</span>
           </div>
-          <div style={{ display: 'flex', gap: '10px' }}>
+          <div style={{ display: 'flex', gap: '10px' }} className="sizes-row">
             {availableSizes.map(size => (
               <button 
                 key={size}
@@ -257,7 +258,7 @@ export default function ProductDetailsClient({ id }) {
         </div>
 
         {/* كمية الطلب وإضافة للسلة */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginTop: '10px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginTop: '10px' }} className="action-row">
           <div style={{ 
             display: 'flex', 
             alignItems: 'center', 
@@ -330,11 +331,11 @@ export default function ProductDetailsClient({ id }) {
 
       {/* الـ Checkout Modal المنبثق (نسخة وطبق الأصل كاملة ومحسنة من واجهة خُطوة) */}
       {isFormOpen && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(0,0,0,0.4)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 2000, padding: '20px 0' }}>
-          <div style={{ backgroundColor: '#fff', borderRadius: '12px', width: '95%', maxWidth: '1100px', display: 'grid', gridTemplateColumns: '1.2fr 1fr', overflow: 'hidden', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.15)', maxHeight: '92vh', direction: 'rtl' }}>
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(0,0,0,0.4)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 2000, padding: '20px 0' }} className="modal-overlay">
+          <div style={{ backgroundColor: '#fff', borderRadius: '12px', width: '95%', maxWidth: '1100px', display: 'grid', gridTemplateColumns: '1.2fr 1fr', overflow: 'hidden', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.15)', maxHeight: '92vh', direction: 'rtl' }} className="modal-card">
             
             {/* النصف الأيمن: الفورم، حقول العميل وطرق السداد */}
-            <form onSubmit={handlePlaceOrder} style={{ padding: '30px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '18px', borderLeft: '1px solid #e2e8f0', backgroundColor: '#fff' }}>
+            <form onSubmit={handlePlaceOrder} style={{ padding: '30px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '18px', borderLeft: '1px solid #e2e8f0', backgroundColor: '#fff' }} className="modal-form-side">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <h2 style={{ fontSize: '20px', fontWeight: 'bold', color: '#1a1a1a', margin: 0 }}>خُطوة - معلومات الشحن</h2>
                 <button type="button" onClick={() => setIsFormOpen(false)} style={{ background: 'none', border: 'none', fontSize: '22px', cursor: 'pointer', color: '#a0aec0' }}>✕</button>
@@ -365,7 +366,7 @@ export default function ProductDetailsClient({ id }) {
                   <input type="text" required value={address} onChange={(e) => setAddress(e.target.value)} placeholder="الحي، اسم الشارع، رقم العمارة" style={{ width: '100%', padding: '11px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '14px' }} />
                   <input type="text" value={apartment} onChange={(e) => setApartment(e.target.value)} placeholder="شقة، جناح، إلخ. (اختياري)" style={{ width: '100%', padding: '11px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '14px' }} />
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr 1fr', gap: '10px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr 1fr', gap: '10px' }} className="modal-city-row">
                     <input type="text" placeholder="Postal code" style={{ width: '100%', padding: '11px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '14px' }} />
                     <select value={governorate} onChange={(e) => { setGovernorate(e.target.value); setCity(e.target.value); }} style={{ width: '100%', padding: '11px', borderRadius: '6px', border: '1px solid #cbd5e1', backgroundColor: '#fff', fontSize: '14px' }}>
                       <option value="محافظة القاهرة">محافظة القاهرة</option>
@@ -412,7 +413,7 @@ export default function ProductDetailsClient({ id }) {
             </form>
 
             {/* النصف الأيسر: ملخص الفاتورة الرمادي والعمليات المالية */}
-            <div style={{ padding: '35px 30px', backgroundColor: '#fafafa', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <div style={{ padding: '35px 30px', backgroundColor: '#fafafa', display: 'flex', flexDirection: 'column', gap: '20px' }} className="modal-invoice-side">
               {/* كارت ملخص القطعة المطلوبة */}
               <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
                 <div style={{ position: 'relative', width: '65px', height: '80px', borderRadius: '6px', overflow: 'hidden', border: '1px solid #e2e8f0', backgroundColor: '#fff' }}>
@@ -460,11 +461,85 @@ export default function ProductDetailsClient({ id }) {
             <h2 style={{ color: '#10b981', marginTop: '10px', fontWeight: 'bold' }}>تم استلام طلبك بنجاح!</h2>
             <p style={{ color: '#475569', margin: '12px 0', fontSize: '15px' }}>رقم الأوردر العشوائي الخاص بك هو:</p>
             <div style={{ fontSize: '25px', fontWeight: '900', color: '#0f172a', backgroundColor: '#f1f5f9', padding: '12px', borderRadius: '8px', letterSpacing: '2px', fontFamily: 'monospace' }}>{orderSuccessId}</div>
-            <p style={{ fontSize: '13px', color: '#94a3b8', marginTop: '12px' }}>سيقوم فريق خدمة عملاء خُطوة بالتواصل معك هاتفياً لتأكيد الشحن.</p>
+            <p style={{ fontSize: '13px', color: '#94a3b8', marginTop: '12px' }}>سيقوم فريق خدمة عملاء خُطوة بالتواصل معك هاتفياً لتأكيد الشحن فوراً.</p>
             <button onClick={() => setOrderSuccessId(null)} style={{ marginTop: '25px', backgroundColor: '#2563eb', color: '#fff', padding: '12px 35px', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '15px' }}>إغلاق</button>
           </div>
         </div>
       )}
+
+      {/* حقن التجاوبية (CSS Media Queries) لتظبيط الموبايل بنسبة 100% ومن غير المساس بتصميم الكمبيوتر */}
+      <style jsx global>{`
+        @media (max-width: 768px) {
+          /* قلب صفحة المنتج لتصبح طولية وعمودية بدلاً من Grid ثنائي */
+          .product-details-page {
+            grid-template-columns: 1fr !important;
+            gap: 25px !important;
+            padding: 15px !important;
+            margin: 10px auto !important;
+          }
+          
+          /* إعادة ترتيب نظام الجاليري في الموبايل */
+          .gallery-layout {
+            flex-direction: column-reverse !important;
+            position: relative !important;
+            top: 0 !important;
+            gap: 10px !important;
+          }
+          .thumbs-list {
+            flex-direction: row !important;
+            justify-content: center !important;
+            gap: 8px !important;
+          }
+          .thumbs-list div {
+            width: 60px !important;
+            height: 80px !important;
+          }
+          .main-image-display {
+            height: 420px !important;
+          }
+
+          /* تظبيط صفوف المقاسات والأزرار لتمنع التمدد في التليفون */
+          .sizes-row {
+            flex-wrap: wrap !important;
+            gap: 8px !important;
+          }
+          .sizes-row button {
+            padding: 10px 18px !important;
+            font-size: 13px !important;
+            flex: 1 !important;
+            min-width: 60px !important;
+          }
+          .action-row {
+            gap: 10px !important;
+          }
+
+          /* تكييف الـ Checkout Modal بالكامل طُولياً ليتناسب مع شاشة الموبايل */
+          .modal-overlay {
+            padding: 10px 0 !important;
+            align-items: flex-start !important;
+          }
+          .modal-card {
+            grid-template-columns: 1fr !important;
+            width: 92% !important;
+            max-height: 95vh !important;
+            overflow-y: auto !important;
+          }
+          .modal-form-side {
+            padding: 20px !important;
+            order: 2 !important; /* وضع الاستمارات تحت الفاتورة بالموبايل لتجربة مستخدم مريحة */
+            border-left: none !important;
+          }
+          .modal-invoice-side {
+            padding: 20px !important;
+            order: 1 !important;
+            border-bottom: 1px solid #e2e8f0 !important;
+          }
+          .modal-city-row {
+            grid-template-columns: 1fr !important;
+            gap: 10px !important;
+          }
+        }
+      `}</style>
 
     </div>
   );
