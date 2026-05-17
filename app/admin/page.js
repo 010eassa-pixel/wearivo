@@ -6,8 +6,6 @@ import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 
-// التعديل 2: إضافة الـ runtime عشان Cloudflare ميضربش
-export const runtime = 'edge';
 
 export default function WearivoFinalDashboard() {
   const [activeTab, setActiveTab] = useState('live');
