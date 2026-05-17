@@ -33,11 +33,6 @@ export default function ProductDetailsClient({ id }) {
     fetchProduct();
   }, [id]);
 
-  if (loading) return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh', color: '#8b7e6a', fontSize: '20px' }}>
-      جاري تحميل تفاصيل القطعة...
-    </div>
-  );
 
   if (!product) return (
     <div style={{ textDirection: 'rtl', textAlign: 'center', marginTop: '100px', fontSize: '20px', color: '#ef4444' }}>
