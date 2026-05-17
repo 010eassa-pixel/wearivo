@@ -1,12 +1,14 @@
 "use client";
 import { useEffect, useState } from 'react';
-import { db } from '../../../firebase'; // تأكد إنك راجع 3 خطوات لملف الفايربيز
+import { db } from '../../../firebase'; 
 import { doc, getDoc } from 'firebase/firestore';
 
 export default function ProductDetailsClient({ id }) {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
+  const [selectedSize, setSelectedSize] = useState('M');
+  const [activeImage, setActiveImage] = useState('');
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -15,7 +17,12 @@ export default function ProductDetailsClient({ id }) {
         const docRef = doc(db, "products", id);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
-          setProduct(docSnap.data());
+          const data = docSnap.data();
+          setProduct(data);
+          setActiveImage(data.imageUrl || '');
+          if (data.sizes && data.sizes.length > 0) {
+            setSelectedSize(data.sizes[0]);
+          }
         }
       } catch (error) {
         console.error("Error fetching product:", error);
@@ -25,58 +32,199 @@ export default function ProductDetailsClient({ id }) {
     fetchProduct();
   }, [id]);
 
-  if (loading) return <div style={{ textAlign: 'center', marginTop: '100px', fontSize: '20px' }}>جاري تحميل المنتج...</div>;
-  if (!product) return <div style={{ textAlign: 'center', marginTop: '100px', fontSize: '20px' }}>المنتج غير موجود</div>;
+  if (loading) return (
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh', color: '#8b7e6a', fontSize: '20px' }}>
+      جاري تحميل تفاصيل القطعة...
+    </div>
+  );
+
+  if (!product) return (
+    <div style={{ textAlign: 'center', marginTop: '100px', fontSize: '20px', color: '#ef4444' }}>
+      عذراً، هذا المنتج غير متوفر حالياً.
+    </div>
+  );
+
+  // مصفوفة الصور (الرئيسية + الإضافية لو وجدت في الداشبورد)
+  const imagesList = product.images && product.images.length > 0 
+    ? product.images 
+    : [product.imageUrl];
+
+  // المقاسات المتاحة ديناميكياً أو افتراضياً لسلامة التصميم
+  const availableSizes = product.sizes && product.sizes.length > 0 ? product.sizes : ['M', 'L', 'XL', '2XL'];
 
   return (
-    <div style={{ maxWidth: '1200px', margin: '40px auto', padding: '20px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px', direction: 'rtl', fontFamily: 'sans-serif' }}>
+    <div style={{ 
+      maxWidth: '1200px', 
+      margin: '40px auto', 
+      padding: '20px', 
+      display: 'grid', 
+      gridTemplateColumns: '1fr 1fr', 
+      gap: '50px', 
+      direction: 'rtl',
+      fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
+    }}>
       
-      {/* القسم الأيمن: صور المنتج */}
-      <div style={{ display: 'flex', gap: '15px' }}>
-         <div style={{ flex: 1 }}>
-            <img src={product.imageUrl} alt={product.name} style={{ width: '100%', borderRadius: '12px', objectFit: 'cover', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
-         </div>
-         <div style={{ width: '80px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            <img src={product.imageUrl} style={{ width: '100%', borderRadius: '8px', border: '2px solid #3b82f6' }} />
-         </div>
+      {/* القسم الأيمن: معرض الصور */}
+      <div style={{ display: 'flex', gap: '20px', position: 'sticky', top: '20px', height: 'fit-content' }}>
+        {/* الصور المصغرة الجانبية */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          {imagesList.map((img, idx) => (
+            <div 
+              key={idx}
+              onClick={() => setActiveImage(img)}
+              style={{ 
+                width: '75px', 
+                height: '100px', 
+                borderRadius: '8px', 
+                overflow: 'hidden', 
+                cursor: 'pointer',
+                border: activeImage === img ? '2px solid #0f172a' : '1px solid #e2e8f0',
+                transition: '0.2s'
+              }}
+            >
+              <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            </div>
+          ))}
+        </div>
+
+        {/* الصورة الرئيسية الكبيرة */}
+        <div style={{ 
+          flex: 1, 
+          borderRadius: '16px', 
+          overflow: 'hidden', 
+          backgroundColor: '#f8f9fa',
+          boxShadow: '0 10px 25px rgba(0,0,0,0.05)',
+          height: '600px'
+        }}>
+          <img 
+            src={activeImage || product.imageUrl} 
+            alt={product.name} 
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+          />
+        </div>
       </div>
 
-      {/* القسم الأيسر: تفاصيل المنتج */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-        <h1 style={{ fontSize: '32px', fontWeight: 'bold', color: '#1e293b' }}>{product.name}</h1>
-        <div style={{ fontSize: '28px', color: '#1e3a8a', fontWeight: '900' }}>{product.price} EGP</div>
+      {/* القسم الأيسر: تفاصيل القطعة والشراء */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}>
         
-        <hr style={{ border: '0.5px solid #e2e8f0' }} />
-
-        {/* اختيار المقاس */}
+        {/* الاسم والوسم والتقييم */}
         <div>
-          <p style={{ marginBottom: '10px', fontWeight: 'bold', color: '#475569' }}>المقاس المتوفر:</p>
+          <span style={{ backgroundColor: '#fee2e2', color: '#dc2626', padding: '4px 10px', borderRadius: '4px', fontSize: '12px', fontWeight: 'bold', display: 'inline-block', marginBottom: '10px' }}>جديد</span>
+          <h1 style={{ fontSize: '32px', fontWeight: '800', color: '#0f172a', marginBottom: '8px', lineHeight: '1.3' }}>
+            {product.name}
+          </h1>
+          
+          {/* نجوم التقييم الثابتة كشكل جمالي وطبيعي للواجهة */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#fbbf24', fontSize: '14px' }}>
+            <span>⭐⭐⭐⭐⭐</span>
+            <span style={{ color: '#64748b', marginRight: '5px' }}>(1,754 تقييم)</span>
+          </div>
+        </div>
+
+        {/* السعر الحقيقي جايبينه من الفايربيز */}
+        <div style={{ fontSize: '34px', color: '#0f172a', fontWeight: '900' }}>
+          {product.price} EGP
+        </div>
+
+        <hr style={{ border: 'none', borderTop: '1px solid #e2e8f0' }} />
+
+        {/* حقل الوصف التفصيلي */}
+        <div>
+          <p style={{ fontWeight: 'bold', color: '#334155', marginBottom: '8px' }}>الخامة والوصف:</p>
+          <p style={{ color: '#64748b', fontSize: '15px', lineHeight: '1.7' }}>
+            {product.description || "قطعة مميزة مصممة بعناية فائقة من أجود الخامات المريحة لتناسب إطلالتك اليومية بكل أناقة ورقي."}
+          </p>
+        </div>
+
+        {/* اختيار المقاسات المتوفرة */}
+        <div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', alignItems: 'center' }}>
+            <p style={{ fontWeight: '700', color: '#334155', margin: 0 }}>المقاس:</p>
+            <span style={{ fontSize: '13px', color: '#2563eb', cursor: 'pointer', textDecoration: 'underline' }}>دليل المقاسات</span>
+          </div>
           <div style={{ display: 'flex', gap: '10px' }}>
-            {['M', 'L', 'XL', '2XL'].map(size => (
-              <button key={size} style={{ padding: '10px 20px', border: '1px solid #cbd5e1', background: '#fff', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>{size}</button>
+            {availableSizes.map(size => (
+              <button 
+                key={size}
+                onClick={() => setSelectedSize(size)}
+                style={{ 
+                  padding: '12px 22px', 
+                  border: selectedSize === size ? '2px solid #0f172a' : '1px solid #cbd5e1', 
+                  background: selectedSize === size ? '#0f172a' : '#fff',
+                  color: selectedSize === size ? '#fff' : '#334155',
+                  borderRadius: '8px', 
+                  cursor: 'pointer',
+                  fontWeight: 'bold',
+                  transition: '0.2s'
+                }}>
+                {size}
+              </button>
             ))}
           </div>
         </div>
 
-        {/* الكمية والتحكم */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginTop: '10px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #cbd5e1', borderRadius: '10px', background: '#f8fafc' }}>
-            <button onClick={() => setQuantity(q => q + 1)} style={{ padding: '12px 18px', border: 'none', background: 'none', cursor: 'pointer', fontSize: '18px' }}>+</button>
-            <span style={{ padding: '0 25px', fontWeight: 'bold' }}>{quantity}</span>
-            <button onClick={() => setQuantity(q => q > 1 ? q - 1 : 1)} style={{ padding: '12px 18px', border: 'none', background: 'none', cursor: 'pointer', fontSize: '18px' }}>-</button>
+        {/* كمية الطلب وإضافة للسلة */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginTop: '10px' }}>
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            border: '1px solid #cbd5e1', 
+            borderRadius: '10px',
+            background: '#f8f9fa'
+          }}>
+            <button onClick={() => setQuantity(q => q + 1)} style={{ padding: '12px 16px', border: 'none', background: 'none', cursor: 'pointer', fontSize: '18px', fontWeight: 'bold' }}>+</button>
+            <span style={{ padding: '0 15px', fontWeight: 'bold', fontSize: '16px' }}>{quantity}</span>
+            <button onClick={() => setQuantity(q => q > 1 ? q - 1 : 1)} style={{ padding: '12px 16px', border: 'none', background: 'none', cursor: 'pointer', fontSize: '18px', fontWeight: 'bold' }}>-</button>
           </div>
-          <button style={{ flex: 1, backgroundColor: '#1e3a8a', color: '#fff', padding: '18px', borderRadius: '12px', border: 'none', fontWeight: 'bold', cursor: 'pointer', transition: '0.3s' }}>إضافة إلى السلة</button>
+          
+          <button style={{ 
+            flex: 1, 
+            backgroundColor: '#0f172a', 
+            color: '#fff', 
+            padding: '16px', 
+            borderRadius: '10px', 
+            border: 'none', 
+            fontWeight: 'bold', 
+            fontSize: '16px',
+            cursor: 'pointer'
+          }}>
+            إضافة إلى السلة
+          </button>
         </div>
 
-        <button style={{ backgroundColor: '#ef4444', color: '#fff', padding: '18px', borderRadius: '12px', border: 'none', fontWeight: 'bold', cursor: 'pointer', width: '100%', fontSize: '18px' }}>اشتري الآن</button>
+        {/* زر الشراء الفوري والسريع */}
+        <button style={{ 
+          backgroundColor: '#dc2626', 
+          color: '#fff', 
+          padding: '18px', 
+          borderRadius: '10px', 
+          border: 'none', 
+          fontWeight: 'bold', 
+          fontSize: '18px',
+          cursor: 'pointer',
+          width: '100%',
+          boxShadow: '0 4px 12px rgba(220, 38, 38, 0.2)'
+        }}>
+          اشتري الآن
+        </button>
 
-        <div style={{ marginTop: '20px', padding: '20px', backgroundColor: '#f1f5f9', borderRadius: '12px', fontSize: '15px', color: '#475569', lineHeight: '1.6' }}>
-            <p>• خامة قطن 100% عالية الجودة</p>
-            <p>• التوصيل خلال 3-5 أيام عمل</p>
-            <p>• إمكانية المعاينة عند الاستلام</p>
+        {/* جدول الثقة والأمان البرمجي */}
+        <div style={{ 
+          marginTop: '10px', 
+          padding: '20px', 
+          backgroundColor: '#f8fafc', 
+          borderRadius: '12px', 
+          fontSize: '14px', 
+          color: '#475569',
+          border: '1px solid #f1f5f9',
+          lineHeight: '1.8'
+        }}>
+          <p style={{ margin: '0 0 8px 0' }}>🚚 <strong>شحن وتوصيل مريح:</strong> سوف يتم توصيل الأوردر في خلال من يومين إلى 5 أيام.</p>
+          <p style={{ margin: '0 0 8px 0' }}>📏 <strong>تأكد من قياسك:</strong> تأكد من مقاسك من جدول المقاسات المرفق.</p>
+          <p style={{ margin: 0 }}>🔄 <strong>سياسة مرنة:</strong> يمكنك عمل استبدال أو استرجاع خلال 14 يوم من تاريخ استلام الأوردر.</p>
         </div>
+
       </div>
-
     </div>
   );
 }
