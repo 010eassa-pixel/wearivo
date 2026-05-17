@@ -33,8 +33,26 @@ export default function ProductDetailsClient({ id }) {
     fetchProduct();
   }, [id]);
 
+  // التعديل السحري الأول: لو لسه بنحمل والبيانات مجتش، بنرجع null عشان الشاشة تفتح فوراً بالتصميم الثابت من غير رسالة الخطأ
+  if (loading) {
+    return (
+      <div style={{ 
+        maxWidth: '1200px', 
+        margin: '40px auto', 
+        padding: '20px', 
+        direction: 'rtl',
+        fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+        textAlign: 'center',
+        color: '#64748b',
+        fontSize: '16px'
+      }}>
+        جاري عرض القطعة...
+      </div>
+    );
+  }
 
-  if (!product) return (
+  // التعديل السحري الثاني: الرسالة دي مش هتبان إلا لو التحميل خلص 100% والمنتج فعلياً ملوش وجود في الفايربيز
+  if (!loading && !product) return (
     <div style={{ textDirection: 'rtl', textAlign: 'center', marginTop: '100px', fontSize: '20px', color: '#ef4444' }}>
       عذراً، هذا المنتج غير متوفر حالياً.
     </div>
@@ -210,7 +228,7 @@ export default function ProductDetailsClient({ id }) {
           اشتري الآن
         </button>
 
-        {/* جدول الثقة والأمان البرمجي - يقرأ المصفوفة بمرونة */}
+        {/* جدول الثقة والأمان البرمجي - يقرأ ال مصفوفة بمرونة */}
         <div style={{ 
           marginTop: '10px', 
           padding: '20px', 
