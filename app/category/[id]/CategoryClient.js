@@ -29,13 +29,6 @@ export default function CategoryClient({ categoryId }) {
     return () => unsubscribe();
   }, [categoryId]);
 
-  if (loading) {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh', color: '#8b7e6a' }}>
-        جاري تحميل الأناقة...
-      </div>
-    );
-  }
 
   return (
     <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
