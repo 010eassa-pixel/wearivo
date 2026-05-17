@@ -15,7 +15,7 @@ export default function ProductDetailsClient({ id }) {
   const [orderSuccessId, setOrderSuccessId] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // حقول بيانات العميل طبقاً لتصميم خُطوة (Khotwh)
+  // حقول بيانات العميل طبقاً لتصميم البراند
   const [emailOrPhone, setEmailOrPhone] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -53,6 +53,32 @@ export default function ProductDetailsClient({ id }) {
   // دالة توليد رقم أوردر عشوائي فريد مكون من 6 أرقام
   const generateOrderNumber = () => {
     return Math.floor(100000 + Math.random() * 900000);
+  };
+
+  // دالة السلة: تخزين المشتريات ديناميكياً في متصفح العميل
+  const handleAddToCart = () => {
+    const currentCart = JSON.parse(localStorage.getItem('wearivo_cart')) || [];
+
+    const cartItem = {
+      id: id,
+      name: product.name,
+      price: Number(product.price),
+      imageUrl: product.imageUrl,
+      size: selectedSize,
+      quantity: quantity
+    };
+
+    // التحقق لو نفس القطعة بنفس المقاس موجودة مسبقاً، نزود الكمية فقط
+    const existingItemIndex = currentCart.findIndex(item => item.id === id && item.size === selectedSize);
+    
+    if (existingItemIndex > -1) {
+      currentCart[existingItemIndex].quantity += quantity;
+    } else {
+      currentCart.push(cartItem);
+    }
+
+    localStorage.setItem('wearivo_cart', JSON.stringify(currentCart));
+    alert(`✅ تم إضافة ${product.name} (مقاس ${selectedSize}) إلى السلة بنجاح!`);
   };
 
   // دالة معالجة وإرسال الطلب إلى الفايربيز لايف
@@ -147,7 +173,6 @@ export default function ProductDetailsClient({ id }) {
   const productPrice = Number(product.price) || 0;
 
   return (
-    /* ضفنا className للـ Container ولأقسام الجاليري والداتا والمودال للتحكم بها تجاوبياً */
     <div style={{ 
       maxWidth: '1200px', 
       margin: '40px auto', 
@@ -222,7 +247,7 @@ export default function ProductDetailsClient({ id }) {
 
         <hr style={{ border: 'none', borderTop: '1px solid #e2e8f0' }} />
 
-        {/* حقل الوصف التفصيلي - يقرأ الآن ديناميكياً من الداشبورد لو أضفته */}
+        {/* حقل الوصف التفصيلي */}
         <div>
           <p style={{ fontWeight: 'bold', color: '#334155', marginBottom: '8px' }}>الخامة والوصف:</p>
           <p style={{ color: '#64748b', fontSize: '15px', lineHeight: '1.7' }}>
@@ -271,7 +296,8 @@ export default function ProductDetailsClient({ id }) {
             <button onClick={() => setQuantity(q => q > 1 ? q - 1 : 1)} style={{ padding: '12px 16px', border: 'none', background: 'none', cursor: 'pointer', fontSize: '18px', fontWeight: 'bold' }}>-</button>
           </div>
           
-          <button onClick={() => setIsFormOpen(true)} style={{ 
+          {/* تم ربط الزرار بدالة الإضافة إلى السلة بالـ LocalStorage المخصصة */}
+          <button onClick={handleAddToCart} style={{ 
             flex: 1, 
             backgroundColor: '#0f172a', 
             color: '#fff', 
@@ -302,7 +328,7 @@ export default function ProductDetailsClient({ id }) {
           اشتري الآن
         </button>
 
-        {/* جدول الثقة والأمان البرمجي - يقرأ المصفوفة بمرونة */}
+        {/* جدول الثقة والأمان البرمجي */}
         <div style={{ 
           marginTop: '10px', 
           padding: '20px', 
@@ -314,12 +340,10 @@ export default function ProductDetailsClient({ id }) {
           lineHeight: '1.8'
         }}>
           {typeof availableFeatures[0] === 'string' ? (
-            // لو تم إدخالها كمصفوفة نصوص بسيطة من الداشبورد
             availableFeatures.map((feat, idx) => (
               <p key={idx} style={{ margin: idx === availableFeatures.length - 1 ? 0 : '0 0 8px 0' }}>• {feat}</p>
             ))
           ) : (
-            // لو بتقرأ الهيكل الافتراضي الحالي للتصميم
             availableFeatures.map((feat, idx) => (
               <p key={idx} style={{ margin: idx === availableFeatures.length - 1 ? 0 : '0 0 8px 0' }}>
                 {feat.icon} <strong>{feat.title}</strong> {feat.text}
@@ -329,7 +353,7 @@ export default function ProductDetailsClient({ id }) {
         </div>
       </div>
 
-      {/* الـ Checkout Modal المنبثق (نسخة وطبق الأصل كاملة ومحسنة من واجهة خُطوة) */}
+      {/* الـ Checkout Modal المنبثق (تم تغيير الاسم البراند هنا بالكامل لـ Wearivo) */}
       {isFormOpen && (
         <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(0,0,0,0.4)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 2000, padding: '20px 0' }} className="modal-overlay">
           <div style={{ backgroundColor: '#fff', borderRadius: '12px', width: '95%', maxWidth: '1100px', display: 'grid', gridTemplateColumns: '1.2fr 1fr', overflow: 'hidden', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.15)', maxHeight: '92vh', direction: 'rtl' }} className="modal-card">
@@ -337,7 +361,7 @@ export default function ProductDetailsClient({ id }) {
             {/* النصف الأيمن: الفورم، حقول العميل وطرق السداد */}
             <form onSubmit={handlePlaceOrder} style={{ padding: '30px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '18px', borderLeft: '1px solid #e2e8f0', backgroundColor: '#fff' }} className="modal-form-side">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h2 style={{ fontSize: '20px', fontWeight: 'bold', color: '#1a1a1a', margin: 0 }}>خُطوة - معلومات الشحن</h2>
+                <h2 style={{ fontSize: '20px', fontWeight: 'bold', color: '#1a1a1a', margin: 0 }}>Wearivo - معلومات الشحن</h2>
                 <button type="button" onClick={() => setIsFormOpen(false)} style={{ background: 'none', border: 'none', fontSize: '22px', cursor: 'pointer', color: '#a0aec0' }}>✕</button>
               </div>
 
@@ -382,7 +406,7 @@ export default function ProductDetailsClient({ id }) {
                 </div>
               </div>
 
-              {/* طريقة الشحن من صورتك */}
+              {/* طريقة الشحن */}
               <div>
                 <h3 style={{ fontSize: '15px', fontWeight: '600', color: '#333', marginBottom: '8px' }}>طريقة الشحن</h3>
                 <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px', border: '1px solid #2563eb', borderRadius: '6px', backgroundColor: '#f0f5ff', fontSize: '14px', fontWeight: 'bold' }}>
@@ -391,7 +415,7 @@ export default function ProductDetailsClient({ id }) {
                 </div>
               </div>
 
-              {/* طريقة الدفع من صورتك */}
+              {/* طريقة الدفع */}
               <div>
                 <h3 style={{ fontSize: '15px', fontWeight: '600', color: '#333', marginBottom: '4px' }}>طريقة الدفع</h3>
                 <p style={{ fontSize: '11px', color: '#667085', margin: '0 0 8px 0' }}>جميع المعاملات آمنة ومشفرة.</p>
@@ -412,9 +436,8 @@ export default function ProductDetailsClient({ id }) {
               </button>
             </form>
 
-            {/* النصف الأيسر: ملخص الفاتورة الرمادي والعمليات المالية */}
+            {/* النصف الأيسر: ملخص الفاتورة الرمادي */}
             <div style={{ padding: '35px 30px', backgroundColor: '#fafafa', display: 'flex', flexDirection: 'column', gap: '20px' }} className="modal-invoice-side">
-              {/* كارت ملخص القطعة المطلوبة */}
               <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
                 <div style={{ position: 'relative', width: '65px', height: '80px', borderRadius: '6px', overflow: 'hidden', border: '1px solid #e2e8f0', backgroundColor: '#fff' }}>
                   <img src={product.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -429,7 +452,6 @@ export default function ProductDetailsClient({ id }) {
 
               <hr style={{ border: 'none', borderTop: '1px solid #e2e8f0' }} />
 
-              {/* العمليات الحسابية المباشرة من صورتك */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '14px', color: '#4a5568' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <span>المبلغ الفرعي</span>
@@ -453,15 +475,15 @@ export default function ProductDetailsClient({ id }) {
         </div>
       )}
 
-      {/* نافذة منبثقة تفيد بنجاح تسجيل الطلب وبها الرقم العشوائي */}
+      {/* نافذة نجاح الطلب (تحديث اسم البراند لـ Wearivo) */}
       {orderSuccessId && (
         <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 3000 }}>
           <div style={{ backgroundColor: '#fff', padding: '40px', borderRadius: '16px', textAlign: 'center', maxWidth: '440px', width: '90%', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }}>
             <span style={{ fontSize: '50px' }}>🎉</span>
-            <h2 style={{ color: '#10b981', marginTop: '10px', fontWeight: 'bold' }}>تم استلام طلبك بنجاح!</h2>
+            <h2 style={{ color: '#10b981', marginTop: '10px', fontWeight: 'bold' }}>تم استلال طلبك بنجاح!</h2>
             <p style={{ color: '#475569', margin: '12px 0', fontSize: '15px' }}>رقم الأوردر العشوائي الخاص بك هو:</p>
             <div style={{ fontSize: '25px', fontWeight: '900', color: '#0f172a', backgroundColor: '#f1f5f9', padding: '12px', borderRadius: '8px', letterSpacing: '2px', fontFamily: 'monospace' }}>{orderSuccessId}</div>
-            <p style={{ fontSize: '13px', color: '#94a3b8', marginTop: '12px' }}>سيقوم فريق خدمة عملاء خُطوة بالتواصل معك هاتفياً لتأكيد الشحن فوراً.</p>
+            <p style={{ fontSize: '13px', color: '#94a3b8', marginTop: '12px' }}>سيقوم فريق خدمة عملاء Wearivo بالتواصل معك هاتفياً لتأكيد الشحن فوراً.</p>
             <button onClick={() => setOrderSuccessId(null)} style={{ marginTop: '25px', backgroundColor: '#2563eb', color: '#fff', padding: '12px 35px', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '15px' }}>إغلاق</button>
           </div>
         </div>
