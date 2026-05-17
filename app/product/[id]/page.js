@@ -1,10 +1,13 @@
-"use client";
-import { useParams } from "next/navigation";
-import ProductDetailsClient from "./ProductDetailsClient";
+import ProductDetailsClient from './ProductDetailsClient';
 
-export default function ProductPage() {
-  const params = useParams();
-  const id = params?.id;
+export const dynamicParams = false;
 
-  return <ProductDetailsClient id={id} />;
+// الدالة دي هي اللي الـ Build مستنيها عشان يعدي وميطلعش الـ Error اللي في صورتك
+export async function generateStaticParams() {
+  // بنرجع مصفوفة فيها ID وهمي واحد بس عشان نرضي الـ Build الاستاتيك
+  return [{ id: '1' }];
+}
+
+export default function Page({ params }) {
+  return <ProductDetailsClient id={params.id} />;
 }
