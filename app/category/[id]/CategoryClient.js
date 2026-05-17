@@ -6,10 +6,9 @@ import { collection, query, where, onSnapshot } from 'firebase/firestore';
 
 export default function CategoryClient({ categoryId }) {
   const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); // لسه بنستخدم الـ loading كحالة داخلية
 
   useEffect(() => {
-    // التأكد من أن db موجود قبل بدأ الاستعلام
     if (!db) return;
 
     const q = query(
@@ -20,7 +19,7 @@ export default function CategoryClient({ categoryId }) {
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setProducts(items);
-      setLoading(false);
+      setLoading(false); // أول ما الداتا تيجي التحميل بيخلص
     }, (error) => {
       console.error("Firestore Error:", error);
       setLoading(false);
@@ -28,7 +27,6 @@ export default function CategoryClient({ categoryId }) {
 
     return () => unsubscribe();
   }, [categoryId]);
-
 
   return (
     <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
@@ -38,8 +36,9 @@ export default function CategoryClient({ categoryId }) {
         </h1>
       </header>
 
-      {products.length === 0 ? (
-        <p style={{ textAlign: 'center', color: '#999' }}>لا توجد قطع متوفرة in هذا القسم حالياً.</p>
+      {/* التعديل السحري هنا: الرسالة مش هتظهر إلا لو التحميل خلص تماماً والمصفوفة فعلاً فاضية */}
+      {!loading && products.length === 0 ? (
+        <p style={{ textAlign: 'center', color: '#999' }}>لا توجد قطع متوفرة في هذا القسم حالياً.</p>
       ) : (
         <div style={{ 
           display: 'grid', 
@@ -47,7 +46,6 @@ export default function CategoryClient({ categoryId }) {
           gap: '30px' 
         }}>
           {products.map((product) => (
-            /* التعديل هنا فقط: غيرنا الرابط ليروح بالـ Query Parameter المضمون */
             <a key={product.id} href={`/product?id=${product.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
               <div className="product-card" style={{
                 backgroundColor: '#fff',
@@ -58,11 +56,13 @@ export default function CategoryClient({ categoryId }) {
                 border: '1px solid #f0f0f0'
               }}>
                 <div style={{ width: '100%', height: '350px', backgroundColor: '#f5f5f5', overflow: 'hidden' }}>
-                  <img 
-                    src={product.imageUrl} 
-                    alt={product.name}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                  />
+                  {product.imageUrl && (
+                    <img 
+                      src={product.imageUrl} 
+                      alt={product.name}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                  )}
                 </div>
 
                 <div style={{ padding: '15px', textAlign: 'center' }}>
