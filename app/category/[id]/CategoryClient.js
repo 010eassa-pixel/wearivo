@@ -46,7 +46,7 @@ export default function CategoryClient({ categoryId }) {
       </header>
 
       {products.length === 0 ? (
-        <p style={{ textAlign: 'center', color: '#999' }}>لا توجد قطع متوفرة في هذا القسم حالياً.</p>
+        <p style={{ textAlign: 'center', color: '#999' }}>لا توجد قطع متوفرة in هذا القسم حالياً.</p>
       ) : (
         <div style={{ 
           display: 'grid', 
@@ -54,7 +54,8 @@ export default function CategoryClient({ categoryId }) {
           gap: '30px' 
         }}>
           {products.map((product) => (
-            <a key={product.id} href={`/product/${product.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+            /* التعديل هنا فقط: غيرنا الرابط ليروح بالـ Query Parameter المضمون */
+            <a key={product.id} href={`/product?id=${product.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
               <div className="product-card" style={{
                 backgroundColor: '#fff',
                 borderRadius: '8px',
